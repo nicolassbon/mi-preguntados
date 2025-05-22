@@ -1,2 +1,6 @@
 <?php
-echo "hola";
+
+class LoginModel
+{
+
+}
