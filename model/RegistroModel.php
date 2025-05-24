@@ -15,7 +15,7 @@ class RegistroModel
     public function registrarUsuario($nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil){
 
         $stmt = $this->database->prepare(
-            "INSERT INTO usuarios (nombre_completo, anio_nacimiento, id_sexo, id_pais, id_ciudad, email, contrasena_hash, nombre_usuario, foto_perfil)
+            "INSERT INTO usuarios (nombre_completo, anio_nacimiento, id_sexo, id_pais, id_ciudad, email, contrasena_hash, nombre_usuario, foto_perfil_url)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
