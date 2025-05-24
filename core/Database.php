@@ -22,6 +22,11 @@ class Database
         $this->conn->query($sql);
     }
 
+    public function prepare($sql)
+    {
+        return $this->conn->prepare($sql);
+    }
+
     function __destruct()
     {
         $this->conn->close();

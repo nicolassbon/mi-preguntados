@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href='https://fonts.googleapis.com/css?family=Baloo' rel='stylesheet'>
   <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
-  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="public/css/styles.css">
 
   <style>
     .info {
@@ -44,7 +44,7 @@
     </form>
     <div class="text-center">
       <p class="">¿No tienes cuenta?</p>
-      <a href="register.php" class="text-white text-decoration-underline">Regístrate</a>
+      <a href="view/registerView.mustache" class="text-white text-decoration-underline">Regístrate</a>
     </div>
   </div>
 
