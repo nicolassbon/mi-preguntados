@@ -11,7 +11,10 @@ class LoginController
     }
 
     public function show(){
-        $this->view->render("login");
+      $this->view->render("login", [
+        'title' => 'Iniciar sesión',
+        'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/login.css">'
+      ]);
     }
 
     public function loguearse(){
