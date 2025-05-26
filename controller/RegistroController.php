@@ -12,7 +12,10 @@ class RegistroController
 
     public function show()
     {
-        $this->view->render("register");
+      $this->view->render("register", [
+        'title' => 'Registrarse',
+        'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">'
+      ]);
     }
 
     public function registrar(){
