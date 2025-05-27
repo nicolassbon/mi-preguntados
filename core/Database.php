@@ -27,6 +27,12 @@ class Database
         return $this->conn->prepare($sql);
     }
 
+    public function getLastInsertId()
+    {
+        return $this->conn->insert_id;
+    }
+
+
     function __destruct()
     {
         $this->conn->close();

@@ -21,5 +21,8 @@ class RegistroModel
 
         $stmt->bind_param("siiiissss", $nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil);
         $stmt->execute();
+
+        return $this->database->getLastInsertId();
+
     }
 }

@@ -1,0 +1,26 @@
+
+<div style="position: relative; height: 100vh; background-image: url("{{base_url}}/public/images/fondoP.jpg"); background-size: cover; background-position: center;">
+
+    <div class="d-flex justify-content-center align-items-center h-100" style="position: relative; z-index: 1;">
+        <div class="container rounded text-dark w-75 p-5" style="background-color: #6b4468ec;">
+            <div class="p-4">
+                <h2 class="text-center text-white">Validación de correo</h2>
+                <p class="text-center text-white">Usted acaba de registrarse, como último paso debe validar su correo para poder loguearse.</p>
+            </div>
+
+
+            <div class="d-flex justify-content-center">
+                <form method="post" action="index.php?controller=email&method=validar">
+                <button type="submit" class="btn btn-success">Validar</button>
+            </form>
+
+                <a href="/Preguntados/registro/show" class="btn btn-danger m-2">No deseo validarme</a>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+

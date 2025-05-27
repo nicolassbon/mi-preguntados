@@ -18,6 +18,10 @@ require_once("model/TourModel.php");
 require_once("model/RegistroModel.php");
 require_once("model/LoginModel.php");
 
+require_once("model/EmailModel.php");
+require_once("controller/EmailController.php");
+
+
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
 class Configuration
@@ -80,6 +84,13 @@ class Configuration
     public function getGroupController()
     {
         return new GroupController(new GroupModel($this->getDatabase()), $this->getViewer());
+    }
+
+    public function getEmailController(){
+        return new EmailController(
+            new EmailModel($this->getDatabase()),
+            $this->getViewer()
+        );
     }
 
     public function getRouter()
