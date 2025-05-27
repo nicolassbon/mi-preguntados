@@ -34,7 +34,7 @@ class RegistroController
         $destino = "uploads/" . basename($foto);
         move_uploaded_file($temp, $destino);
 
-        $this->model->registrarUsuario(
+        $idUsuario = $this->model->registrarUsuario(
             $nombreCompleto,
             $fechaNac,
             $sexoId,
@@ -46,7 +46,16 @@ class RegistroController
             $foto
         );
 
-        echo "¡Usuario registrado con éxito!";
+
+        if ($idUsuario !== null) {
+            $_SESSION['id_usuario'] = $idUsuario;
+            header('Location: ../email/show');
+        } else {
+            echo "Error al registrar usuario.";
+            // Podrías redirigir a una vista de error si preferís
+        }
+
+
 
     }
 }
