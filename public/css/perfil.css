@@ -1,0 +1,109 @@
+body {
+  margin: 0;
+  font-family: 'Fredoka One', sans-serif;
+  background-color: #6B4468ec;
+  color: white;
+}
+
+p {
+  font-size: 1.6em;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.perfil-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  font-size: 2.5em;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px #00000050;
+}
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  backdrop-filter: blur(5px);
+  text-align: center;
+}
+
+.perfil-img {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 5px solid white;
+  margin-bottom: 10px;
+}
+
+.nombre {
+  font-size: 1.9em;
+  color: white;
+  text-shadow: 1px 1px black;
+}
+
+.info {
+  font-size: 1.1em;
+  color: #ddd;
+}
+
+.partidas span {
+  margin: 40px 0;
+  display: block;
+  font-size: 1.8em;
+}
+
+.ganadas { color: #59ff59; }
+.perdidas { color: #ff6060; }
+
+.categorias {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  font-size: 1.2em;
+}
+
+.categoria-btn {
+  display: inline-block;
+  padding: 8px 15px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 1.3em;
+  color: white;
+  width: 200px;
+}
+
+.historia { background-color: #cc9600; }
+.entretenimiento { background-color: #c3007c; }
+.ciencia { background-color: #008e39; }
+
+.mapa {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.qr {
+  max-width: 100%;
+  margin-top: 15px;
+}
+
+.categoria-botones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}

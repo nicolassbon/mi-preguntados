@@ -21,6 +21,9 @@ require_once("model/LoginModel.php");
 require_once("model/EmailModel.php");
 require_once("controller/EmailController.php");
 
+require_once("model/PerfilModel.php");
+require_once("controller/PerfilController.php");
+
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -49,6 +52,14 @@ class Configuration
             new RegistroModel($this->getDatabase()),
             $this->getViewer()
         );
+    }
+
+    public function getPerfilController()
+    {
+      return new PerfilController(
+        new PerfilModel($this->getDatabase()),
+        $this->getViewer()
+      );
     }
 
     public function getLoginController(){
