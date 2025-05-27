@@ -33,6 +33,7 @@ class Database
     }
 
 
+
     function __destruct()
     {
         $this->conn->close();

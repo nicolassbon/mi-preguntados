@@ -32,10 +32,11 @@ class LoginController
             session_start();
             $_SESSION["usuario_id"] = $usuario["id_usuario"];
             $_SESSION["nombre_usuario"] = $usuario["nombre_usuario"];
-            header("Location: index.php?controller=home&method=show");
+            header("Location: index.php?controller=perfil&method=show");
         } else {
             echo "<p style='color:red;text-align:center;'>Correo o contraseña incorrectos</p>";
             $this->view->render("login");
         }
     }
+
 }
