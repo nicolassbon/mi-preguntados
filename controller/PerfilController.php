@@ -27,7 +27,8 @@ class PerfilController
 
     $this->view->render("perfil", array_merge([
       'title' => 'Perfil Usuario',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/perfil.css">'
+      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/perfil.css">
+                      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />'
     ], $usuario));
   }
 

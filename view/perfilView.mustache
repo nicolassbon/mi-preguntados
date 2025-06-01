@@ -1,17 +1,13 @@
-<!-- Header Bootstrap personalizado -->
 <nav class="navbar navbar-expand-lg navbar-preguntopolis">
   <div class="container-fluid justify-content-between align-items-center">
-    <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center" href="#">
       <img src="{{base_url}}/public/images/logo.png" alt="Logo" height="40" class="d-inline-block align-text-top">
     </a>
 
-    <!-- Título -->
     <span class="navbar-text mx-auto fw-bold preguntopolis-title">
         Preguntópolis
       </span>
 
-    <!-- Icono cerrar sesión -->
     <a href="index.php?controller=auth&method=logout" class="text-white me-2">
       <img src="{{base_url}}/public/images/cerrar-sesion.png" alt="Icono cerrar sesion" style="max-height: 40px;">
     </a>
@@ -19,16 +15,14 @@
 </nav>
 <main class="fondo">
   <div class="perfil-grid">
-    <!-- Columna 1: Perfil -->
     <div class="card perfil-card">
       <div class="perfil-top">
-        <img src="{{base_url}}/public/images/canguro.png" alt="perfil" class="perfil-img">
+        <img src="{{base_url}}/public/uploads/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
         <div class="nombre">{{nombre_usuario}}</div>
       </div>
       <div class="info">Nivel 7<br>Ranking #125</div>
     </div>
 
-    <!-- Columna 2: Partidas -->
     <div class="card partidas-card">
       <p>Partidas:</p>
       <span class="mb-2 fs-5"><strong>54 Jugadas</strong></span>
@@ -36,7 +30,6 @@
       <span class="perdidas mb-2 fs-5">25 Perdidas</span>
     </div>
 
-    <!-- Columna 2: Categorías -->
     <div class="card categorias-card">
       <p>Categorías destacadas:</p><br>
       <div class="categoria-botones">
@@ -46,15 +39,51 @@
       </div>
     </div>
 
-    <!-- Columna 3: QR -->
     <div class="card qr-card justify-content-center align-items-center">
       <img class="qr" src="{{base_url}}/public/images/ImagenQR.png" alt="QR">
     </div>
 
-    <!-- Columna 3: Mapa -->
     <div class="card mapa-card">
-      <p>Ubicación: Argentina</p>
-      <img class="mapa" src="{{base_url}}/public/images/mapa.png" alt="Mapa de Argentina">
+      <p>Ubicación: <span id="ubicacion-texto"></span></p>
+      <div id="map" style="height: 200px"></div>
     </div>
   </div>
 </main>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const ciudad = "{{nombre_ciudad}}";
+  const pais = "{{nombre_pais}}";
+  const ubicacion = `${ciudad}, ${pais}`;
+
+  document.getElementById("ubicacion-texto").textContent = ubicacion;
+
+  // Buscar coordenadas con Nominatim
+  fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(ubicacion)}&format=json&limit=1`, {
+    headers: {
+      'User-Agent': 'Preguntopolis/1.0 (nicolasbon019@gmail.com)'
+    }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+
+        const map = L.map('map').setView([lat, lon], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([lat, lon]).addTo(map)
+          .bindPopup(ubicacion)
+          .openPopup();
+      } else {
+        document.getElementById("map").innerHTML = "No se pudo encontrar la ubicación.";
+      }
+    })
+    .catch(err => {
+      console.error("Error al buscar ubicación:", err);
+    });
+</script>
