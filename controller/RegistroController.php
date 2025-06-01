@@ -35,7 +35,7 @@ class RegistroController
 
     if (isset($_FILES['foto']) && is_uploaded_file($_FILES['foto']['tmp_name'])) {
       $fotoTmpNombre = basename($_FILES['foto']['name']);
-      $destinoTmp = "uploads/tmp/" . $fotoTmpNombre;
+      $destinoTmp = "public/uploads/tmp/" . $fotoTmpNombre;
       move_uploaded_file($_FILES['foto']['tmp_name'], $destinoTmp);
       $_SESSION['foto_temp'] = $destinoTmp;
     }
@@ -92,7 +92,7 @@ class RegistroController
     $fotoNombre = null;
     if (isset($_SESSION['foto_temp']) && file_exists($_SESSION['foto_temp'])) {
       $fotoNombre = basename($_SESSION['foto_temp']);
-      $destinoFinal = "uploads/" . $fotoNombre;
+      $destinoFinal = "public/uploads/" . $fotoNombre;
       rename($_SESSION['foto_temp'], $destinoFinal);
     }
 
