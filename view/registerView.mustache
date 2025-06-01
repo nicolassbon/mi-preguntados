@@ -1,6 +1,5 @@
 <div class="form-container">
-    <form action="index.php?controller=registro&method=registrar" method="POST" enctype="multipart/form-data">
-
+    <form action="index.php?controller=registro&method=pasoMapa" method="POST" enctype="multipart/form-data">
 
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre Completo</label>
@@ -41,11 +40,11 @@
             <input type="password" class="form-control input" name="password" id="password" placeholder="Contraseña" required />
         </div>
 
-        <button type="submit" class="btn btn-form w-100 mb-3" style="background-color: mediumpurple">Registrarse</button>
+        <button type="submit" class="btn btn-form w-100 mb-3" style="background-color: mediumpurple">Siguiente paso</button>
     </form>
     <div class="text-center">
         <p class="">¿Ya tienes cuenta?</p>
-        <a href="Preguntados/login/show" class="text-white text-decoration-underline">Inicia sesión</a>
+        <a href="{{base_url}}/login/show" class="text-white text-decoration-underline">Inicia sesión</a>
     </div>
 </div>
 
