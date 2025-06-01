@@ -1,0 +1,36 @@
+<div class="form-container">
+  <form action="index.php?controller=registro&method=registrar" method="POST">
+    <div class="mb-3 text-center fw-bold fs-5">
+      <p>Ubicación en el mapa</p>
+    </div>
+
+    <div class="mb-3">
+      <div id="map" style="height: 300px;"></div>
+    </div>
+
+    <div class="mb-3 fw-bold fs-5">
+      <p>Ubicación seleccionada</p>
+    </div>
+
+    <div class="mb-3">
+      <p>País: <span id="pais">Seleccione un país</span></p>
+    </div>
+
+    <div class="mb-3">
+      <p>Ciudad: <span id="ciudad">Seleccione una ciudad</span></p>
+    </div>
+
+    <button type="submit" class="btn btn-form w-100 mb-3">Registrarse</button>
+  </form>
+</div>
+
+<div class="info">
+  <div class="image-container">
+    <img src="{{base_url}}/public/images/logo.png" alt="Logo de Preguntopolis"/>
+    <h1 class="title">Preguntopolis</h1>
+  </div>
+  <p>Ya falta poco para comenzar tu aventura!</p>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="{{base_url}}/public/js/mapa.js"></script>
