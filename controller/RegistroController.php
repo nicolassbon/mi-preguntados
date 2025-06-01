@@ -17,7 +17,8 @@ class RegistroController
   {
     $this->view->render("register", [
       'title' => 'Registrarse',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">'
+      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/styles.css">
+                      <link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">'
     ]);
   }
 
@@ -46,8 +47,9 @@ class RegistroController
   {
     $this->view->render("mapa", [
       'title' => 'Registrarse',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">
-                    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">'
+      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/styles.css">
+                      <link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">
+                      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">'
     ]);
   }
 

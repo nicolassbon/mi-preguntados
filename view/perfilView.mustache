@@ -1,26 +1,42 @@
-<div class="perfil-container">
-  <div class="header">Preguntópolis</div>
+<!-- Header Bootstrap personalizado -->
+<nav class="navbar navbar-expand-lg navbar-preguntopolis">
+  <div class="container-fluid justify-content-between align-items-center">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="{{base_url}}/public/images/logo.png" alt="Logo" height="40" class="d-inline-block align-text-top">
+    </a>
 
+    <!-- Título -->
+    <span class="navbar-text mx-auto fw-bold preguntopolis-title">
+        Preguntópolis
+      </span>
+
+    <!-- Icono cerrar sesión -->
+    <a href="index.php?controller=auth&method=logout" class="text-white me-2">
+      <img src="{{base_url}}/public/images/cerrar-sesion.png" alt="Icono cerrar sesion" style="max-height: 40px;">
+    </a>
+  </div>
+</nav>
+<main class="fondo">
   <div class="perfil-grid">
-    <div class="card">
-      <img src="{{base_url}}/public/images/canguro.png" alt="perfil" class="perfil-img">
-
-      <div class="nombre">{{nombre_usuario}}</div>
+    <!-- Columna 1: Perfil -->
+    <div class="card perfil-card">
+      <div class="perfil-top">
+        <img src="{{base_url}}/public/images/canguro.png" alt="perfil" class="perfil-img">
+        <div class="nombre">{{nombre_usuario}}</div>
+      </div>
       <div class="info">Nivel 7<br>Ranking #125</div>
     </div>
 
-    <div class="card partidas">
-      <span><strong>54 Jugadas</strong></span>
-      <span class="ganadas">29 Ganadas</span>
-      <span class="perdidas">25 Perdidas</span>
+    <!-- Columna 2: Partidas -->
+    <div class="card partidas-card">
+      <p>Partidas:</p>
+      <span class="mb-2 fs-5"><strong>54 Jugadas</strong></span>
+      <span class="ganadas mb-2 fs-5">29 Ganadas</span>
+      <span class="perdidas mb-2 fs-5">25 Perdidas</span>
     </div>
 
-    <div class="card">
-      <img class="qr" src="{{base_url}}/public/images/ImagenQR.png" alt="QR">
-    </div>
-  </div>
-
-  <div class="categorias">
+    <!-- Columna 2: Categorías -->
     <div class="card categorias-card">
       <p>Categorías destacadas:</p><br>
       <div class="categoria-botones">
@@ -30,10 +46,15 @@
       </div>
     </div>
 
-    <div class="card">
-      <p>Ubicación: Argentina</p><br>
-      <img class="mapa" src="{{base_url}}/public/images/mapa.png" alt="Mapa de Argentina">
+    <!-- Columna 3: QR -->
+    <div class="card qr-card justify-content-center align-items-center">
+      <img class="qr" src="{{base_url}}/public/images/ImagenQR.png" alt="QR">
     </div>
 
+    <!-- Columna 3: Mapa -->
+    <div class="card mapa-card">
+      <p>Ubicación: Argentina</p>
+      <img class="mapa" src="{{base_url}}/public/images/mapa.png" alt="Mapa de Argentina">
+    </div>
   </div>
-</div>
+</main>
