@@ -13,7 +13,7 @@ class PerfilModel
   {
 
     $resultado = $this->database->query("
-        SELECT u.nombre_completo, u.foto_perfil_url,
+        SELECT u.nombre_usuario, u.foto_perfil_url,
                p.nombre_pais, c.nombre_ciudad
         FROM usuarios u
         JOIN paises p ON u.id_pais = p.id_pais

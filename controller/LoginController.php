@@ -43,4 +43,13 @@ class LoginController
 
   }
 
+  public function logout() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      session_unset();
+      session_destroy();
+      header("Location: index.php?controller=login&method=show");
+      exit;
+    }
+  }
+
 }
