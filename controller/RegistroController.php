@@ -17,7 +17,7 @@ class RegistroController
   {
     $this->view->render("register", [
       'title' => 'Registrarse',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">'
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">'
     ]);
   }
 
@@ -34,20 +34,20 @@ class RegistroController
 
     if (isset($_FILES['foto']) && is_uploaded_file($_FILES['foto']['tmp_name'])) {
       $fotoTmpNombre = basename($_FILES['foto']['name']);
-      $destinoTmp = "uploads/tmp/" . $fotoTmpNombre;
+      $destinoTmp = "public/uploads/tmp/" . $fotoTmpNombre;
       move_uploaded_file($_FILES['foto']['tmp_name'], $destinoTmp);
       $_SESSION['foto_temp'] = $destinoTmp;
     }
 
-    header("Location: index.php?controller=registro&method=mostrarMapa");
+    $this->redirectTo("/registro/mostrarMapa");
   }
 
   public function mostrarMapa()
   {
     $this->view->render("mapa", [
       'title' => 'Registrarse',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">
-                    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">'
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">
+                <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">'
     ]);
   }
 
@@ -90,7 +90,7 @@ class RegistroController
     $fotoNombre = null;
     if (isset($_SESSION['foto_temp']) && file_exists($_SESSION['foto_temp'])) {
       $fotoNombre = basename($_SESSION['foto_temp']);
-      $destinoFinal = "uploads/" . $fotoNombre;
+      $destinoFinal = "public/uploads/" . $fotoNombre;
       rename($_SESSION['foto_temp'], $destinoFinal);
     }
 
@@ -110,13 +110,18 @@ class RegistroController
       $fotoNombre
     );
 
-
     if ($idUsuario !== null) {
       $_SESSION['id_usuario'] = $idUsuario;
-      header('Location: ../email/show');
+      $this->redirectTo("/email/show");
     } else {
       echo "Error al registrar usuario.";
       // Podrías redirigir a una vista de error si preferís
     }
+  }
+
+  private function redirectTo($str)
+  {
+    header('Location: ' . $str);
+    exit();
   }
 }
