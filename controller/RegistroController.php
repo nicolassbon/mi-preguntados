@@ -17,8 +17,7 @@ class RegistroController
   {
     $this->view->render("register", [
       'title' => 'Registrarse',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/styles.css">
-                      <link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">'
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">'
     ]);
   }
 
@@ -40,16 +39,15 @@ class RegistroController
       $_SESSION['foto_temp'] = $destinoTmp;
     }
 
-    header("Location: index.php?controller=registro&method=mostrarMapa");
+    $this->redirectTo("/registro/mostrarMapa");
   }
 
   public function mostrarMapa()
   {
     $this->view->render("mapa", [
       'title' => 'Registrarse',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/styles.css">
-                      <link rel="stylesheet" href="http://localhost/Preguntados/public/css/register.css">
-                      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">'
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">
+                <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">'
     ]);
   }
 
@@ -112,13 +110,18 @@ class RegistroController
       $fotoNombre
     );
 
-
     if ($idUsuario !== null) {
       $_SESSION['id_usuario'] = $idUsuario;
-      header('Location: ../email/show');
+      $this->redirectTo("/email/show");
     } else {
       echo "Error al registrar usuario.";
       // Podrías redirigir a una vista de error si preferís
     }
+  }
+
+  private function redirectTo($str)
+  {
+    header('Location: ' . $str);
+    exit();
   }
 }

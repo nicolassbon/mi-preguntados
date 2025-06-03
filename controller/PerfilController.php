@@ -13,11 +13,13 @@ class PerfilController
 
   public function show()
   {
+    if (!$this->isLogueado()) {
+      $this->redirectTo("/login/show");
+    }
+
     $id_usuario = $_SESSION['usuario_id'] ?? null;
 
-
     $datos = $this->model->getDatos($id_usuario);
-
 
     if (!empty($datos) && is_array($datos)) {
       $usuario = $datos[0];
@@ -27,9 +29,20 @@ class PerfilController
 
     $this->view->render("perfil", array_merge([
       'title' => 'Perfil Usuario',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/perfil.css">
+      'css' => '<link rel="stylesheet" href="/public/css/perfil.css">
                       <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />'
     ], $usuario));
+  }
+
+  private function redirectTo($str)
+  {
+    header('Location: ' . $str);
+    exit();
+  }
+
+  private function isLogueado(): bool
+  {
+    return !($_SESSION['usuario_id'] === null);
   }
 
 }

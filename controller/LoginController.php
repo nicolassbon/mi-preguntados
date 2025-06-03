@@ -15,8 +15,7 @@ class LoginController
   {
     $this->view->render("login", [
       'title' => 'Iniciar sesión',
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/styles.css" >
-                      <link rel="stylesheet" href="http://localhost/Preguntados/public/css/login.css">'
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css" >'
     ]);
   }
 
@@ -35,7 +34,7 @@ class LoginController
     if ($usuario && password_verify($password, $usuario["contrasena_hash"])) {
       $_SESSION["usuario_id"] = $usuario["id_usuario"];
       $_SESSION["nombre_usuario"] = $usuario["nombre_usuario"];
-      header("Location: index.php?controller=perfil&method=show");
+      $this->redirectTo("/perfil/show");
     } else {
       echo "<p style='color:red;text-align:center;'>Correo o contraseña incorrectos</p>";
       $this->view->render("login");
@@ -43,13 +42,19 @@ class LoginController
 
   }
 
-  public function logout() {
+  public function logout()
+  {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       session_unset();
       session_destroy();
-      header("Location: index.php?controller=login&method=show");
-      exit;
+      $this->redirectTo("/login/show");
     }
+  }
+
+  private function redirectTo($str)
+  {
+    header('Location: ' . $str);
+    exit();
   }
 
 }

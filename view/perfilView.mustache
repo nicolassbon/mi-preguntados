@@ -3,21 +3,21 @@
   <div class="perfil-grid">
     <div class="card perfil-card">
       <div class="perfil-top">
-        <img src="{{base_url}}/public/uploads/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
+        <img src="/public/uploads/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
         <div class="nombre">{{nombre_usuario}}</div>
       </div>
       <div class="info">Nivel 7<br>Ranking #125</div>
     </div>
 
     <div class="card partidas-card">
-      <p>Partidas:</p>
+      <p class="fs-4 text-white">Partidas:</p>
       <span class="mb-2 fs-5"><strong>54 Jugadas</strong></span>
       <span class="ganadas mb-2 fs-5">29 Ganadas</span>
       <span class="perdidas mb-2 fs-5">25 Perdidas</span>
     </div>
 
     <div class="card categorias-card">
-      <p>Categorías destacadas:</p><br>
+      <p class="fs-4 text-white">Categorías destacadas:</p><br>
       <div class="categoria-botones">
         <span class="categoria-btn historia">Historia</span>
         <span class="categoria-btn entretenimiento">Entretenimiento</span>
@@ -26,11 +26,11 @@
     </div>
 
     <div class="card qr-card justify-content-center align-items-center">
-      <img class="qr" src="{{base_url}}/public/images/ImagenQR.png" alt="QR">
+      <img class="qr" src="/public/images/ImagenQR.png" alt="QR">
     </div>
 
     <div class="card mapa-card">
-      <p>Ubicación: <span id="ubicacion-texto"></span></p>
+      <p class="fs-4 text-white">Ubicación: <span id="ubicacion-texto"></span></p>
       <div id="map" style="height: 200px"></div>
     </div>
   </div>

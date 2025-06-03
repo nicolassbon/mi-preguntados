@@ -18,7 +18,7 @@ class EmailController
     $this->view->render("validarCorreo", [
       'title' => 'Validar Correo',
       'id_usuario' => $id_usuario,
-      'extra_css' => '<link rel="stylesheet" href="http://localhost/Preguntados/public/css/styles.css">'
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">'
     ]);
   }
 
@@ -30,7 +30,13 @@ class EmailController
 
     $this->model->validarCorreo($id_usuario);
 
-    header('Location: ../login/show');
+    $this->redirectTo("/login/show");
+  }
+
+  private function redirectTo($str)
+  {
+    header('Location: ' . $str);
+    exit();
   }
 
 }
