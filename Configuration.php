@@ -3,6 +3,7 @@ require_once("core/Database.php");
 require_once("core/FilePresenter.php");
 require_once("core/MustachePresenter.php");
 require_once("core/Router.php");
+require_once("core/EmailSender.php");
 
 require_once("controller/HomeController.php");
 require_once("controller/GroupController.php");
@@ -10,21 +11,15 @@ require_once("controller/SongController.php");
 require_once("controller/TourController.php");
 require_once("controller/RegistroController.php");
 require_once("controller/LoginController.php");
-require_once("controller/UbicacionController.php");
-
+require_once("controller/PerfilController.php");
 
 require_once("model/GroupModel.php");
 require_once("model/SongModel.php");
 require_once("model/TourModel.php");
 require_once("model/RegistroModel.php");
 require_once("model/LoginModel.php");
-require_once("model/UbicacionModel.php");
-
 require_once("model/EmailModel.php");
-require_once("controller/EmailController.php");
-
 require_once("model/PerfilModel.php");
-require_once("controller/PerfilController.php");
 
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
@@ -52,15 +47,8 @@ class Configuration
   {
     return new RegistroController(
       new RegistroModel($this->getDatabase()),
-      new UbicacionModel($this->getDatabase()),
-      $this->getViewer()
-    );
-  }
-
-  public function getUbicacionController()
-  {
-    return new UbicacionController(
-      new UbicacionModel($this->getDatabase())
+      $this->getViewer(),
+      new EmailSender()
     );
   }
 
@@ -106,14 +94,6 @@ class Configuration
   public function getGroupController()
   {
     return new GroupController(new GroupModel($this->getDatabase()), $this->getViewer());
-  }
-
-  public function getEmailController()
-  {
-    return new EmailController(
-      new EmailModel($this->getDatabase()),
-      $this->getViewer()
-    );
   }
 
   public function getRouter()

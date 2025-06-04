@@ -2,15 +2,15 @@
 
 class RegistroController
 {
-  private $registroModel;
-  private $ubicacionModel;
+  private $model;
   private $view;
+  private $emailSender;
 
-  public function __construct($registroModel, $ubicacionModel, $view)
+  public function __construct($registroModel, $view, $emailSender)
   {
-    $this->registroModel = $registroModel;
-    $this->ubicacionModel = $ubicacionModel;
+    $this->model = $registroModel;
     $this->view = $view;
+    $this->emailSender = $emailSender;
   }
 
   public function show()
@@ -21,84 +21,40 @@ class RegistroController
     ]);
   }
 
-  public function pasoMapa()
+  public function procesar()
   {
-    $_SESSION['registro'] = [
-      'nombre' => $_POST['nombre'],
-      'fecha_nac' => $_POST['fecha-nac'],
-      'email' => $_POST['email'],
-      'usuario' => $_POST['usuario'],
-      'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
-      'sexo' => $_POST['sexo']
-    ];
-
-    if (isset($_FILES['foto']) && is_uploaded_file($_FILES['foto']['tmp_name'])) {
-      $fotoTmpNombre = basename($_FILES['foto']['name']);
-      $destinoTmp = "public/uploads/tmp/" . $fotoTmpNombre;
-      move_uploaded_file($_FILES['foto']['tmp_name'], $destinoTmp);
-      $_SESSION['foto_temp'] = $destinoTmp;
-    }
-
-    $this->redirectTo("/registro/mostrarMapa");
-  }
-
-  public function mostrarMapa()
-  {
-    $this->view->render("mapa", [
-      'title' => 'Registrarse',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css">
-                <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">'
-    ]);
-  }
-
-  public function guardarUbicacion()
-  {
-    error_log("📍 Entró al método guardarUbicacion");
-
-    $json = file_get_contents('php://input');
-    $data = json_decode($json, true);
-
-    if ($data && isset($data['pais']) && isset($data['provincia'])) {
-      $_SESSION['registro']['pais'] = $data['pais'];
-      $_SESSION['registro']['provincia'] = $data['provincia'];
-    } else {
-      echo "Error al guardar la ubicacion";
-      echo json_encode(['error' => 'Datos inválidos']);
-    }
-  }
-
-  public function registrar()
-  {
-
-    $data = $_SESSION['registro'] ?? null;
-
-    if (!$data) {
-      echo "Datos incompletos.";
-      return;
-    }
-
-    $nombreCompleto = $data['nombre'];
-    $fechaNac = $data['fecha_nac'];
-    $correo = $data['email'];
-    $usuario = $data['usuario'];
-    $contrasenaHash = $data['password'];
-    $sexo = $data['sexo'];
+    $nombreCompleto = $_POST['nombre'];
+    $fechaNac = $_POST['fecha-nac'];
+    $correo = $_POST['email'];
+    $usuario = $_POST['usuario'];
+    $contrasenaHash = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $sexo = $_POST['sexo'];
     $sexoId = ($sexo == "masculino") ? 1 : (($sexo == "femenino") ? 2 : 3);
-    $paisNombre = $data['pais'];
-    $ciudadNombre = $data['provincia'];
+
+    // Hardcodeado siempre sera Buenos Aires y  Argentina hasta tener el mapa
+    $idPais = 1;
+    $idCiudad = 1;
 
     $fotoNombre = null;
-    if (isset($_SESSION['foto_temp']) && file_exists($_SESSION['foto_temp'])) {
-      $fotoNombre = basename($_SESSION['foto_temp']);
-      $destinoFinal = "public/uploads/" . $fotoNombre;
-      rename($_SESSION['foto_temp'], $destinoFinal);
+    if (isset($_FILES['foto']) && is_uploaded_file($_FILES['foto']['tmp_name'])) {
+      $fotoNombre = $_FILES['foto']['name'];
+      $temp = $_FILES['foto']['tmp_name'];
+      $destino = __DIR__ . '/../public/uploads/' . $fotoNombre;
+
+      if (!is_dir(dirname($destino))) {
+        mkdir(dirname($destino), 0755, true);
+      }
+
+      move_uploaded_file($temp, $destino);
     }
 
-    $idPais = $this->ubicacionModel->obtenerOCrearPais($paisNombre);
+    /*
+      Dentro del model genero un random y lo guardo en la base
+      Cuando doy de alta el usuario en la bdd con un valor random y un campo
+      validado = false
+    */
 
-    $idCiudad = $this->ubicacionModel->obtenerOCrearCiudad($ciudadNombre, $idPais);
-
-    $idUsuario = $this->registroModel->registrarUsuario(
+    $result = $this->model->registrarUsuario(
       $nombreCompleto,
       $fechaNac,
       $sexoId,
@@ -110,18 +66,83 @@ class RegistroController
       $fotoNombre
     );
 
-    if ($idUsuario !== null) {
-      $_SESSION['id_usuario'] = $idUsuario;
-      $this->redirectTo("/email/show");
-    } else {
-      echo "Error al registrar usuario.";
-      // Podrías redirigir a una vista de error si preferís
+    $idUsuario = $result["idUsuario"];
+
+    if ($idUsuario == null) {
+      $this->renderErrorView('Error de Registro', 'No se pudo crear tu cuenta. Intentá de nuevo más tarde.');
+      return; // Estoy en duda si esta bien hacer esto
     }
+
+    // Cuando lo doy de alta, voy a mandar un correo
+    $body = $this->generateEmailBodyFor($result["nombreUsuario"], $result["token"], $result["idUsuario"]);
+    $mailOK = $this->emailSender->send($result["email"], $body);
+
+    if (!$mailOK) {
+      $this->renderErrorView('Error de Envío de Email', 'Tu cuenta se creó, pero no pudimos enviarte el correo de validación.');
+      return; // Estoy en duda si esta bien hacer esto
+    }
+
+    $_SESSION['id_usuario'] = $idUsuario;
+    $_SESSION['email'] = $email;
+    $this->redirectTo("/registro/success");
+  }
+
+  public function success()
+  {
+    $email = $_SESSION['email'];
+    $this->view->render("registroSuccess", [
+      'title' => 'Validacion',
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+      'email' => $email
+    ]);
+  }
+
+  // Endpoint que llama el link que le llega por correo al usuario
+  public function verificar()
+  {
+    $idVerificador = $_GET["idVerificador"];
+    $idUsuario = $_GET["idUsuario"];
+
+    // EN LA BASE TENGO PARA ESE USUARIO UN VALOR RANDOM
+    // Si coincide el random con el idUsuario de la bdd, voy a cambiar el validado a true
+    $verificado = $this->model->verificarEmailUsuario($idVerificador, $idUsuario);
+
+    if (!$verificado) {
+      $this->renderErrorView('Error de validación', 'Ocurrio un error en la validacion del correo. Verifica tus credenciales.');
+      return; // Estoy en duda si esta bien hacer esto
+    }
+
+    $this->view->render("verificacionSuccess", [
+      'title' => '¡Cuenta verificada!',
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+      'message' => 'Tu correo ha sido validado correctamente. Ya podés ingresar al sistema.'
+    ]);
   }
 
   private function redirectTo($str)
   {
     header('Location: ' . $str);
     exit();
+  }
+
+  private function generateEmailBodyFor($userName, $token, $idUsuario)
+  {
+    $url = "http://localhost/registro/verificar?idUsuario=$idUsuario&idVerificador=$token";
+    return "
+    <body>
+      <p>Hola $userName,</p>
+      <p>Gracias por registrarte. Por favor, valida tu cuenta haciendo click en el siguiente enlace:</p>
+      <p><a href='$url'>Validar cuenta</a></p>
+    </body>
+  ";
+  }
+
+  private function renderErrorView($title, $message)
+  {
+    $this->view->render("error", [
+      'title' => $title,
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+      'message' => $message
+    ]);
   }
 }
