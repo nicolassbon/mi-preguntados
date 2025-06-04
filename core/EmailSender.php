@@ -10,20 +10,33 @@ use PHPMailer\PHPMailer\Exception;
 class EmailSender
 {
 
+  private $host;
+  private $username;
+  private $password;
+  private $port;
+
+  public function __construct($host, $username, $password, $port)
+  {
+    $this->host = $host;
+    $this->username = $username;
+    $this->password = $password;
+    $this->port = $port;
+  }
+
   public function send($email, $body)
   {
     $mail = new PHPMailer(true);
 
     try {
       $mail->isSMTP();
-      $mail->Host = 'smtp.gmail.com';
+      $mail->Host = $this->host;
       $mail->SMTPAuth = true;
-      $mail->Username = 'nicolasconfig@gmail.com';
-      $mail->Password = 'wtgp vnwc mybe hhuy';
+      $mail->Username = $this->username;
+      $mail->Password = $this->password;
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-      $mail->Port = 587;
+      $mail->Port = $this->port;
 
-      $mail->setFrom('nicolasconfig@gmail.com', 'Preguntopolis');
+      $mail->setFrom($this->username, 'Preguntopolis');
       $mail->addAddress($email);
 
       $mail->isHTML(true);

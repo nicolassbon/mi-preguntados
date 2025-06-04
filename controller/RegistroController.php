@@ -83,7 +83,7 @@ class RegistroController
     }
 
     $_SESSION['id_usuario'] = $idUsuario;
-    $_SESSION['email'] = $email;
+    $_SESSION['email'] = $result["email"];
     $this->redirectTo("/registro/success");
   }
 

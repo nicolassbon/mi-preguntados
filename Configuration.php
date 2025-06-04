@@ -38,6 +38,18 @@ class Configuration
     );
   }
 
+  public function getEmailSender()
+  {
+    $config = $this->getIniConfig();
+
+    return new EmailSender(
+      $config["email"]["host"],
+      $config["email"]["username"],
+      $config["email"]["password"],
+      $config["email"]["port"]
+    );
+  }
+
   public function getIniConfig()
   {
     return parse_ini_file("configuration/config.ini", true);
@@ -48,7 +60,7 @@ class Configuration
     return new RegistroController(
       new RegistroModel($this->getDatabase()),
       $this->getViewer(),
-      new EmailSender()
+      $this->getEmailSender()
     );
   }
 

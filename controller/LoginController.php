@@ -35,8 +35,12 @@ class LoginController
       $this->redirectTo("/login/show");
     }
 
+    if (!$usuario["es_validado"]) {
+      $_SESSION['login_error'] = 'Tu cuenta aún no fue validada. Por favor revisá tu correo.';
+      $this->redirectTo("/login/show");
+    }
+
     $_SESSION["usuario_id"] = $usuario["id_usuario"];
-    $_SESSION["nombre_usuario"] = $usuario["nombre_usuario"];
     $this->redirectTo("/perfil/show");
   }
 
