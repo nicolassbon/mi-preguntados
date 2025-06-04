@@ -34,7 +34,7 @@ class LoginController
     if ($usuario && password_verify($password, $usuario["contrasena_hash"])) {
       $_SESSION["usuario_id"] = $usuario["id_usuario"];
       $_SESSION["nombre_usuario"] = $usuario["nombre_usuario"];
-      $this->redirectTo("/perfil/show");
+      $this->redirectTo("/lobby/show");
     } else {
       echo "<p style='color:red;text-align:center;'>Correo o contraseña incorrectos</p>";
       $this->view->render("login");

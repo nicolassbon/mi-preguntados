@@ -26,6 +26,13 @@ require_once("controller/EmailController.php");
 require_once("model/PerfilModel.php");
 require_once("controller/PerfilController.php");
 
+require_once("controller/LobbyController.php");
+require_once("model/LobbyModel.php");
+
+require_once("controller/RuletaController.php");
+require_once("model/RuletaModel.php");
+
+require_once("controller/InicioController.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -114,6 +121,26 @@ class Configuration
       new EmailModel($this->getDatabase()),
       $this->getViewer()
     );
+  }
+
+  public function getLobbyController()
+  {
+      return new LobbyController(
+          $this->getViewer()
+      );
+  }
+
+  public function getRuletaController(){
+      return new RuletaController(
+          new RuletaModel($this->getDatabase()),
+          $this->getViewer()
+      );
+  }
+
+  public function getInicioController(){
+      return new InicioController(
+          $this->getViewer()
+      );
   }
 
   public function getRouter()
