@@ -17,6 +17,9 @@
       <input type="password" class="form-control input" name="password" id="password" placeholder="Contraseña" required>
     </div>
     <button type="submit" class="btn btn-form w-100 mb-5">Iniciar sesión</button>
+    {{#error}}
+      <p class="text-danger text-center">{{error}}</p>
+    {{/error}}
   </form>
   <div class="text-center">
     <p class="">¿No tienes cuenta?</p>

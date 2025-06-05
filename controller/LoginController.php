@@ -13,36 +13,40 @@ class LoginController
 
   public function show()
   {
+    $error = $_SESSION['login_error'] ?? null;
+    unset($_SESSION['login_error']);
+
     $this->view->render("login", [
       'title' => 'Iniciar sesión',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css" >'
+      'css' => '<link rel="stylesheet" href="/public/css/styles.css" >',
+      'error' => $error
     ]);
   }
 
   public function loguearse()
   {
-    if (!isset($_POST["email"]) || !isset($_POST["password"])) {
-      $this->view->render("login");
-      return;
-    }
-
     $email = $_POST["email"];
     $password = $_POST["password"];
 
     $usuario = $this->model->buscarUsuarioPorEmail($email);
 
-    if ($usuario && password_verify($password, $usuario["contrasena_hash"])) {
-      $_SESSION["usuario_id"] = $usuario["id_usuario"];
-      $_SESSION["nombre_usuario"] = $usuario["nombre_usuario"];
-      $this->redirectTo("/perfil/show");
-    } else {
-      echo "<p style='color:red;text-align:center;'>Correo o contraseña incorrectos</p>";
-      $this->view->render("login");
+    if (!$usuario || !password_verify($password, $usuario["contrasena_hash"])) {
+      $_SESSION['login_error'] = 'Correo o contraseña incorrectos';
+      $this->redirectTo("/login/show");
     }
 
+    if (!$usuario["es_validado"]) {
+      $_SESSION['login_error'] = 'Tu cuenta aún no fue validada. Por favor revisá tu correo.';
+      $this->redirectTo("/login/show");
+    }
+
+    $_SESSION["usuario_id"] = $usuario["id_usuario"];
+    $this->redirectTo("/perfil/show");
   }
 
-  public function logout()
+
+  public
+  function logout()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       session_unset();
@@ -51,7 +55,8 @@ class LoginController
     }
   }
 
-  private function redirectTo($str)
+  private
+  function redirectTo($str)
   {
     header('Location: ' . $str);
     exit();

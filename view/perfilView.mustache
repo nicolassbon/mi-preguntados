@@ -30,46 +30,10 @@
     </div>
 
     <div class="card mapa-card">
-      <p class="fs-4 text-white">Ubicación: <span id="ubicacion-texto"></span></p>
-      <div id="map" style="height: 200px"></div>
+      <p class="fs-4 text-white">Ubicación: <span></span></p>
+      <div>
+        <img src="/public/images/mapa.png" alt="Imagen del mapa" style="max-height: 200px">
+      </div>
     </div>
   </div>
 </main>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  const ciudad = "{{nombre_ciudad}}";
-  const pais = "{{nombre_pais}}";
-  const ubicacion = `${ciudad}, ${pais}`;
-
-  document.getElementById("ubicacion-texto").textContent = ubicacion;
-
-  // Buscar coordenadas con Nominatim
-  fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(ubicacion)}&format=json&limit=1`, {
-    headers: {
-      'User-Agent': 'Preguntopolis/1.0 (nicolasbon019@gmail.com)'
-    }
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.length > 0) {
-        const lat = parseFloat(data[0].lat);
-        const lon = parseFloat(data[0].lon);
-
-        const map = L.map('map').setView([lat, lon], 10);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        L.marker([lat, lon]).addTo(map)
-          .bindPopup(ubicacion)
-          .openPopup();
-      } else {
-        document.getElementById("map").innerHTML = "No se pudo encontrar la ubicación.";
-      }
-    })
-    .catch(err => {
-      console.error("Error al buscar ubicación:", err);
-    });
-</script>
