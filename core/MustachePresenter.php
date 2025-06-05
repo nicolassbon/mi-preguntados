@@ -22,7 +22,6 @@ class MustachePresenter
 
   public function generateHtml($contentFile, $data = array())
   {
-    $data['base_url'] = 'http://localhost/Preguntados';
     $contentAsString = file_get_contents($this->partialsPathLoader . '/header.mustache');
     $contentAsString .= file_get_contents($contentFile);
     $contentAsString .= file_get_contents($this->partialsPathLoader . '/footer.mustache');
