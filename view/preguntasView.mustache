@@ -1,0 +1,17 @@
+<div class="pregunta-container">
+    <h2 class="categoria">{{categoria}} - {{dificultad}}</h2>
+
+    <p class="texto-pregunta">{{textoPregunta}}</p>
+
+    <ul class="opciones">
+        {{#opciones}}
+            <li><button>{{texto}}</button></li>
+        {{/opciones}}
+    </ul>
+
+    <div class="nueva-pregunta">
+        <form method="get">
+            <button type="submit">Otra pregunta</button>
+        </form>
+    </div>
+</div>

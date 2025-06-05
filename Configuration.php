@@ -11,6 +11,7 @@ require_once("controller/TourController.php");
 require_once("controller/RegistroController.php");
 require_once("controller/LoginController.php");
 require_once("controller/UbicacionController.php");
+require_once("controller/PreguntasController.php");
 
 
 require_once("model/GroupModel.php");
@@ -19,6 +20,8 @@ require_once("model/TourModel.php");
 require_once("model/RegistroModel.php");
 require_once("model/LoginModel.php");
 require_once("model/UbicacionModel.php");
+require_once("model/PreguntasModel.php");
+
 
 require_once("model/EmailModel.php");
 require_once("controller/EmailController.php");
@@ -63,6 +66,14 @@ class Configuration
       new UbicacionModel($this->getDatabase())
     );
   }
+
+    public function getPreguntasController()
+    {
+        return new PreguntasController(
+            new PreguntasModel($this->getDatabase()),
+            $this->getViewer()
+        );
+    }
 
   public function getPerfilController()
   {
