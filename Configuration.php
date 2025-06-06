@@ -12,6 +12,8 @@ require_once("controller/TourController.php");
 require_once("controller/RegistroController.php");
 require_once("controller/LoginController.php");
 require_once("controller/PerfilController.php");
+require_once("controller/PreguntasController.php");
+
 
 require_once("model/GroupModel.php");
 require_once("model/SongModel.php");
@@ -20,6 +22,8 @@ require_once("model/RegistroModel.php");
 require_once("model/LoginModel.php");
 require_once("model/EmailModel.php");
 require_once("model/PerfilModel.php");
+require_once("model/PreguntasModel.php");
+
 
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');

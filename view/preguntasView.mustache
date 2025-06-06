@@ -5,13 +5,28 @@
 
     <ul class="opciones">
         {{#opciones}}
-            <li><button>{{texto}}</button></li>
+            <li>
+                <form method="post">
+                    <input type="hidden" name="respuesta" value="{{id_respuesta}}">
+                    <button type="submit"
+                            {{#esRespuestaProcesada}}disabled{{/esRespuestaProcesada}}
+                            style="
+                                {{#esSeleccionada}}background-color: {{#esCorrecta}}lightgreen{{/esCorrecta}}{{^esCorrecta}}salmon{{/esCorrecta}}{{/esSeleccionada}}
+                                    "
+                    >
+                        {{texto}}
+                    </button>
+                </form>
+            </li>
         {{/opciones}}
     </ul>
-
-    <div class="nueva-pregunta">
-        <form method="get">
-            <button type="submit">Otra pregunta</button>
-        </form>
-    </div>
 </div>
+
+{{#esRespuestaProcesada}}
+<script>
+    // Espera 3 segundos y recarga la página para cargar otra pregunta automáticamente
+    setTimeout(() => {
+        window.location.href = window.location.pathname;
+    }, 3000);
+</script>
+{{/esRespuestaProcesada}}
