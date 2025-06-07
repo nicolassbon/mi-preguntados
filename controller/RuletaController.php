@@ -27,7 +27,28 @@ class RuletaController
 
     }
 
+    public function proceso(){
+
+       $id_usuario = $_SESSION['usuario_id'] ?? null;
+
+       if($id_usuario == null){
+           header('Location: /inicio/show');
+           exit;
+       }
+
+       $_SESSION['partida_id'] = rand(1, 10000);
+       header('Location: /ruleta/show');
+
+    }
+
     public function partida(){
+
+       $id_usuario = $_SESSION['usuario_id'] ?? null;
+
+       if($id_usuario == null){
+           header('Location: /inicio/show');
+           exit;
+       }
 
         $numCategoria = $this->model->getIdCategoria();
 

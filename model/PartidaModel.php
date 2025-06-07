@@ -25,7 +25,7 @@ class PartidaModel
 
     private function getPreguntaPorId($idPregunta) {
         $sql = "
-            SELECT p.pregunta AS textoPregunta, c.nombre AS categoria,
+            SELECT p.id_pregunta AS id, p.pregunta AS textoPregunta, c.nombre AS categoria,
                    r.id_respuesta, r.respuesta AS texto, r.esCorrecta
             FROM preguntas p
             JOIN categoria c ON p.id_categoria = c.id_categoria
@@ -39,6 +39,7 @@ class PartidaModel
         $pregunta = [
             "categoria" => $result[0]['categoria'],
             "textoPregunta" => $result[0]['textoPregunta'],
+            "id_pregunta" => $result[0]['id'],
             "opciones" => []
         ];
 
@@ -65,6 +66,27 @@ class PartidaModel
     {
         $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + 5 WHERE id_usuario = $idUsuario";
         $this->database->execute($sql);
+
+    }
+
+    public function creoPartidaPregunta($idPartida, $idPregunta, $idRespuesta, $acerto)
+    {
+
+
+
+        $sql = "INSERT INTO partida_pregunta(id_partida, id_pregunta, id_respuesta_elegida, acerto)
+VALUES (?, ?, ?, ?)";
+
+        $consulta = $this->database->prepare($sql);
+
+        $acertoInt = $acerto ? 1 : 0;
+
+        // Asignar parámetros (todos enteros, por eso 'iiii')
+        $consulta->bind_param("iiii", $idPartida, $idPregunta, intval($idRespuesta), $acertoInt);
+
+        // Ejecutar
+        $consulta->execute();
+
 
     }
 

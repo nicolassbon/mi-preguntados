@@ -1,13 +1,22 @@
-<div class="pregunta-container">
-    <h2 class="categoria">{{categoria}}</h2>
-    <p class="texto-pregunta">{{textoPregunta}}</p>
+<div class="container-fluid d-flex flex-column m-0 p-0 vh-100">
+<div style="background-color: #6b4468b9;" class="p-3 d-flex justify-content-center align-items-center">
+    <img src="../public/images/logo.png" style="width: 50px" alt="logo">
+    <h2 class="categoria w-100 m-0 p-0 text-center">{{categoria}}</h2>
+    <p class="p-0 m-0">usuario</p>
+</div>
 
-    <ul class="opciones">
+<div class="container-fluid d-flex flex-column justify-content-center align-items-center m-0 p-0">
+
+<div class="pregunta-container container text-center p-5 m-5 d-flex flex-column justify-content-center align-items-center rounded-1 w-100">
+
+    <p class="texto-pregunta bg-light rounded-3 w-100 text-dark p-5">{{textoPregunta}}</p>
+
+    <div class="opciones w-100 d-flex flex-column">
         {{#opciones}}
-            <li>
+
                 <form method="post">
                     <input type="hidden" name="respuesta" value="{{id_respuesta}}">
-                    <button type="submit"
+                    <button type="submit" class="btn btn-light w-100 m-1"
                             {{#esRespuestaProcesada}}disabled{{/esRespuestaProcesada}}
                             style="{{#esSeleccionada}}
                             background-color:
@@ -18,14 +27,14 @@
                         {{texto}}
                     </button>
                 </form>
-            </li>
+
         {{/opciones}}
-    </ul>
+    </div>
 </div>
 
 {{#esRespuestaProcesada}}
-    <div class="fondo container-rta">
-        <div class="card qr-card justify-content-center align-items-center fs-6">
+    <div class="fondo container-rta d-flex flex-column justify-content-center align-items-center w-100">
+        <div class="card qr-card justify-content-center align-items-center fs-6 w-75 p-3">
             {{#esCorrecta}}
                 <p class="rtaCorrectaText">¡Respuesta correcta!</p>
                 <p class="rtaCorrectaText">Categoria: {{categoria}}</p>
@@ -42,12 +51,14 @@
 
         <div class="btn-rta">
             {{#esCorrecta}}
-                <button class="continuar-btn" onclick="window.location.href='/ruleta/show'">Continuar partida</button>
+                <button class="continuar-btn btn btn-secondary m-2" onclick="window.location.href='/ruleta/show'">Continuar partida</button>
             {{/esCorrecta}}
 
             {{^esCorrecta}}
-                <button class="continuar-btn" onclick="window.location.href='/lobby/show'">Volver al lobby</button>
+                <button class="continuar-btn btn btn-secondary m-2" onclick="window.location.href='/lobby/show'">Volver al lobby</button>
             {{/esCorrecta}}
         </div>
     </div>
 {{/esRespuestaProcesada}}
+</div>
+</div>
