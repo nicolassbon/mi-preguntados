@@ -2,35 +2,21 @@
 
 class RuletaModel
 {
-
-
-    private $database;
+   private $database;
 
     public function __construct($database){
         $this->database = $database;
     }
 
+    public function getIdCategoria(){
 
-    public function getCategoriaName($categoria){
+        $numCategoria = rand(1, 8);
 
-        $sql = "SELECT nombre FROM categoria WHERE id_categoria = $categoria ";
-
-       $this->database->query($sql);
-
-
-
-    }
-
-
-    public function getPreguntaAleatoriaPorCategoria($categoria){
-
-
-        $sql = "SELECT pregunta FROM preguntas WHERE id_categoria = $categoria ORDER BY RAND() LIMIT 1";
+       $sql = "SELECT id_categoria FROM categoria WHERE id_categoria = $numCategoria ";
         $resultado = $this->database->query($sql);
-        $pregunta = $resultado->fetch_assoc();
-        return $pregunta['pregunta'];
+
+        return $resultado[0]['id_categoria'];
 
     }
-
 
 }

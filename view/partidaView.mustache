@@ -1,0 +1,53 @@
+<div class="pregunta-container">
+    <h2 class="categoria">{{categoria}}</h2>
+    <p class="texto-pregunta">{{textoPregunta}}</p>
+
+    <ul class="opciones">
+        {{#opciones}}
+            <li>
+                <form method="post">
+                    <input type="hidden" name="respuesta" value="{{id_respuesta}}">
+                    <button type="submit"
+                            {{#esRespuestaProcesada}}disabled{{/esRespuestaProcesada}}
+                            style="{{#esSeleccionada}}
+                            background-color:
+                                {{#es_correcta}}lightgreen{{/es_correcta}}
+                                {{^es_correcta}}salmon{{/es_correcta}};
+                            {{/esSeleccionada}}"
+                    >
+                        {{texto}}
+                    </button>
+                </form>
+            </li>
+        {{/opciones}}
+    </ul>
+</div>
+
+{{#esRespuestaProcesada}}
+    <div class="fondo container-rta">
+        <div class="card qr-card justify-content-center align-items-center fs-6">
+            {{#esCorrecta}}
+                <p class="rtaCorrectaText">¡Respuesta correcta!</p>
+                <p class="rtaCorrectaText">Categoria: {{categoria}}</p>
+                <p class="rtaCorrectaText">Puntos: {{puntaje}}</p>
+            {{/esCorrecta}}
+
+            {{^esCorrecta}}
+                <p class="rtaincorrectaText">Respuesta incorrecta</p>
+                <p class="rtaincorrectaText">Categoria: {{categoria}}</p>
+                <p class="rtaincorrectaText">Puntos: {{puntaje}} </p>
+                <p class="rtaincorrectaText">Su partida ha terminado. ¡Podés empezar otra y superarte!</p>
+            {{/esCorrecta}}
+        </div>
+
+        <div class="btn-rta">
+            {{#esCorrecta}}
+                <button class="continuar-btn" onclick="window.location.href='/ruleta/show'">Continuar partida</button>
+            {{/esCorrecta}}
+
+            {{^esCorrecta}}
+                <button class="continuar-btn" onclick="window.location.href='/lobby/show'">Volver al lobby</button>
+            {{/esCorrecta}}
+        </div>
+    </div>
+{{/esRespuestaProcesada}}

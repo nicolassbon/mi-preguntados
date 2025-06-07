@@ -13,20 +13,27 @@ class EmailController
 
   public function show()
   {
-    $id_usuario = $_SESSION['id_usuario'] ?? null;
 
-    $this->view->render("validarCorreo", [
-      'title' => 'Validar Correo',
-      'id_usuario' => $id_usuario,
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css">'
-    ]);
+    $id_usuario = $_SESSION['usuario_id'] ?? null;
+
+
+    if($id_usuario != null){
+        $this->view->render("validarCorreo", [
+            'title' => 'Validar Correo',
+            'usuario_id' => $id_usuario,
+            'css' => '<link rel="stylesheet" href="/public/css/styles.css">'
+        ]);
+    }else{
+        header("Location: /inicio/show");
+    }
+
+
   }
 
   public function validar()
   {
 
-    $id_usuario = $_SESSION['id_usuario'] ?? null;
-
+    $id_usuario = $_SESSION['usuario_id'] ?? null;
 
     $this->model->validarCorreo($id_usuario);
 
