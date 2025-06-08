@@ -23,6 +23,10 @@ class PartidaController
             exit;
         }
 
+        $_SESSION['inicio_pregunta'] = time();
+
+        $tiempo_restante = $this->model->getTiempo();
+
         $this->view->render("partida", [
             'title' => 'Ruleta',
             'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
@@ -30,7 +34,8 @@ class PartidaController
             'pregunta' => $_SESSION['pregunta'],
             'categoria' => $_SESSION['nombre_categoria'],
             'respuestas' => $_SESSION['opciones'],
-            'id_partida' => $_SESSION['id_partida']
+            'id_partida' => $_SESSION['id_partida'],
+            'tiempo_restante' => $tiempo_restante
         ]);
 
     }
@@ -44,14 +49,24 @@ class PartidaController
             exit;
         }
 
+        $texto = '';
+        $color = '';
+        $ocultar = 'display:none';
+
+        $inicio = $_SESSION['inicio_pregunta'] ?? null;
+        if ($inicio === null || (time() - $inicio) > 10) {
+            $this->model->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
+            header("Location: /perdio/show");
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_respuesta'])) {
 
             $id_pregunta = $_SESSION['id_pregunta'];
             $respuestas = $this->model->getRespuestasPorPregunta($id_pregunta);
 
             $respuestaCorrecta = false;
-            $texto = '';
-            $color = '';
+
 
 
             foreach ($respuestas as &$respuesta) {
@@ -100,8 +115,12 @@ class PartidaController
                 'respondido' => true,
                 'texto' => $texto,
                 'color' => $color,
-                'puntaje' => $_SESSION['puntaje']
+                'puntaje' => $_SESSION['puntaje'],
+                'ocultar' => $ocultar
             ]);
+
+
+            unset($_SESSION['inicio_pregunta']);
 
         } else {
             echo 'error';

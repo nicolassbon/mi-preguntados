@@ -11,7 +11,7 @@
 
 
 <div class="container-fluid d-flex flex-column justify-content-center align-items-center vh-100">
-
+    <h2 id="contador_texto" style="{{ocultar}}">Tiempo restante: <span id="contador">{{tiempo_restante}}</span> segundos</h2>
     <p class="p-0 m-0 text-center fw-bold fs-3 {{color}}">{{texto}}</p>
    <div class="container d-flex flex-column justify-content-center align-items-center">
 
@@ -22,7 +22,7 @@
 
         <form method="POST" action="/partida/responder" class="m-0 p-0 w-75">
            <input type="hidden" name="id_respuesta" value={{id}}>
-           <button type="submit" name="respuesta" class="btn btn-light w-100 m-1 {{clase}}" {{#disabled}}disabled{{/disabled}}>{{texto_respuesta}}</button>
+           <button type="submit" name="respuesta" class="btn btn-light respuesta w-100 m-1 {{clase}}" {{#disabled}}disabled{{/disabled}}>{{texto_respuesta}}</button>
        </form>
         </div>
        {{/respuestas}}
@@ -34,6 +34,55 @@
 
 </div>
 </div>
+
+
+    <script>
+        let tiempoMaximo = 10; // duración máxima en segundos
+
+        // Intentamos leer el tiempo restante guardado en sessionStorage
+        let tiempo = sessionStorage.getItem('tiempoRestante');
+        if (tiempo === null) {
+            tiempo = {{tiempo_restante}}; // toma el valor que envía el backend (ejemplo 10)
+            if (typeof tiempo === 'undefined' || tiempo === null) {
+                tiempo = tiempoMaximo;
+            }
+        } else {
+            tiempo = parseInt(tiempo);
+        }
+
+        const contador = document.getElementById("contador");
+        const contador_texto = document.getElementById("contador_texto");
+        contador.textContent = tiempo;
+
+
+        const timer = setInterval(() => {
+            contador.textContent = tiempo;
+            if (tiempo <= 0) {
+                clearInterval(timer);
+                sessionStorage.removeItem('tiempoRestante'); // limpio storage
+                contador_texto.innerHTML = '';
+                contador_texto.textContent = 'TIEMPO AGOTADO';
+                contador_texto.style.color = 'red';
+                setTimeout(function() {
+                    window.location.href = "/perdio/show";  // redirijo cuando se acaba
+                }, 1000);
+
+            } else {
+                tiempo--;
+                sessionStorage.setItem('tiempoRestante', tiempo); // guardo el tiempo restante
+            }
+        }, 1000);
+
+        document.querySelectorAll("button.respuesta").forEach(btn => {
+            btn.addEventListener("click", () => {
+                clearInterval(timer);
+                sessionStorage.removeItem('tiempoRestante'); // limpio storage cuando responden
+            });
+        });
+
+    </script>
+
+
 {{#respondido}}
     <p>su puntaje es {{puntaje}}</p>
     </div>

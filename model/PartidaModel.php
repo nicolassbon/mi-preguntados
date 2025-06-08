@@ -46,14 +46,25 @@ class PartidaModel
 
     $sql = "UPDATE partidas SET correctas = correctas + 1 WHERE id_partida = $id_partida";
     $this->database->execute($sql);
-}
+    }
 
     public function getCantidadDePreguntas($id_partida){
-        $sql = "SELECT entregadas FROM partidas WHERE id_partida = $id_partida";
+        $sql = "SELECT correctas FROM partidas WHERE id_partida = $id_partida";
        $resultado = $this->database->query($sql);
-       return $resultado[0]['entregadas'];
-}
+       return $resultado[0]['correctas'];
+    }
 
+
+    public function getTiempo(){
+        $inicio = $_SESSION['inicio_pregunta'] ?? null;
+        if (!$inicio) return 0;
+
+        $ahora = time();
+        $tiempo_total = 10;
+        $tiempo_pasado = $ahora - $inicio;
+        $tiempo_restante = max(0, $tiempo_total - $tiempo_pasado);
+        return $tiempo_restante;
+    }
 
 
 }
