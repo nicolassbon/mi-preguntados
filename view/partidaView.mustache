@@ -1,64 +1,55 @@
-<div class="container-fluid d-flex flex-column m-0 p-0 vh-100">
-<div style="background-color: #6b4468b9;" class="p-3 d-flex justify-content-center align-items-center">
-    <img src="../public/images/logo.png" style="width: 50px" alt="logo">
-    <h2 class="categoria w-100 m-0 p-0 text-center">{{categoria}}</h2>
-    <p class="p-0 m-0">usuario</p>
-</div>
 
-<div class="container-fluid d-flex flex-column justify-content-center align-items-center m-0 p-0">
 
-<div class="pregunta-container container text-center p-5 m-5 d-flex flex-column justify-content-center align-items-center rounded-1 w-100">
 
-    <p class="texto-pregunta bg-light rounded-3 w-100 text-dark p-5">{{textoPregunta}}</p>
+<div class="container-fluid d-flex flex-column justify-content-center align-items-center m-0 p-0 vh-100">
 
-    <div class="opciones w-100 d-flex flex-column">
-        {{#opciones}}
-
-                <form method="post">
-                    <input type="hidden" name="respuesta" value="{{id_respuesta}}">
-                    <button type="submit" class="btn btn-light w-100 m-1"
-                            {{#esRespuestaProcesada}}disabled{{/esRespuestaProcesada}}
-                            style="{{#esSeleccionada}}
-                            background-color:
-                                {{#es_correcta}}lightgreen{{/es_correcta}}
-                                {{^es_correcta}}salmon{{/es_correcta}};
-                            {{/esSeleccionada}}"
-                    >
-                        {{texto}}
-                    </button>
-                </form>
-
-        {{/opciones}}
+    <div class="m-0 p-3 d-flex justify-content-center text-center align-items-center w-100" style="background-color: #6B4468">
+        <img src="../public/images/logo.png" style="width: 50px" alt="">
+        <h1 class="text-center w-100 p-0 m-0">{{categoria}}</h1>
+        <p class="text-center m-0">usuario</p>
     </div>
+
+
+<div class="container-fluid d-flex flex-column justify-content-center align-items-center vh-100">
+
+    <p class="p-0 m-0 text-center fw-bold fs-3 {{color}}">{{texto}}</p>
+   <div class="container d-flex flex-column justify-content-center align-items-center">
+
+       <p class="bg-light w-75 m-2 p-5 text-dark text-center rounded-3 fw-bold">{{pregunta}}</p>
+
+    {{#respuestas}}
+        <div class="container d-flex w-100 justify-content-center align-items-center m-0 p-0">
+
+        <form method="POST" action="/partida/responder" class="m-0 p-0 w-75">
+           <input type="hidden" name="id_respuesta" value={{id}}>
+           <button type="submit" name="respuesta" class="btn btn-light w-100 m-1 {{clase}}" {{#disabled}}disabled{{/disabled}}>{{texto_respuesta}}</button>
+       </form>
+        </div>
+       {{/respuestas}}
+
+
+
+
+
+
 </div>
-
-{{#esRespuestaProcesada}}
-    <div class="fondo container-rta d-flex flex-column justify-content-center align-items-center w-100">
-        <div class="card qr-card justify-content-center align-items-center fs-6 w-75 p-3">
-            {{#esCorrecta}}
-                <p class="rtaCorrectaText">¡Respuesta correcta!</p>
-                <p class="rtaCorrectaText">Categoria: {{categoria}}</p>
-                <p class="rtaCorrectaText">Puntos: {{puntaje}}</p>
-            {{/esCorrecta}}
-
-            {{^esCorrecta}}
-                <p class="rtaincorrectaText">Respuesta incorrecta</p>
-                <p class="rtaincorrectaText">Categoria: {{categoria}}</p>
-                <p class="rtaincorrectaText">Puntos: {{puntaje}} </p>
-                <p class="rtaincorrectaText">Su partida ha terminado. ¡Podés empezar otra y superarte!</p>
-            {{/esCorrecta}}
-        </div>
-
-        <div class="btn-rta">
-            {{#esCorrecta}}
-                <button class="continuar-btn btn btn-secondary m-2" onclick="window.location.href='/ruleta/show'">Continuar partida</button>
-            {{/esCorrecta}}
-
-            {{^esCorrecta}}
-                <button class="continuar-btn btn btn-secondary m-2" onclick="window.location.href='/lobby/show'">Volver al lobby</button>
-            {{/esCorrecta}}
-        </div>
+</div>
+{{#respondido}}
+    <p>su puntaje es {{puntaje}}</p>
     </div>
-{{/esRespuestaProcesada}}
-</div>
-</div>
+{{#correcto}}
+    <script>
+        setTimeout(function() {
+            window.location.href = "/ruleta/show";
+        }, 2000);
+    </script>
+{{/correcto}}
+
+{{^correcto}}
+    <script>
+        setTimeout(function() {
+            window.location.href = "/perdio/show";
+        }, 2000);
+    </script>
+{{/correcto}}
+{{/respondido}}

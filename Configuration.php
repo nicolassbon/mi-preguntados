@@ -37,6 +37,8 @@ require_once("controller/InicioController.php");
 require_once("controller/PartidaController.php");
 require_once("model/PartidaModel.php");
 
+require_once("controller/PerdioController.php");
+
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
 class Configuration
@@ -143,6 +145,13 @@ class Configuration
   public function getPartidaController(){
       return new PartidaController(
           new PartidaModel($this->getDatabase()),
+          $this->getViewer()
+      );
+  }
+
+  public function getPerdioController()
+  {
+      return new PerdioController(
           $this->getViewer()
       );
   }

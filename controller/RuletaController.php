@@ -29,15 +29,18 @@ class RuletaController
 
     public function proceso(){
 
-       $id_usuario = $_SESSION['usuario_id'] ?? null;
+        $id_usuario = $_SESSION['usuario_id'] ?? null;
+        $_SESSION['puntaje'] = 0;
 
-       if($id_usuario == null){
-           header('Location: /inicio/show');
-           exit;
-       }
+        if($id_usuario == null){
+            header('Location: /inicio/show');
+            exit;
+        }
 
-       $_SESSION['partida_id'] = rand(1, 10000);
-       header('Location: /ruleta/show');
+        //crear partida
+        $this->model->crearPartida($id_usuario);
+
+        header('Location: /ruleta/show');
 
     }
 
@@ -50,9 +53,24 @@ class RuletaController
            exit;
        }
 
-        $numCategoria = $this->model->getIdCategoria();
+       $numero_random = $this->model->getGenerarRandom();
 
-        $_SESSION['numCategoria'] = $numCategoria;
+       $nombre_categoria = $this->model->getNombreCategoria($numero_random);
+
+       $id_pregunta = $this->model->getIdPreguntaAleatoria($numero_random);
+
+       $pregunta_texto = $this->model->getPreguntaAleatoriaPorId($id_pregunta);
+
+       $respuestas = $this->model->getRespuestasPorIdPreguntaAleatoria($id_pregunta);
+
+
+       $_SESSION['id_pregunta'] = $id_pregunta;
+       $_SESSION['pregunta'] = $pregunta_texto;
+
+       $_SESSION['nombre_categoria'] = $nombre_categoria;
+
+       $_SESSION['opciones'] = $respuestas;
+
 
         header('Location: /partida/show');
 

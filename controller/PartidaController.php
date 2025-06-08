@@ -16,70 +16,93 @@ class PartidaController
     public function show()
     {
 
-        $idUsuario = $_SESSION['usuario_id'] ?? null;
+        $id_usuario = $_SESSION['usuario_id'] ?? null;
 
-        if($idUsuario == null){
+        if($id_usuario == null){
             header('Location: /inicio/show');
             exit;
         }
 
-        $numero = $_SESSION['numCategoria'];
+        $this->view->render("partida", [
+            'title' => 'Ruleta',
+            'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+            'usuario_id' => $id_usuario,
+            'pregunta' => $_SESSION['pregunta'],
+            'categoria' => $_SESSION['nombre_categoria'],
+            'respuestas' => $_SESSION['opciones']
+        ]);
 
-        $partida = $this->model->getPreguntaAleatoriaConSusOpciones($numero);
+    }
 
-        $idPartida = $_SESSION['partida_id'];
+    public function responder(){
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['respuesta'])) {
-            $idRespuesta = intval($_POST['respuesta']);
-            $pregunta = $this->model->getPreguntaPorRespuesta($idRespuesta);
+        $id_usuario = $_SESSION['usuario_id'] ?? null;
+
+        if($id_usuario == null){
+            header('Location: /inicio/show');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_respuesta'])) {
+
+            $id_pregunta = $_SESSION['id_pregunta'];
+            $respuestas = $this->model->getRespuestasPorPregunta($id_pregunta);
+
+            $respuestaCorrecta = false;
+            $texto = '';
+            $color = '';
 
 
-            if ($pregunta) {
-                $esCorrecta = false;
+            foreach ($respuestas as &$respuesta) {
+                $respuesta['id'] = $respuesta['id_respuesta'];
+                $respuesta['texto_respuesta'] = $respuesta['respuesta'];
 
+                if ($respuesta['esCorrecta']) {
+                    if ($respuesta['id_respuesta'] == $_POST['id_respuesta']) {
+                        $respuestaCorrecta = true;
+                        $texto = "¡CORRECTA!";
+                        $color = 'text-success';
 
-                foreach ($pregunta['opciones'] as &$opcion) {
-                    $opcion['esSeleccionada'] = ($opcion['id_respuesta'] == $idRespuesta);
+                        $this->model->incrementoPuntaje();
 
-                    if ($opcion['esSeleccionada'] && $opcion['es_correcta']) {
-                        $esCorrecta = true;
                     }
+                    $respuesta['clase'] = 'bg-success';
+                } elseif ($respuesta['id_respuesta'] == $_POST['id_respuesta']) {
+                    $respuesta['clase'] = 'bg-danger';
+                        $texto = "¡INCORRECTA!";
+                        $color = 'text-danger';
+                } else {
+                    $respuesta['clase'] = 'bg-light';
                 }
-
-               $user = $_SESSION['usuario_id'];
-
-
-                if($esCorrecta){
-                    $this->model->incrementoPuntaje($user);
-                }else{
-                    unset($_SESSION['partida_id']);
-                }
-
-
-                $this->model->creoPartidaPregunta($idPartida, intval($partida['id_pregunta']), $idRespuesta, $esCorrecta);
-
-                $puntaje = $this->model->obtenerPuntajeUsuario($_SESSION['usuario_id']);
-
-                $pregunta['esRespuestaProcesada'] = true;
-                $pregunta['esCorrecta'] = $esCorrecta;
-                $pregunta['puntaje'] = $puntaje;
-                $pregunta['css'] = '<link rel="stylesheet" href="/public/css/styles.css">';
-
+                $respuesta['disabled'] = true;
             }
 
 
-
-            $this->view->render("partida", $pregunta);
+            $this->view->render("partida", [
+                'title' => 'Ruleta',
+                'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+                'usuario_id' => $id_usuario,
+                'pregunta' => $_SESSION['pregunta'],
+                'respuestas' => $respuestas,
+                'categoria' => $_SESSION['nombre_categoria'],
+                'correcto' => $respuestaCorrecta,
+                'respondido' => true,
+                'texto' => $texto,
+                'color' => $color,
+                'puntaje' => $_SESSION['puntaje']
+            ]);
 
         } else {
-            $pregunta = $this->model->getPreguntaAleatoriaConSusOpciones($numero);
-            $pregunta['esRespuestaProcesada'] = false;
-            $pregunta['esCorrecta'] = null;
-            $pregunta['css'] = '<link rel="stylesheet" href="/public/css/styles.css">';
-
-            $this->view->render("partida", $pregunta);
+            echo 'error';
         }
+
+
+
+
     }
+
+
+
 
 
 }
