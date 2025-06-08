@@ -29,7 +29,8 @@ class PartidaController
             'usuario_id' => $id_usuario,
             'pregunta' => $_SESSION['pregunta'],
             'categoria' => $_SESSION['nombre_categoria'],
-            'respuestas' => $_SESSION['opciones']
+            'respuestas' => $_SESSION['opciones'],
+            'id_partida' => $_SESSION['id_partida']
         ]);
 
     }
@@ -57,13 +58,16 @@ class PartidaController
                 $respuesta['id'] = $respuesta['id_respuesta'];
                 $respuesta['texto_respuesta'] = $respuesta['respuesta'];
 
+
                 if ($respuesta['esCorrecta']) {
                     if ($respuesta['id_respuesta'] == $_POST['id_respuesta']) {
                         $respuestaCorrecta = true;
                         $texto = "¡CORRECTA!";
                         $color = 'text-success';
 
-                        $this->model->incrementoPuntaje();
+                        $this->model->incrementoPuntaje($_SESSION['id_partida']);
+                        $this->model->incremetoPreguntaRespondidaCorrectamente($_SESSION['id_partida']);
+
 
                     }
                     $respuesta['clase'] = 'bg-success';
@@ -71,11 +75,18 @@ class PartidaController
                     $respuesta['clase'] = 'bg-danger';
                         $texto = "¡INCORRECTA!";
                         $color = 'text-danger';
+
+                    $this->model->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
                 } else {
+
                     $respuesta['clase'] = 'bg-light';
                 }
                 $respuesta['disabled'] = true;
+
             }
+
+            $this->model->incrementoPreguntaContestada($_SESSION['id_partida']);
+            $_SESSION['cantidad'] = intval($this->model->getCantidadDePreguntas($_SESSION['id_partida']));
 
 
             $this->view->render("partida", [

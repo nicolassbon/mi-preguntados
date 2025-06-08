@@ -38,7 +38,9 @@ class RuletaController
         }
 
         //crear partida
-        $this->model->crearPartida($id_usuario);
+        $id_partida = $this->model->crearPartida($id_usuario);
+
+        $_SESSION['id_partida'] = $id_partida;
 
         header('Location: /ruleta/show');
 

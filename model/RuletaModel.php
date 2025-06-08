@@ -60,7 +60,8 @@ class RuletaModel
 
         $id_usuario = intval($id_usuario);
         $sql = "INSERT INTO partidas (id_usuario) VALUES ($id_usuario)";
-        return $this->database->execute($sql);
+        $this->database->execute($sql);
+        return $this->database->getLastInsertId();
 
     }
 
