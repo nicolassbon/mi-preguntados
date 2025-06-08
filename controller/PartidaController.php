@@ -54,8 +54,11 @@ class PartidaController
         $ocultar = 'display:none';
 
         $inicio = $_SESSION['inicio_pregunta'] ?? null;
+
+
         if ($inicio === null || (time() - $inicio) > 10) {
             $this->model->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
+            unset($_SESSION['inicio_pregunta']);
             header("Location: /perdio/show");
             exit;
         }
@@ -120,7 +123,7 @@ class PartidaController
             ]);
 
 
-            unset($_SESSION['inicio_pregunta']);
+
 
         } else {
             echo 'error';

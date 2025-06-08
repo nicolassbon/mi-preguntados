@@ -11,7 +11,7 @@
 
 
 <div class="container-fluid d-flex flex-column justify-content-center align-items-center vh-100">
-    <h2 id="contador_texto" style="{{ocultar}}">Tiempo restante: <span id="contador">{{tiempo_restante}}</span> segundos</h2>
+    <h5 id="contador_texto" class="mb-3 fw-bold" style="{{ocultar}}">Tiempo: <span id="contador">{{tiempo_restante}}</span> segundos</h5>
     <p class="p-0 m-0 text-center fw-bold fs-3 {{color}}">{{texto}}</p>
    <div class="container d-flex flex-column justify-content-center align-items-center">
 
@@ -24,9 +24,10 @@
            <input type="hidden" name="id_respuesta" value={{id}}>
            <button type="submit" name="respuesta" class="btn btn-light respuesta w-100 m-1 {{clase}}" {{#disabled}}disabled{{/disabled}}>{{texto_respuesta}}</button>
        </form>
+
         </div>
        {{/respuestas}}
-
+       <p class="mt-3">¿Hay algo mal en esta pregunta? <span style="color: darkred; text-decoration: underline" class=" underline fw-bold">REPORTAR PREGUNTA</span></p>
 
 
 
