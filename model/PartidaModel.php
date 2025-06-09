@@ -42,6 +42,18 @@ class PartidaModel
         return $resultado[0]['nombre_usuario'];
     }
 
+    public function sumarCorrectaAUsuario($id_usuario){
+
+        $sql = "UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = $id_usuario ";
+        $this->database->execute($sql);
+    }
+
+    public function incrementoDeContestada($id_usuario){
+        $sql = "UPDATE usuarios SET preguntas_entregadas = preguntas_entregadas + 1 WHERE id_usuario = $id_usuario ";
+        $this->database->execute($sql);
+
+    }
+
     public function incrementoPuntaje($id_partida){
 
         $_SESSION['puntaje'] = $_SESSION['puntaje'] + 5;

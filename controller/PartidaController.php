@@ -93,6 +93,8 @@ class PartidaController
                         $this->model->incremetoPreguntaRespondidaCorrectamente($id_partida);
                         $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
                         $this->model->acumularPuntajeUsuario($id_usuario);
+                        $this->model->sumarCorrectaAUsuario($id_usuario);
+                        $this->model->incrementoDeContestada($id_usuario);
 
                     }
                     $respuesta['clase'] = 'bg-success';
@@ -103,6 +105,7 @@ class PartidaController
 
                     $this->model->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
                     $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 0);
+                    $this->model->incrementoDeContestada($id_usuario);
                 } else {
 
                     $respuesta['clase'] = 'bg-light';
