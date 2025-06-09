@@ -10,6 +10,20 @@ class PartidaModel
     }
 
 
+    public function getColorCategoria($nombre_categoria){
+
+        $sql = "SELECT color FROM categoria WHERE nombre = '$nombre_categoria' ";
+        $resultado = $this->database->query($sql);
+        return $resultado[0]['color'];
+
+    }
+
+    public function getFotoCategoria($nombre_categoria){
+        $sql = "SELECT foto_categoria FROM categoria WHERE nombre = '$nombre_categoria' ";
+        $resultado = $this->database->query($sql);
+        return $resultado[0]['foto_categoria'];
+    }
+
 
 
     public function getRespuestasPorPregunta($id_pregunta)
@@ -21,12 +35,27 @@ class PartidaModel
 
     }
 
+    public function getUsuario($id_usuario)
+    {
+        $sql = "SELECT nombre_usuario FROM usuarios WHERE id_usuario = $id_usuario ";
+        $resultado = $this->database->query($sql);
+        return $resultado[0]['nombre_usuario'];
+    }
+
     public function incrementoPuntaje($id_partida){
+
         $_SESSION['puntaje'] = $_SESSION['puntaje'] + 5;
        $puntaje = $_SESSION['puntaje'];
         $sql = "UPDATE partidas SET puntaje_final = $puntaje  WHERE id_partida = $id_partida ";
         $this->database->execute($sql);
     }
+
+    public function acumularPuntajeUsuario($id_usuario){
+
+        $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + 5 WHERE id_usuario = $id_usuario ";
+        $this->database->execute($sql);
+    }
+
 
     public function actualizarFechaPartidaFinalizada($id_partida){
 
@@ -35,12 +64,7 @@ class PartidaModel
 
     }
 
-    public function incrementoPreguntaContestada($id_partida){
 
-        $sql = "UPDATE partidas SET entregadas = entregadas + 1 WHERE id_partida = $id_partida ";
-        $this->database->execute($sql);
-
-    }
 
     public function incremetoPreguntaRespondidaCorrectamente($id_partida){
 
@@ -64,6 +88,21 @@ class PartidaModel
         $tiempo_pasado = $ahora - $inicio;
         $tiempo_restante = max(0, $tiempo_total - $tiempo_pasado);
         return $tiempo_restante;
+    }
+
+
+    public function crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta, $acerto){
+
+        $id_preg = intval($id_pregunta);
+        $id_par = intval($id_partida);
+        $id_resp = intval($id_respuesta);
+        $acerto = intval($acerto);
+
+
+            $sql = "INSERT INTO partida_pregunta (id_partida, id_pregunta, id_respuesta_elegida, acerto) 
+    VALUES ($id_par, $id_preg, $id_resp, $acerto)";
+
+        $this->database->execute($sql);
     }
 
 

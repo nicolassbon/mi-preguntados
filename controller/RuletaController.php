@@ -14,17 +14,19 @@ class RuletaController
 
        $id_usuario = $_SESSION['usuario_id'] ?? null;
 
-       if($id_usuario != null){
-           $this->view->render("ruleta", [
-                'title' => 'Ruleta',
-                'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
-                'usuario_id' => $id_usuario
-            ]);
-
-        }else{
-            header('Location: /inicio/show');
+       if($id_usuario == null){
+           header('Location: /inicio/show');
+           exit;
         }
 
+       $user = $this->model->getUsuario($id_usuario);
+
+        $this->view->render("ruleta", [
+            'title' => 'Ruleta',
+            'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+            'usuario_id' => $id_usuario,
+            'user' => $user
+        ]);
     }
 
     public function proceso(){

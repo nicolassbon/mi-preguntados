@@ -25,6 +25,10 @@ class PartidaController
 
         $_SESSION['inicio_pregunta'] = time();
 
+        $fondo = $this->model->getColorCategoria($_SESSION['nombre_categoria']);
+        $foto = $this->model->getFotoCategoria($_SESSION['nombre_categoria']);
+        $user = $this->model->getUsuario($id_usuario);
+
         $tiempo_restante = $this->model->getTiempo();
 
         $this->view->render("partida", [
@@ -35,7 +39,10 @@ class PartidaController
             'categoria' => $_SESSION['nombre_categoria'],
             'respuestas' => $_SESSION['opciones'],
             'id_partida' => $_SESSION['id_partida'],
-            'tiempo_restante' => $tiempo_restante
+            'tiempo_restante' => $tiempo_restante,
+            'fondo' => $fondo,
+            'foto' => $foto,
+            'user' => $user
         ]);
 
     }
@@ -66,11 +73,10 @@ class PartidaController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_respuesta'])) {
 
             $id_pregunta = $_SESSION['id_pregunta'];
+            $id_partida = $_SESSION['id_partida'];
             $respuestas = $this->model->getRespuestasPorPregunta($id_pregunta);
 
             $respuestaCorrecta = false;
-
-
 
             foreach ($respuestas as &$respuesta) {
                 $respuesta['id'] = $respuesta['id_respuesta'];
@@ -83,9 +89,10 @@ class PartidaController
                         $texto = "¡CORRECTA!";
                         $color = 'text-success';
 
-                        $this->model->incrementoPuntaje($_SESSION['id_partida']);
-                        $this->model->incremetoPreguntaRespondidaCorrectamente($_SESSION['id_partida']);
-
+                        $this->model->incrementoPuntaje($id_partida);
+                        $this->model->incremetoPreguntaRespondidaCorrectamente($id_partida);
+                        $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
+                        $this->model->acumularPuntajeUsuario($id_usuario);
 
                     }
                     $respuesta['clase'] = 'bg-success';
@@ -95,6 +102,7 @@ class PartidaController
                         $color = 'text-danger';
 
                     $this->model->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
+                    $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 0);
                 } else {
 
                     $respuesta['clase'] = 'bg-light';
@@ -102,9 +110,12 @@ class PartidaController
                 $respuesta['disabled'] = true;
 
             }
-
-            $this->model->incrementoPreguntaContestada($_SESSION['id_partida']);
+            
             $_SESSION['cantidad'] = intval($this->model->getCantidadDePreguntas($_SESSION['id_partida']));
+
+            $fondo = $this->model->getColorCategoria($_SESSION['nombre_categoria']);
+            $foto = $this->model->getFotoCategoria($_SESSION['nombre_categoria']);
+            $user = $this->model->getUsuario($id_usuario);
 
 
             $this->view->render("partida", [
@@ -119,7 +130,10 @@ class PartidaController
                 'texto' => $texto,
                 'color' => $color,
                 'puntaje' => $_SESSION['puntaje'],
-                'ocultar' => $ocultar
+                'ocultar' => $ocultar,
+                'foto' => $foto,
+                'fondo' => $fondo,
+                'user' => $user
             ]);
 
 

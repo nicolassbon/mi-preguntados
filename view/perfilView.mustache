@@ -1,9 +1,23 @@
-{{> navbar}}
-<main class="fondo">
+
+<div style="font-family: 'Jockey One'" class="container-fluid mb-1 p-0">
+    <div style="background-color:#6b4468b9" class="d-flex justify-content-center align-items-center p-3">
+        <a href="/lobby/show">
+            <img src="../public/images/logo.png" alt="logo" style="width: 50px">
+        </a>
+
+        <h1 class="text-center w-100" >Preguntopolis</h1>
+        <form action="/login/logout" method="post" style="display:inline;">
+            <button type="submit" style="border:none; background:none; padding:0; cursor:pointer;">
+                <img src="/public/images/cerrar-sesion.png" alt="Icono cerrar sesión" style="max-height: 40px;">
+            </button>
+        </form>
+    </div>
+
+<main class="bg-dark">
   <div class="perfil-grid">
     <div class="card perfil-card">
       <div class="perfil-top">
-        <img src="/public/uploads/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
+        <img src="/public/images/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
         <div class="nombre">{{nombre_usuario}}</div>
       </div>
       <div class="info">Nivel 7<br>Ranking #125</div>

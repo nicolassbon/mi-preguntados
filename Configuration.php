@@ -131,6 +131,7 @@ class Configuration
   public function getLobbyController()
   {
       return new LobbyController(
+          new LobbyModel($this->getDatabase()),
           $this->getViewer()
       );
   }
