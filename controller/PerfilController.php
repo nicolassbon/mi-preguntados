@@ -13,7 +13,7 @@ class PerfilController
 
   public function show()
   {
-    if (!$this->isLogueado()) {
+    /*if (!$this->isLogueado()) {
       $this->redirectTo("/login/show");
     }
 
@@ -30,7 +30,33 @@ class PerfilController
     $this->view->render("perfil", array_merge([
       'title' => 'Perfil Usuario',
       'css' => '<link rel="stylesheet" href="/public/css/perfil.css">'
-    ], $usuario));
+    ], $usuario)); */
+
+
+      $id_usuario = $_GET["idUsuario"] ?? null;
+
+      if (!$id_usuario) {
+          if (!$this->isLogueado()) {
+              $this->redirectTo("/login/show");
+          }
+          $id_usuario = $_SESSION['usuario_id'];
+      }
+
+      $datos = $this->model->getDatos($id_usuario);
+
+      if (!empty($datos) && is_array($datos)) {
+          $usuario = $datos[0];
+      } else {
+          $usuario = ['nombre_usuario' => 'Invitado'];
+      }
+
+
+      $this->view->render("perfil", array_merge([
+          'title' => 'Perfil Usuario',
+          'css' => '<link rel="stylesheet" href="/public/css/perfil.css">'
+      ], $usuario));
+
+
   }
 
   private function redirectTo($str)

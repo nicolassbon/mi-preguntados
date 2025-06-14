@@ -1,0 +1,41 @@
+<h1>{{title}}</h1>
+<table>
+    <tr>
+        <th>Jugador</th>
+        <th>Foto</th>
+        <th>Puntaje</th>
+    </tr>
+    {{#ranking}}
+        <tr>
+            <td>
+                <form method="GET" action="/perfil/show?idUsuario={{id_usuario}}" style="margin:0;">
+
+                    <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;">
+                        {{nombre_usuario}}
+                    </button>
+                </form>
+            </td>
+            <td><img src="/public/images/{{foto_perfil_url}}" width="50"></td>
+            <td>{{puntaje_acumulado}}</td>
+        </tr>
+    {{/ranking}}
+</table>
+
+<table>
+    <tr>
+        <th>Partida</th>
+        <th>Jugador</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Puntaje</th>
+    </tr>
+    {{#partidas}}
+        <tr>
+            <td>{{id_partida}}</td>
+            <td>{{nombre_usuario}}</td>
+            <td>{{fecha_inicio}}</td>
+            <td>{{fecha_fin}}</td>
+            <td>{{puntaje_final}}</td>
+        </tr>
+    {{/partidas}}
+</table>
