@@ -18,12 +18,11 @@ class LoginController
 
     $this->view->render("login", [
       'title' => 'Iniciar sesión',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css" >',
       'error' => $error
     ]);
   }
 
-  public function loguearse()
+  public function procesar()
   {
     $email = $_POST["email"];
     $password = $_POST["password"];

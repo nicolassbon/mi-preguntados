@@ -3,27 +3,29 @@
 class PartidaModel
 {
 
-    private $database;
+    private $db;
 
-    public function __construct($database){
-        $this->database = $database;
+    public function __construct($database)
+    {
+        $this->db = $database;
     }
 
 
-    public function getColorCategoria($nombre_categoria){
+    public function getColorCategoria($nombre_categoria)
+    {
 
         $sql = "SELECT color FROM categoria WHERE nombre = '$nombre_categoria' ";
-        $resultado = $this->database->query($sql);
+        $resultado = $this->db->query($sql);
         return $resultado[0]['color'];
 
     }
 
-    public function getFotoCategoria($nombre_categoria){
+    public function getFotoCategoria($nombre_categoria)
+    {
         $sql = "SELECT foto_categoria FROM categoria WHERE nombre = '$nombre_categoria' ";
-        $resultado = $this->database->query($sql);
+        $resultado = $this->db->query($sql);
         return $resultado[0]['foto_categoria'];
     }
-
 
 
     public function getRespuestasPorPregunta($id_pregunta)
@@ -31,67 +33,88 @@ class PartidaModel
         $id_preg = intval($id_pregunta);
 
         $sql = "SELECT id_respuesta, respuesta, esCorrecta FROM respuestas WHERE id_pregunta = $id_preg ";
-        return $this->database->query($sql);
+        return $this->db->query($sql);
 
     }
 
     public function getUsuario($id_usuario)
     {
         $sql = "SELECT nombre_usuario FROM usuarios WHERE id_usuario = $id_usuario ";
-        $resultado = $this->database->query($sql);
+        $resultado = $this->db->query($sql);
         return $resultado[0]['nombre_usuario'];
     }
 
-    public function sumarCorrectaAUsuario($id_usuario){
-
-        $sql = "UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = $id_usuario ";
-        $this->database->execute($sql);
+    public function incrementarEntregas($id_pregunta)
+    {
+        $stmt = $this->db->prepare("UPDATE preguntas SET entregadas = entregadas + 1 WHERE id_pregunta = ?");
+        $stmt->bind_param("i", $id_pregunta);
+        $stmt->execute();
     }
 
-    public function incrementoDeContestada($id_usuario){
+    public function incrementarEntregadasUsuario($id_usuario)
+    {
         $sql = "UPDATE usuarios SET preguntas_entregadas = preguntas_entregadas + 1 WHERE id_usuario = $id_usuario ";
-        $this->database->execute($sql);
+        $this->db->execute($sql);
 
     }
 
-    public function incrementoPuntaje($id_partida){
+    public function incrementarCorrectasPregunta($id_pregunta)
+    {
+        $stmt = $this->db->prepare("UPDATE preguntas SET correctas = correctas + 1 WHERE id_pregunta = ?");
+        $stmt->bind_param("i", $id_pregunta);
+        $stmt->execute();
+    }
+
+    public function incrementarCorrectasUsuario($id_usuario)
+    {
+        $stmt = $this->db->prepare("UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = ?");
+        $stmt->bind_param("i", $id_usuario);
+        $stmt->execute();
+    }
+
+    public function incrementoPuntaje($id_partida)
+    {
 
         $_SESSION['puntaje'] = $_SESSION['puntaje'] + 5;
-       $puntaje = $_SESSION['puntaje'];
+        $puntaje = $_SESSION['puntaje'];
         $sql = "UPDATE partidas SET puntaje_final = $puntaje  WHERE id_partida = $id_partida ";
-        $this->database->execute($sql);
+        $this->db->execute($sql);
     }
 
-    public function acumularPuntajeUsuario($id_usuario){
+    public function acumularPuntajeUsuario($id_usuario)
+    {
 
         $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + 5 WHERE id_usuario = $id_usuario ";
-        $this->database->execute($sql);
+        $this->db->execute($sql);
     }
 
 
-    public function actualizarFechaPartidaFinalizada($id_partida){
+    public function actualizarFechaPartidaFinalizada($id_partida)
+    {
 
         $sql = "UPDATE partidas SET fecha_fin = NOW() WHERE id_partida = $id_partida ";
-        $this->database->execute($sql);
+        $this->db->execute($sql);
 
     }
 
 
+    public function incremetoPreguntaRespondidaCorrectamente($id_partida)
+    {
 
-    public function incremetoPreguntaRespondidaCorrectamente($id_partida){
-
-    $sql = "UPDATE partidas SET correctas = correctas + 1 WHERE id_partida = $id_partida";
-    $this->database->execute($sql);
+        $sql = "UPDATE partidas SET correctas = correctas + 1 WHERE id_partida = $id_partida";
+        $this->db->execute($sql);
     }
 
-    public function getCantidadDePreguntas($id_partida){
+    public function getCantidadDePreguntas($id_partida)
+    {
         $sql = "SELECT correctas FROM partidas WHERE id_partida = $id_partida";
-       $resultado = $this->database->query($sql);
-       return $resultado[0]['correctas'];
+        $resultado = $this->db->query($sql);
+        return $resultado[0]['correctas'];
     }
 
 
-    public function getTiempo(){
+    public function getTiempo()
+    {
         $inicio = $_SESSION['inicio_pregunta'] ?? null;
         if (!$inicio) return 0;
 
@@ -103,7 +126,8 @@ class PartidaModel
     }
 
 
-    public function crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta, $acerto){
+    public function crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta, $acerto)
+    {
 
         $id_preg = intval($id_pregunta);
         $id_par = intval($id_partida);
@@ -111,11 +135,195 @@ class PartidaModel
         $acerto = intval($acerto);
 
 
-            $sql = "INSERT INTO partida_pregunta (id_partida, id_pregunta, id_respuesta_elegida, acerto) 
+        $sql = "INSERT INTO partida_pregunta (id_partida, id_pregunta, id_respuesta_elegida, acerto) 
     VALUES ($id_par, $id_preg, $id_resp, $acerto)";
 
-        $this->database->execute($sql);
+        $this->db->execute($sql);
     }
 
+    public function crearPartida($id_usuario)
+    {
 
+        $id_usuario = intval($id_usuario);
+        $sql = "INSERT INTO partidas (id_usuario) VALUES ($id_usuario)";
+        $this->db->execute($sql);
+        return $this->db->getLastInsertId();
+
+    }
+
+    public function getCategoriaAleatoria()
+    {
+        $sql = "SELECT * FROM categoria ORDER BY RAND() LIMIT 1";
+        $resultado = $this->db->query($sql);
+        return $resultado[0] ?? null;
+    }
+
+    public function marcarPreguntaComoVista($id_usuario, $id_pregunta)
+    {
+        $stmt = $this->db->prepare("INSERT INTO usuario_pregunta (idUsuario, idPregunta, fechaVisto) VALUES (?, ?, NOW())");
+        $stmt->bind_param("ii", $id_usuario, $id_pregunta);
+        $stmt->execute();
+    }
+
+    public function getRespuestasPorIdPreguntaAleatoria($id_pregunta)
+    {
+        $sql = "SELECT id_respuesta, respuesta FROM respuestas WHERE id_pregunta = $id_pregunta ";
+        $respuestas_obtenidas = $this->db->query($sql);
+
+        $respuestas = [];
+
+        foreach ($respuestas_obtenidas as $respuesta) {
+            $respuestas[] = [
+                'id' => $respuesta['id_respuesta'],
+                'texto_respuesta' => $respuesta['respuesta']
+            ];
+        }
+        return $respuestas;
+    }
+
+    /*
+     * 1. Dificultad adecuada según su nivel (ratio: correctas / entregadas)
+     * 2. Haya sido entregada al menos 5 veces
+     * 3. El usuario no la vio (usuario_pregunta)
+     * 4. Sea de esa categoria
+     */
+    public function obtenerPregunta($id_usuario, $id_categoria)
+    {
+        // estadisticas del usuario
+        $estadisticas = $this->getEstadisticasUsuario($id_usuario);
+
+        // Nivel del usuario
+        $nivelUsuario = $this->getNivelUsuario(
+            $estadisticas['entregadas'],
+            $estadisticas['acertadas']
+        );
+
+        // Preguntas no vistas
+        $preguntas = $this->getPreguntasNoVistas($id_usuario, $id_categoria);
+
+        // si se acabaron → limpio historial y recursión
+        if (empty($preguntas)) {
+            $this->limpiarHistorialPreguntasVistas($id_usuario);
+            return $this->obtenerPregunta($id_usuario, $id_categoria);
+        }
+
+        // d) agrupo y selecciono según nivel
+        $grupos = $this->agruparPorNivel($preguntas);
+
+        $preg = $this->elegirPorNivelUsuario($grupos, $nivelUsuario);
+        return $preg;
+    }
+
+    private function seDebeCalcularNivelUsuario($entregadas)
+    {
+        return $entregadas >= 5;
+    }
+
+    private function seDebeCalcularNivelPregunta($pregunta)
+    {
+        return $pregunta["entregadas"] >= 5;
+    }
+
+    private function getEstadisticasUsuario($id_usuario): array
+    {
+        $result = $this->db->query("
+            SELECT preguntas_entregadas, preguntas_acertadas
+            FROM usuarios
+            WHERE id_usuario = $id_usuario
+        ");
+
+        return [
+            "entregadas" => $result[0]["preguntas_entregadas"],
+            "acertadas" => $result[0]["preguntas_acertadas"]
+        ] ?? ['entregadas' => 0, 'acertadas' => 0];
+    }
+
+    private function getNivelUsuario($entregadas, $acertadas): string
+    {
+        if (!$this->seDebeCalcularNivelUsuario($entregadas)) {
+            return "intermedio";
+        }
+
+        $ratio = $acertadas / $entregadas;
+        if ($ratio > 0.7) {
+            return 'facil';
+        }
+        if ($ratio < 0.3) {
+            return 'dificil';
+        }
+        return 'intermedio';
+    }
+
+    private function getDificultadPregunta($pregunta): string
+    {
+        if (!$this->seDebeCalcularNivelPregunta($pregunta)) {
+            return 'intermedio';
+        }
+
+        $ratio = $pregunta['correctas'] / $pregunta['entregadas'];
+        if ($ratio > 0.7) {
+            return 'facil';
+        }
+        if ($ratio < 0.3) {
+            return 'dificil';
+        }
+        return 'intermedio';
+    }
+
+    private function getPreguntasNoVistas($id_usuario, $id_categoria): array
+    {
+        return $this->db->query("
+            SELECT p.*
+              FROM preguntas p
+              LEFT JOIN usuario_pregunta up
+                ON p.id_pregunta = up.idPregunta
+               AND up.idUsuario   = $id_usuario
+             WHERE up.idPregunta IS NULL
+               AND p.id_categoria = $id_categoria
+        ");
+    }
+
+    private function limpiarHistorialPreguntasVistas($id_usuario)
+    {
+        $this->db->execute("
+            DELETE FROM usuario_pregunta
+             WHERE idUsuario = $id_usuario
+        ");
+    }
+
+    public function agruparPorNivel($preguntas): array
+    {
+        $grupos = [
+            'facil' => [],
+            'intermedio' => [],
+            'dificil' => [],
+        ];
+        foreach ($preguntas as $p) {
+            $dificultad = $this->getDificultadPregunta($p);
+            $grupos[$dificultad][] = $p;
+        }
+        return $grupos;
+    }
+
+    public function elegirPorNivelUsuario($grupos, $nivelUsuario): array
+    {
+        $order = ['facil', 'intermedio', 'dificil'];
+        $idx = array_search($nivelUsuario, $order, true);
+
+        // Intento desde el mismo nivel hacia niveles más difíciles
+        for ($i = $idx, $iMax = count($order); $i < $iMax; $i++) {
+            if (!empty($grupos[$order[$i]])) {
+                return $grupos[$order[$i]][array_rand($grupos[$order[$i]])];
+            }
+        }
+        // Si aún vacío, busco niveles más fáciles
+        for ($i = $idx - 1; $i >= 0; $i--) {
+            if (!empty($grupos[$order[$i]])) {
+                return $grupos[$order[$i]][array_rand($grupos[$order[$i]])];
+            }
+        }
+
+        // No debería llegar aquí
+        return [];
+    }
 }
