@@ -21,12 +21,6 @@ class LobbyController
 
         $id_usuario = $_SESSION['usuario_id'] ?? null;
 
-
-        if($id_usuario == null){
-            header("Location: /inicio/show");
-            exit;
-        }
-
         $user = $this->model->getUsuario($id_usuario);
 
         $this->view->render("lobby", [

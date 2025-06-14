@@ -13,9 +13,6 @@ class PerfilController
 
   public function show()
   {
-    if (!$this->isLogueado()) {
-      $this->redirectTo("/login/show");
-    }
 
     $id_usuario = $_SESSION['usuario_id'] ?? null;
 
@@ -31,17 +28,6 @@ class PerfilController
       'title' => 'Perfil Usuario',
       'css' => '<link rel="stylesheet" href="/public/css/perfil.css">'
     ], $usuario));
-  }
-
-  private function redirectTo($str)
-  {
-    header('Location: ' . $str);
-    exit();
-  }
-
-  private function isLogueado(): bool
-  {
-    return !($_SESSION['usuario_id'] === null);
   }
 
 }

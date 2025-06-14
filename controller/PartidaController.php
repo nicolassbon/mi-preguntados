@@ -17,11 +17,6 @@ class PartidaController
         $id_usuario = $_SESSION['usuario_id'] ?? null;
         $_SESSION['puntaje'] = 0;
 
-        if ($id_usuario == null) {
-            header('Location: /inicio/show');
-            exit;
-        }
-
         //crear partida
         $id_partida = $this->model->crearPartida($id_usuario);
 
@@ -35,11 +30,6 @@ class PartidaController
     {
 
         $id_usuario = $_SESSION['usuario_id'] ?? null;
-
-        if ($id_usuario == null) {
-            header('Location: /inicio/show');
-            exit;
-        }
 
         $categoria = $this->model->getCategoriaAleatoria();
 
@@ -66,7 +56,8 @@ class PartidaController
         $tiempo_restante = $this->model->getTiempo();
 
         // Se le entrego la pregunta, actualizar datos bdd
-        $this->model->incrementoDeEntregadas($id_usuario);
+        $this->model->incrementarEntregas($id_pregunta);
+        $this->model->incrementarEntregadasUsuario($id_usuario);
         $this->model->marcarPreguntaComoVista($id_usuario, $id_pregunta);
 
         $this->view->render("partida", [
@@ -89,11 +80,6 @@ class PartidaController
     {
 
         $id_usuario = $_SESSION['usuario_id'] ?? null;
-
-        if ($id_usuario == null) {
-            header('Location: /inicio/show');
-            exit;
-        }
 
         $texto = '';
         $color = '';
@@ -132,7 +118,9 @@ class PartidaController
                         $this->model->incremetoPreguntaRespondidaCorrectamente($id_partida);
                         $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
                         $this->model->acumularPuntajeUsuario($id_usuario);
-                        $this->model->sumarCorrectaAUsuario($id_usuario);
+                        $this->model->incrementarCorrectasPregunta($id_pregunta);
+                        $this->model->incrementarCorrectasUsuario($id_usuario);
+
                     }
                     $respuesta['clase'] = 'bg-success';
                 } elseif ($respuesta['id_respuesta'] == $_POST['id_respuesta']) {

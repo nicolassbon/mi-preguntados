@@ -44,18 +44,32 @@ class PartidaModel
         return $resultado[0]['nombre_usuario'];
     }
 
-    public function sumarCorrectaAUsuario($id_usuario)
+    public function incrementarEntregas($id_pregunta)
     {
-
-        $sql = "UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = $id_usuario ";
-        $this->db->execute($sql);
+        $stmt = $this->db->prepare("UPDATE preguntas SET entregadas = entregadas + 1 WHERE id_pregunta = ?");
+        $stmt->bind_param("i", $id_pregunta);
+        $stmt->execute();
     }
 
-    public function incrementoDeEntregadas($id_usuario)
+    public function incrementarEntregadasUsuario($id_usuario)
     {
         $sql = "UPDATE usuarios SET preguntas_entregadas = preguntas_entregadas + 1 WHERE id_usuario = $id_usuario ";
         $this->db->execute($sql);
 
+    }
+
+    public function incrementarCorrectasPregunta($id_pregunta)
+    {
+        $stmt = $this->db->prepare("UPDATE preguntas SET correctas = correctas + 1 WHERE id_pregunta = ?");
+        $stmt->bind_param("i", $id_pregunta);
+        $stmt->execute();
+    }
+
+    public function incrementarCorrectasUsuario($id_usuario)
+    {
+        $stmt = $this->db->prepare("UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = ?");
+        $stmt->bind_param("i", $id_usuario);
+        $stmt->execute();
     }
 
     public function incrementoPuntaje($id_partida)
