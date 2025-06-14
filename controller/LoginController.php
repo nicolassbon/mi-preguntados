@@ -55,6 +55,7 @@ class LoginController
     }
   }
 
+
   private
   function redirectTo($str)
   {
