@@ -31,6 +31,33 @@ class PartidaController
 
         $id_usuario = $_SESSION['usuario_id'] ?? null;
 
+        // Verificar si ya tiene una pregunta
+        if (isset($_SESSION['id_pregunta'])) {
+            $nombre_categoria = $_SESSION['nombre_categoria'] ?? null;
+            $id_pregunta = $_SESSION['id_pregunta'];
+            $pregunta_texto = $_SESSION['pregunta'];
+            $respuestas = $this->model->getRespuestasPorIdPreguntaAleatoria($id_pregunta);
+
+            $fondo = $this->model->getColorCategoria($nombre_categoria);
+            $foto = $this->model->getFotoCategoria($nombre_categoria);
+            $user = $this->model->getUsuario($id_usuario);
+
+            $tiempo_restante = $this->model->getTiempo();
+            $this->view->render("partida", [
+                'title' => 'Ruleta',
+                'usuario_id' => $id_usuario,
+                'pregunta' => $pregunta_texto,
+                'categoria' => $nombre_categoria,
+                'respuestas' => $respuestas,
+                'id_partida' => $_SESSION['id_partida'],
+                'tiempo_restante' => $tiempo_restante,
+                'fondo' => $fondo,
+                'foto' => $foto,
+                'user' => $user
+            ]);
+            return;
+        }
+
         $categoria = $this->model->getCategoriaAleatoria();
 
         $nombre_categoria = $categoria["nombre"];
@@ -61,8 +88,7 @@ class PartidaController
         $this->model->marcarPreguntaComoVista($id_usuario, $id_pregunta);
 
         $this->view->render("partida", [
-            'title' => 'Ruleta',
-            'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+            'title' => 'Partida',
             'usuario_id' => $id_usuario,
             'pregunta' => $pregunta_texto,
             'categoria' => $nombre_categoria,
@@ -146,8 +172,7 @@ class PartidaController
 
 
             $this->view->render("partida", [
-                'title' => 'Ruleta',
-                'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
+                'title' => 'Partida',
                 'usuario_id' => $id_usuario,
                 'pregunta' => $_SESSION['pregunta'],
                 'respuestas' => $respuestas,
@@ -162,6 +187,9 @@ class PartidaController
                 'fondo' => $fondo,
                 'user' => $user
             ]);
+
+            // Limpiar datos de la partida,categoria y pregunta actual en sesión
+            unset($_SESSION["nombre_categoria"], $_SESSION["id_pregunta"], $_SESSION["pregunta"], $_SESSION["inicio_pregunta"]);
         } else {
             echo 'error';
         }

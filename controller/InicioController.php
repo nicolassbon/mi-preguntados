@@ -11,8 +11,7 @@ class InicioController
 
     public function show(){
         $this->view->render("inicio", [
-            'title' => 'Inicio Preguntopolis',
-            'css' => '<link rel="stylesheet" href="/public/css/styles.css">'
+            'title' => 'Inicio Preguntopolis'
         ]);
     }
 }

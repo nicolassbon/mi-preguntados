@@ -23,14 +23,13 @@ class LobbyController
 
         $user = $this->model->getUsuario($id_usuario);
 
+        $_SESSION['nombre_usuario'] = $user;
+
         $this->view->render("lobby", [
             'title' => 'Lobby Preguntopolis',
-            'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
             'usuario_id' => $id_usuario,
             'user' => $user
         ]);
-
-
     }
 
 }

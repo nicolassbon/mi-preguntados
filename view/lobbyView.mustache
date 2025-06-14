@@ -1,36 +1,22 @@
+{{> navbar}}
+<main class="main-height bg-fondo d-flex justify-content-center align-items-center p-2">
+    <div class="container-fluid d-flex justify-content-center align-items-center text-center text-white w-100">
+        <div class="container-fluid m-0">
 
-<div style="font-family: 'Jockey One'" class="container-fluid m-0 p-0 vh-100">
-    <div style="background-color:#6b4468b9" class="d-flex justify-content-center align-items-center p-3">
-        <img src="../public/images/logo.png" alt="logo" style="width: 50px">
-        <h1 class="text-center w-100" >Preguntopolis</h1>
-        <a class="btn btn-dark" href="/perfil/show">{{user}}</a>
-        <form action="/login/logout" method="post" style="display:inline;">
-            <button type="submit" style="border:none; background:none; padding:0; cursor:pointer;">
-                <img src="/public/images/cerrar-sesion.png" alt="Icono cerrar sesión" style="max-height: 40px;">
-            </button>
-        </form>
-    </div>
+            <div class="m-5">
+                <p>Bienvenido a Preguntopólis, el juego más popular del momento.</p>
+                <p>¿Te animas a desafiar tus conocimientos?</p>
+                <a href="/partida/crearPartida" class="btn w-25 fw-bold" style="background-color: #AB98A9;">jugar</a>
+            </div>
 
-<div class="container-fluid m-0 d-flex justify-content-center align-items-center text-center text-white w-100 mt-3">
-    <div class="container-fluid m-0">
+            <hr class="w-100">
 
-        <div class="m-5">
-            <p>Bienvenido a Preguntopólis, el juego más popular del momento.</p>
-            <p>¿Te animas a desafiar tus conocimientos?</p>
-            <a href="/partida/crearPartida" class="btn w-25 fw-bold" style="background-color: #AB98A9;">jugar</a>
+            <div class="m-5">
+                <p>Si pensas que nos falta una pregunta, ¡es tu momento de brillar!</p>
+                <p>Podes crear tu pregunta y la revisaremos a la brevedad</p>
+                <a href="" class="btn w-25 fw-bold" style="background-color: #AB98A9;">crear pregunta</a>
+            </div>
         </div>
-
-        <hr class="w-100">
-
-        <div class="m-5">
-            <p>Si pensas que nos falta una pregunta, ¡es tu momento de brillar!</p>
-            <p>Podes crear tu pregunta y la revisaremos a la brevedad</p>
-            <a href="" class="btn w-25 fw-bold" style="background-color: #AB98A9;">crear pregunta</a>
-        </div>
-
-
     </div>
+</main>
 
-
-</div>
-</div>

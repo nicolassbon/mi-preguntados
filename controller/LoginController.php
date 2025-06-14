@@ -18,7 +18,6 @@ class LoginController
 
     $this->view->render("login", [
       'title' => 'Iniciar sesión',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css" >',
       'error' => $error
     ]);
   }
