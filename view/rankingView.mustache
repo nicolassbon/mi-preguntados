@@ -8,8 +8,8 @@
     {{#ranking}}
         <tr>
             <td>
-                <form method="GET" action="/perfil/show?idUsuario={{id_usuario}}" style="margin:0;">
-
+                <form method="GET" action="/perfil/show" style="margin:0;">
+                    <input type="hidden" name="idUsuario" value="{{id_usuario}}">
                     <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;">
                         {{nombre_usuario}}
                     </button>
