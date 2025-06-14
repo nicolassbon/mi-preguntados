@@ -21,6 +21,18 @@ require_once("model/LoginModel.php");
 require_once("model/EmailModel.php");
 require_once("model/PerfilModel.php");
 
+require_once("controller/LobbyController.php");
+require_once("model/LobbyModel.php");
+
+require_once("controller/RuletaController.php");
+require_once("model/RuletaModel.php");
+
+require_once("controller/InicioController.php");
+
+require_once("controller/PartidaController.php");
+require_once("model/PartidaModel.php");
+
+require_once("controller/PerdioController.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -106,6 +118,49 @@ class Configuration
   public function getGroupController()
   {
     return new GroupController(new GroupModel($this->getDatabase()), $this->getViewer());
+  }
+
+  public function getEmailController()
+  {
+    return new EmailController(
+      new EmailModel($this->getDatabase()),
+      $this->getViewer()
+    );
+  }
+
+  public function getLobbyController()
+  {
+      return new LobbyController(
+          new LobbyModel($this->getDatabase()),
+          $this->getViewer()
+      );
+  }
+
+  public function getRuletaController(){
+      return new RuletaController(
+          new RuletaModel($this->getDatabase()),
+          $this->getViewer()
+      );
+  }
+
+  public function getPartidaController(){
+      return new PartidaController(
+          new PartidaModel($this->getDatabase()),
+          $this->getViewer()
+      );
+  }
+
+  public function getPerdioController()
+  {
+      return new PerdioController(
+          $this->getViewer()
+      );
+  }
+
+  public function getInicioController(){
+      return new InicioController(
+          $this->getViewer()
+      );
   }
 
   public function getRouter()
