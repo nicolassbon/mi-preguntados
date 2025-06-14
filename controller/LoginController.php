@@ -41,7 +41,7 @@ class LoginController
     }
 
     $_SESSION["usuario_id"] = $usuario["id_usuario"];
-    $this->redirectTo("/perfil/show");
+    $this->redirectTo("/lobby/show");
   }
 
 
