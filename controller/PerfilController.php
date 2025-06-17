@@ -29,4 +29,15 @@ class PerfilController
     ], $usuario));
   }
 
+  private function redirectTo($str)
+  {
+    header('Location: ' . $str);
+    exit();
+  }
+
+  private function isLogueado(): bool
+  {
+    return !($_SESSION['usuario_id'] === null);
+  }
+
 }
