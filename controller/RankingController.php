@@ -27,7 +27,6 @@ class RankingController
 
         $this->view->render("ranking", [
             'title' => 'Ranking de jugadores',
-            'css' => '<link rel="stylesheet" href="/public/css/ranking.css">',
             'ranking' => $ranking,
             'title2' => 'Top partidas',
             'partidas' => $partidas

@@ -94,3 +94,60 @@ body {
   grid-template-columns: 1.2fr 1fr 2fr;
   gap: 20px;
 }
+
+.tabla-ranking {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+tr:hover {
+  background-color: rgba(167, 106, 198, 0.2);
+}
+
+.foto-perfil {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 2px solid #a76ac6;
+}
+
+.cantidad-partidas {
+  text-align: center;
+  color: #4c1765;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.tabla-titulo {
+  text-align: center;
+  font-size: 1.2em;
+  color: #4c1765;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+.jugador-btn {
+  background: none;
+  border: none;
+  color: #4c1765;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jugador-btn:hover {
+  color: #d50d7d;
+}
