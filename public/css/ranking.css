@@ -1,4 +1,4 @@
-body {
+main {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(to bottom right, #d6b4fc, #f8e8ff);
     margin: 0;
@@ -50,7 +50,7 @@ tr:hover {
     background-color: rgba(167, 106, 198, 0.2);
 }
 
-img {
+.foto-perfil {
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -90,4 +90,11 @@ td form {
 
 .jugador-btn:hover {
     color: #d50d7d;
+}
+
+.navbar-container {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }

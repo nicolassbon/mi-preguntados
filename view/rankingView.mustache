@@ -1,51 +1,54 @@
-<h1>{{title}}</h1>
-<table>
+{{> navbar}}
+<main>
+  <h1>{{title}}</h1>
+  <table>
     <tr>
-        <th>Posición</th>
-        <th>Jugador</th>
-        <th>Foto</th>
-        <th>Puntaje</th>
+      <th>Posición</th>
+      <th>Jugador</th>
+      <th>Foto</th>
+      <th>Puntaje</th>
     </tr>
     {{#ranking}}
-        <tr>
-            <td>{{posicionJugador}}</td>
-            <td>
-                <form method="GET" action="/perfil/show" style="margin:0;">
-                    <input type="hidden" name="idUsuario" value="{{id_usuario}}">
-                    <button type="submit" class="jugador-btn">
-                        {{nombre_usuario}}
-                    </button>
-                </form>
-            </td>
-            <td><img src="/public/uploads/{{foto_perfil_url}}" width="50" alt=""></td>
-            <td>{{puntaje_acumulado}}</td>
-        </tr>
+      <tr>
+        <td>{{posicionJugador}}</td>
+        <td>
+          <form method="GET" action="/perfil/show" style="margin:0;">
+            <input type="hidden" name="idUsuario" value="{{id_usuario}}">
+            <button type="submit" class="jugador-btn">
+              {{nombre_usuario}}
+            </button>
+          </form>
+        </td>
+        <td><img src="/public/uploads/{{foto_perfil_url}}" width="50" alt="" class="foto-perfil"></td>
+        <td>{{puntaje_acumulado}}</td>
+      </tr>
     {{/ranking}}
-</table>
+  </table>
 
-<h2>{{title2}}</h2>
-<table>
+  <h2>{{title2}}</h2>
+  <table>
     <tr>
-        <th>Top</th>
-        <th>Jugador</th>
-        <th>Inicio</th>
-        <th>Fin</th>
-        <th>Puntaje</th>
+      <th>Top</th>
+      <th>Jugador</th>
+      <th>Inicio</th>
+      <th>Fin</th>
+      <th>Puntaje</th>
     </tr>
     {{#partidas}}
-        <tr>
-            <td>{{posicionPartida}}</td>
-            <td>
-                <form method="GET" action="/perfil/show" style="margin:0;">
-                    <input type="hidden" name="idUsuario" value="{{id_usuario}}">
-                    <button type="submit" class="jugador-btn">
-                        {{nombre_usuario}}
-                    </button>
-                </form>
-            </td>
-            <td>{{fecha_inicio}}</td>
-            <td>{{fecha_fin}}</td>
-            <td>{{puntaje_final}}</td>
-        </tr>
+      <tr>
+        <td>{{posicionPartida}}</td>
+        <td>
+          <form method="GET" action="/perfil/show" style="margin:0;">
+            <input type="hidden" name="idUsuario" value="{{id_usuario}}">
+            <button type="submit" class="jugador-btn">
+              {{nombre_usuario}}
+            </button>
+          </form>
+        </td>
+        <td>{{fecha_inicio}}</td>
+        <td>{{fecha_fin}}</td>
+        <td>{{puntaje_final}}</td>
+      </tr>
     {{/partidas}}
-</table>
+  </table>
+</main>
