@@ -104,7 +104,8 @@ class Configuration
     public function getEditorController()
     {
         return new EditorController(
-            $this->getViewer()
+            $this->getViewer(),
+            new PreguntaModel($this->getDatabase())
         );
     }
 

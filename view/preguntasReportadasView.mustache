@@ -1,0 +1,110 @@
+{{> navbar}}
+<main class="p-2 main-ranking main-height"
+      style="font-family: 'Segoe UI',serif; background: linear-gradient(to bottom right, #d6b4fc, #f8e8ff);overflow-y: auto">
+    <h1 class="mt-4 text-center mb-4" style="color: #4c1765">{{title}}</h1>
+
+    <form class="d-flex justify-content-center mb-4" method="GET" action="/editor/reportes">
+        <div class="input-group w-75">
+            <input
+                    class="form-control"
+                    type="search"
+                    name="terminoBusqueda"
+                    placeholder="Buscar por texto de la pregunta..."
+                    value="{{terminoBusqueda}}"
+                    aria-label="Buscar pregunta"
+                    style="background-color: rgba(255, 255, 255, 0.8); border: 1px solid #a76ac6; color: #4c1765;">
+            <button class="btn fw-bold" type="submit" style="background-color: #a76ac6; color: white;">Buscar</button>
+            {{#q}}
+                <a href="/editor/reportes" class="btn fw-bold ms-2" style="background-color: #f8d5e8; color: #4c1765;">Limpiar</a>
+            {{/q}}
+        </div>
+    </form>
+
+    {{^hayReportes}}
+        <div class="alert alert-info text-center mx-auto"
+             style="background-color: rgba(167, 106, 198, 0.2); color: #4c1765; border: 1px solid #a76ac6; width: 80%;"
+             role="alert">
+            <h4 class="alert-heading" style="color: #4c1765;">¡Todo en orden!</h4>
+            <p>No hay reportes pendientes por revisar en este momento.</p>
+            <hr style="border-top-color: #a76ac6;">
+            <p class="mb-0">¡Sigue manteniendo la calidad de las preguntas!</p>
+        </div>
+        <div class="text-center mt-4">
+            <a href="/editor/show" class="btn w-25 fw-bold" style="background-color: #AB98A9;">Volver al
+                Panel</a>
+        </div>
+    {{/hayReportes}}
+
+    {{#hayReportes}}
+        <div class="table-responsive rounded-3 overflow-hidden">
+            <table class="tabla-ranking">
+                <thead>
+                <tr>
+                    <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Pregunta</th>
+                    <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Categoría</th>
+                    <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Reportador</th>
+                    <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Fecha</th>
+                    <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Motivo</th>
+                    <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#reportes}}
+                    <tr>
+                        <td class="p-2" style="color: #333">{{pregunta}}</td>
+                        <td class="text-center p-2" style="color: #333">{{nombre_categoria}}</td>
+                        <td class="text-center p-2" style="color: #333">
+                            <strong>{{reportador_usuario}}</strong><br>
+                            <small style="color: #666;">{{reportador_email}}</small>
+                        </td>
+                        <td class="text-center p-2" style="color: #333">{{fecha_reporte}}</td>
+                        <td class="p-2" style="color: #333; max-width: 300px; word-wrap: break-word;">{{motivo}}</td>
+                        <td class="text-center p-2">
+                            <form action="/editor/procesarReporte" method="POST"
+                                  class="d-flex flex-column flex-md-row justify-content-center gap-2">
+                                <input type="hidden" name="id_reporte" value="{{id_reporte}}">
+                                <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">
+                                <button type="submit" name="accion" value="descartar"
+                                        class="btn btn-sm btn-action-ranking" style="background-color: #d64d4d;"
+                                        title="Descartar reporte">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                                <button type="submit" name="accion" value="editar"
+                                        class="btn btn-sm btn-action-ranking" style="background-color: #f7d057;"
+                                        title="Editar pregunta">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                                <button type="submit" name="accion" value="aprobar"
+                                        class="btn btn-sm btn-action-ranking" style="background-color: #6fb65a;"
+                                        title="Aprobar reporte">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {{/reportes}}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/editor/show" class="btn w-25 fw-bold" style="background-color: #AB98A9;">Volver al
+                Panel</a>
+        </div>
+    {{/hayReportes}}
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Selecciona todos los botones dentro de los formularios de acciones
+        document.querySelectorAll('form[action="/editor/procesarReporte"] button[type="submit"]').forEach(button => {
+            button.addEventListener('click', function (event) {
+                const accion = this.getAttribute('name') + ': ' + this.value;
+                const confirmacion = confirm(`¿Estás seguro que querés realizar esta acción (${this.value})?`);
+                if (!confirmacion) {
+                    event.preventDefault();
+                }
+            });
+        });
+    });
+</script>
