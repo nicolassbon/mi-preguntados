@@ -4,11 +4,13 @@ class LoginController
 {
   private $model;
   private $view;
+  private $rolModel;
 
-  public function __construct($model, $view)
+  public function __construct($model, $view, $rolModel)
   {
     $this->model = $model;
     $this->view = $view;
+    $this->rolModel = $rolModel;
   }
 
   public function show()
@@ -40,6 +42,14 @@ class LoginController
     }
 
     $_SESSION["usuario_id"] = $usuario["id_usuario"];
+    $_SESSION["nombre_usuario"] = $usuario["nombre_usuario"];
+
+    $roles = $this->rolModel->getRolesDelUsuario($usuario['id_usuario']);
+    $_SESSION['roles'] = $roles;
+    $_SESSION['esEditor'] = in_array('editor', $roles, true);
+    $_SESSION['esAdmin'] = in_array('admin', $roles, true);
+    $_SESSION['esJugador'] = in_array('jugador', $roles, true);
+
     $this->redirectTo("/lobby/show");
   }
 
