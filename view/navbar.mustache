@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-container py-2" style="background: #6B4468">
     <div class="container-fluid justify-content-between align-items-center">
         <a class="d-flex align-items-center" href="/lobby/">
-            <img src="/public/images/logo.png" alt="Logo" height="40" class="d-inline-block align-text-top">
+            <img src="/public/images/logo.png" alt="Logo" height="50" class="d-inline-block align-text-top">
         </a>
 
         <span class="navbar-text mx-auto fw-bold text-white fs-2" style="font-family: 'Baloo', cursive">
@@ -9,7 +9,22 @@
       </span>
 
         <div class="d-flex align-items-center gap-3">
-            <a class="btn btn-dark" style="font-size: 0.8rem" href="/perfil/show">{{user}}</a>
+            {{#esJugador}}
+                <a class="btn btn-dark" style="font-size: 0.8rem" href="/perfil/show">{{user}}</a>
+            {{/esJugador}}
+            {{#esEditor}}
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="/editor/preguntas">Gestionar preguntas</a></li>
+                        <li><a class="dropdown-item" href="/editor/reportes">Revisar reportes</a></li>
+                        <li><a class="dropdown-item" href="/editor/sugerencias">Revisar sugerencias</a></li>
+                    </ul>
+                </div>
+            {{/esEditor}}
             <form action="/login/logout" method="post" style="display:inline;">
                 <button type="submit" style="border:none; background:none; padding:0; cursor:pointer;">
                     <img src="/public/images/cerrar-sesion.png" alt="Icono cerrar sesión" style="max-height: 30px;">
