@@ -1,41 +1,42 @@
-<h1>{{title}}</h1>
-<table>
-    <tr>
-        <th>Jugador</th>
-        <th>Foto</th>
-        <th>Puntaje</th>
-    </tr>
-    {{#ranking}}
-        <tr>
-            <td>
-                <form method="GET" action="/perfil/show" style="margin:0;">
-                    <input type="hidden" name="idUsuario" value="{{id_usuario}}">
-                    <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;">
-                        {{nombre_usuario}}
-                    </button>
-                </form>
-            </td>
-            <td><img src="/public/images/{{foto_perfil_url}}" width="50"></td>
-            <td>{{puntaje_acumulado}}</td>
-        </tr>
-    {{/ranking}}
-</table>
+<div class="container">
+    <h1>{{title}}</h1>
 
-<table>
-    <tr>
-        <th>Partida</th>
-        <th>Jugador</th>
-        <th>Inicio</th>
-        <th>Fin</th>
-        <th>Puntaje</th>
-    </tr>
-    {{#partidas}}
+    <table>
         <tr>
-            <td>{{id_partida}}</td>
-            <td>{{nombre_usuario}}</td>
-            <td>{{fecha_inicio}}</td>
-            <td>{{fecha_fin}}</td>
-            <td>{{puntaje_final}}</td>
+            <th>Jugador</th>
+            <th>Foto</th>
+            <th>Puntaje</th>
         </tr>
-    {{/partidas}}
-</table>
+        {{#ranking}}
+            <tr>
+                <td>
+                    <form method="GET" action="/perfil/show" style="margin:0;">
+                        <input type="hidden" name="idUsuario" value="{{id_usuario}}">
+                        <button type="submit">{{nombre_usuario}}</button>
+                    </form>
+                </td>
+                <td><img src="/public/images/{{foto_perfil_url}}" width="50" height="50"></td>
+                <td>{{puntaje_acumulado}}</td>
+            </tr>
+        {{/ranking}}
+    </table>
+
+    <table>
+        <tr>
+            <th>Partida</th>
+            <th>Jugador</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Puntaje</th>
+        </tr>
+        {{#partidas}}
+            <tr>
+                <td>{{id_partida}}</td>
+                <td>{{nombre_usuario}}</td>
+                <td>{{fecha_inicio}}</td>
+                <td>{{fecha_fin}}</td>
+                <td>{{puntaje_final}}</td>
+            </tr>
+        {{/partidas}}
+    </table>
+</div>

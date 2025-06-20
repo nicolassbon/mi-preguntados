@@ -1,83 +1,62 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to bottom right, #d6b4fc, #f8e8ff);
+    font-family: Arial, sans-serif;
+    background: #e8f0fd;
     margin: 0;
     padding: 20px;
+    background-image: url("../images/fondo.png");
+    background-size: cover;
+    background-position: center;
 }
 
-h1 {
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: rgba(49, 48, 49, 0.411); /* Violeta con transparencia */
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+h1, h2 {
     text-align: center;
-    color: #4c1765;
+    color: white;
     margin-bottom: 20px;
 }
 
 table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    color: white;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
 }
 
 th {
-    background-color: #a76ac6;
-    color: #fff;
-    padding: 12px 15px;
+    background-color: rgba(49, 48, 49, 0.411);
     font-weight: bold;
+    border-radius: 10px 10px 0 0;
 }
 
-td {
-    padding: 12px 15px;
-    color: #333;
-    text-align: center;
+tr:nth-child(odd) {
+    background-color: rgba(49, 48, 49, 0.411);
 }
 
 tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(49, 48, 49, 0.411);
 }
 
-tr:hover {
-    background-color: rgba(167, 106, 198, 0.2);
+
+td {
+    vertical-align: middle;
 }
 
 img {
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border: 2px solid #a76ac6;
-}
-
-.cantidad-partidas {
-    text-align: center;
-    color: #4c1765;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.tabla-titulo {
-    text-align: center;
-    font-size: 1.2em;
-    color: #4c1765;
-    margin-top: 20px;
-    margin-bottom: 5px;
-}
-.jugador-btn {
-    background: none;
-    border: none;
-    color: #4c1765;
-    font-weight: bold;
-    font-size: 1em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.jugador-btn:hover {
-    color: #a76ac6;
-    text-decoration: underline;
+    width: 30px;
+    height: 30px;
 }
