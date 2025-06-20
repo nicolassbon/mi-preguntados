@@ -21,6 +21,11 @@ class MustachePresenter
           $data['user'] = $_SESSION['nombre_usuario'];
       }
 
+      // Variables globales de rol desde sesión
+      $data['esEditor'] = $_SESSION['esEditor'] ?? false;
+      $data['esAdmin'] = $_SESSION['esAdmin'] ?? false;
+      $data['esJugador'] = $_SESSION['esJugador'] ?? false;
+
     echo $this->generateHtml($this->partialsPathLoader . '/' . $contentFile . "View.mustache", $data);
   }
 

@@ -16,8 +16,7 @@ class RegistroController
   public function show()
   {
     $this->view->render("register", [
-      'title' => 'Registrarse',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css">'
+      'title' => 'Registrarse'
     ]);
   }
 
@@ -67,10 +66,11 @@ class RegistroController
     );
 
     $idUsuario = $result["idUsuario"];
+    $this->model->asignarRolJugador($idUsuario);
 
     if ($idUsuario == null) {
       $this->renderErrorView('Error de Registro', 'No se pudo crear tu cuenta. Intentá de nuevo más tarde.');
-      return; // Estoy en duda si esta bien hacer esto
+      return;
     }
 
     // Cuando lo doy de alta, voy a mandar un correo
@@ -79,7 +79,7 @@ class RegistroController
 
     if (!$mailOK) {
       $this->renderErrorView('Error de Envío de Email', 'Tu cuenta se creó, pero no pudimos enviarte el correo de validación.');
-      return; // Estoy en duda si esta bien hacer esto
+      return;
     }
 
     $_SESSION['id_usuario'] = $idUsuario;
@@ -92,7 +92,6 @@ class RegistroController
     $email = $_SESSION['email'];
     $this->view->render("registroSuccess", [
       'title' => 'Validacion',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
       'email' => $email
     ]);
   }
@@ -109,12 +108,11 @@ class RegistroController
 
     if (!$verificado) {
       $this->renderErrorView('Error de validación', 'Ocurrio un error en la validacion del correo. Verifica tus credenciales.');
-      return; // Estoy en duda si esta bien hacer esto
+      return;
     }
 
     $this->view->render("verificacionSuccess", [
       'title' => '¡Cuenta verificada!',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
       'message' => 'Tu correo ha sido validado correctamente. Ya podés ingresar al sistema.'
     ]);
   }
@@ -141,7 +139,6 @@ class RegistroController
   {
     $this->view->render("error", [
       'title' => $title,
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css">',
       'message' => $message
     ]);
   }
