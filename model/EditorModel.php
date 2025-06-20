@@ -45,5 +45,21 @@ class EditorModel
         return $this->db->query($sql);
     }
 
+    public function desactivarPregunta(int $id_pregunta)
+    {
+        $sql = "
+                UPDATE preguntas
+                SET activa = 0
+                WHERE id_pregunta = $id_pregunta";
+        $this->db->execute($sql);
+    }
 
+    public function activarPregunta(int $id_pregunta)
+    {
+        $sql = "
+                UPDATE preguntas
+                SET activa = 1
+                WHERE id_pregunta = $id_pregunta";
+        $this->db->execute($sql);
+    }
 }

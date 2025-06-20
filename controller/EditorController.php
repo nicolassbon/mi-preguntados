@@ -33,7 +33,22 @@ class EditorController
             'categoria_todas' => $id_categoria === 'todasLasCategorias',
             'preguntas' => $preguntas
         ]);
+    }
 
+    public function desactivar(){
+        $id_pregunta = $_GET['id_pregunta'] ?? '';
+        $pregunta = $this->model->desactivarPregunta($id_pregunta);
+
+        header("Location: /editor/gestionarPreguntas");
+        exit;
+    }
+
+    public function activar(){
+        $id_pregunta = $_GET['id_pregunta'] ?? '';
+        $pregunta = $this->model->activarPregunta($id_pregunta);
+
+        header("Location: /editor/gestionarPreguntas");
+        exit;
     }
 
     public function show()
