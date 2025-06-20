@@ -9,7 +9,9 @@ $rutasPublicas = [
     'registro/procesar',
     'registro/success',
     'registro/verificar',
-    'login/logout'
+    'login/logout',
+    'perfil/show',
+    'ranking/show'
 ];
 
 $controller = $_GET['controller'] ?? null;

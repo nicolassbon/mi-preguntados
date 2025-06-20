@@ -16,7 +16,7 @@ class PerfilController
       $id_usuario = $_GET['idUsuario'] ?? ($_SESSION['usuario_id'] ?? null);
 
       if ($id_usuario === null) {
-          $this->redirectTo('/login'); // o donde quieras
+          $this->redirectTo('/login');
       }
 
       $datos = $this->model->getDatos($id_usuario);
@@ -27,9 +27,20 @@ class PerfilController
           $usuario = ['nombre_usuario' => 'Invitado'];
       }
 
-      $this->view->render("perfil", array_merge([
-          'title' => 'Perfil Usuario'
-      ], $usuario));
+      // Obtiene el host dinamico para no estar cambiandolo manualmente
+      $host = $_SERVER['HTTP_HOST'];
+      $es_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+      $protocolo = $es_https ? 'https' : 'http';
+
+      $url_perfil = "$protocolo://$host/perfil?idUsuario=$id_usuario";
+
+      $this->view->render("perfil", array_merge(
+          [
+              'title' => 'Perfil Usuario',
+              'url_perfil' => $url_perfil
+          ],
+          $usuario
+      ));
   }
 
   private function redirectTo($str)
