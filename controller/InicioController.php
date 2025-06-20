@@ -1,16 +1,15 @@
 <?php
 
-class HomeController
+class InicioController
 {
+
     private $view;
 
-    public function __construct($view)
-    {
+    public function __construct($view){
         $this->view = $view;
     }
 
-    public function show()
-    {
+    public function show(){
         $this->view->render("inicio", [
             'title' => 'Inicio Preguntopolis'
         ]);

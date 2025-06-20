@@ -17,6 +17,10 @@ class MustachePresenter
 
   public function render($contentFile, $data = array())
   {
+      if (isset($_SESSION['usuario_id'])) {
+          $data['user'] = $_SESSION['nombre_usuario'];
+      }
+
     echo $this->generateHtml($this->partialsPathLoader . '/' . $contentFile . "View.mustache", $data);
   }
 

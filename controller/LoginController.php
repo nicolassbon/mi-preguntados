@@ -18,12 +18,11 @@ class LoginController
 
     $this->view->render("login", [
       'title' => 'Iniciar sesión',
-      'css' => '<link rel="stylesheet" href="/public/css/styles.css" >',
       'error' => $error
     ]);
   }
 
-  public function loguearse()
+  public function procesar()
   {
     $email = $_POST["email"];
     $password = $_POST["password"];
@@ -41,7 +40,7 @@ class LoginController
     }
 
     $_SESSION["usuario_id"] = $usuario["id_usuario"];
-    $this->redirectTo("/perfil/show");
+    $this->redirectTo("/lobby/show");
   }
 
 
@@ -54,6 +53,7 @@ class LoginController
       $this->redirectTo("/login/show");
     }
   }
+
 
   private
   function redirectTo($str)
