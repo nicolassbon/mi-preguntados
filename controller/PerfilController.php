@@ -13,20 +13,23 @@ class PerfilController
 
   public function show()
   {
+      $id_usuario = $_GET['idUsuario'] ?? ($_SESSION['usuario_id'] ?? null);
 
-    $id_usuario = $_SESSION['usuario_id'] ?? null;
+      if ($id_usuario === null) {
+          $this->redirectTo('/login'); // o donde quieras
+      }
 
-    $datos = $this->model->getDatos($id_usuario);
+      $datos = $this->model->getDatos($id_usuario);
 
-    if (!empty($datos) && is_array($datos)) {
-      $usuario = $datos[0];
-    } else {
-      $usuario = ['nombre_usuario' => 'Invitado'];
-    }
+      if (!empty($datos) && is_array($datos)) {
+          $usuario = $datos[0];
+      } else {
+          $usuario = ['nombre_usuario' => 'Invitado'];
+      }
 
-    $this->view->render("perfil", array_merge([
-      'title' => 'Perfil Usuario'
-    ], $usuario));
+      $this->view->render("perfil", array_merge([
+          'title' => 'Perfil Usuario'
+      ], $usuario));
   }
 
   private function redirectTo($str)
