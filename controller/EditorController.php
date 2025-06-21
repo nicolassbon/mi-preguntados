@@ -90,4 +90,5 @@ class EditorController
             'title' => 'Panel Editor'
         ]);
     }
+
 }
