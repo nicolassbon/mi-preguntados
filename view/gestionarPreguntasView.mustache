@@ -37,7 +37,13 @@
                         {{^activa}}<span class="badge bg-secondary">Inactiva</span>{{/activa}}
                     </td>
                     <td class="text-center">
-                        <a href="/editor/editar/{{id_pregunta}}" class="btn btn-sm btn-warning me-1">Editar</a>
+                    {{!        <a href="/editor/editar/{{id_pregunta}}{{! " class="btn btn-sm btn-warning me-1">Editar</a> }}
+                        <form method="GET" action="/editor/editar/" class="d-inline">
+                            <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">
+                            <button type="submit" class="btn btn-sm btn-warning me-1">
+                                Editar
+                            </button>
+                        </form>
                     {{#activa}}
                         <form action="/editor/desactivar/{{id_pregunta}}" method="GET" class="d-inline">
                             <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">

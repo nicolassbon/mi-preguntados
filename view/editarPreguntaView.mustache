@@ -1,0 +1,25 @@
+{{> navbar}}
+<form method="POST" action="/editor/guardarEdicion">
+
+    <div class="container mt-4">
+        <h1 class="text-center text-primary mb-4">{{title}}</h1>
+    </div>
+
+    <p class="fw-bold fs-5">Pregunta:</p>
+    <input type="hidden" name="id_pregunta" value="{{pregunta.id_pregunta}}">
+
+
+    <input type="text" name="pregunta" value="{{pregunta.pregunta}}" class="form-control mb-3">
+
+    <p class="fw-bold fs-5">Opciones:</p>
+
+    {{#respuestas}}
+        <input type="hidden" name="ids_respuestas[]" value="{{id_respuesta}}">
+        <input type="text" name="respuestas[]" value="{{respuesta}}" class="form-control mb-2">
+
+    {{/respuestas}}
+
+    <button type="submit" class="btn btn-success mt-3">Guardar</button>
+    <a href="/editor/gestionarPreguntas" class="btn btn-danger mt-3">Cancelar</a>
+
+</form>
