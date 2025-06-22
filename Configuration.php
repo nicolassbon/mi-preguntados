@@ -33,6 +33,7 @@ require_once("model/RolModel.php");
 require_once("model/RuletaModel.php");
 require_once("model/PartidaModel.php");
 require_once("model/PreguntaModel.php");
+require_once("model/EditorModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -105,6 +106,7 @@ class Configuration
     {
         return new EditorController(
             $this->getViewer(),
+            new EditorModel($this->getDatabase()),
             new PreguntaModel($this->getDatabase())
         );
     }

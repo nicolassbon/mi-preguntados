@@ -1,0 +1,71 @@
+{{> navbar}}
+
+<div class="container mt-4">
+    <h1 class="text-center text-primary mb-4">{{title}}</h1>
+
+    <!-- Filtro por categoría -->
+    <form method="GET" action="/editor/gestionarPreguntas" class="row mb-4">
+        <div class="col-md-8">
+            <label for="categoria" class="form-label">Filtrar por categoría:</label>
+            <select name="categoria" id="categoria" class="form-select" onchange="this.form.submit()">
+                <option value="todasLasCategorias" {{#categoria_todas}}selected{{/categoria_todas}}>Todas las categorias</option>
+                {{#categorias}}
+                    <option value="{{id_categoria}}" {{#seleccionada}}selected{{/seleccionada}}>{{nombre}}</option>
+                {{/categorias}}
+            </select>
+        </div>
+    </form>
+
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-primary text-center">
+            <tr>
+                <th>Pregunta</th>
+                <th>Categoría</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#preguntas}}
+                <tr>
+                    <td>{{pregunta}}</td>
+                    <td>{{nombre}}</td>
+                    <td class="text-center">
+                        {{#activa}}<span class="badge bg-success">Activa</span>{{/activa}}
+                        {{^activa}}<span class="badge bg-secondary">Inactiva</span>{{/activa}}
+                    </td>
+                    <td class="text-center">
+                    {{!        <a href="/editor/editar/{{id_pregunta}}{{! " class="btn btn-sm btn-warning me-1">Editar</a> }}
+                        <form method="GET" action="/editor/editar/" class="d-inline">
+                            <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">
+                            <button type="submit" class="btn btn-sm btn-warning me-1">
+                                Editar
+                            </button>
+                        </form>
+                    {{#activa}}
+                        <form action="/editor/desactivar/{{id_pregunta}}" method="GET" class="d-inline">
+                            <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Desactivar esta pregunta?')">Desactivar</button>
+                        </form>
+                    {{/activa}}
+                    {{^activa}}
+                        <form action="/editor/activar/{{id_pregunta}}" method="GET" class="d-inline">
+                            <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Activar esta pregunta?')">Activar</button>
+                        </form>
+                    {{/activa}}
+                    </td>
+                </tr>
+            {{/preguntas}}
+
+            {{^preguntas}}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No hay preguntas para esta categoría.</td>
+                </tr>
+            {{/preguntas}}
+            </tbody>
+        </table>
+    </div>
+</div>
