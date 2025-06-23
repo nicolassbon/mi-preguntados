@@ -17,6 +17,57 @@ class EditorModel
         return $this->db->query($sql);
     }
 
+    public function getPreguntasSugeridas(){
+
+        $sql = "SELECT * FROM 
+            preguntas p JOIN 
+            categoria c ON 
+            p.id_categoria = c.id_categoria
+         WHERE estado = 'sugerida'";
+        return $this->db->query($sql);
+
+    }
+
+    public function activarPreguntaSugerida($id){
+
+        $estado = 'activa';
+
+        $sql = "UPDATE preguntas SET estado = '$estado' WHERE id_pregunta = $id ";
+        $this->db->execute($sql);
+
+        $sql2 = "UPDATE respuestas SET activa = '1' WHERE id_pregunta = $id ";
+        $this->db->execute($sql2);
+
+    }
+
+    public function desactivarPreguntaSugerida($id){
+        $estado = 'deshabilitada';
+
+        $sql = "UPDATE preguntas SET estado = '$estado' WHERE id_pregunta = $id ";
+        $this->db->execute($sql);
+
+        $sql2 = "UPDATE respuestas SET activa = '0' WHERE id_pregunta = $id ";
+        $this->db->execute($sql2);
+
+    }
+
+    public function fechaResolucionSugerencia($id){
+
+        $query = "SELECT pregunta FROM preguntas WHERE id_pregunta = $id ";
+        $resultado = $this->db->query($query);
+
+        $final = $resultado[0]['pregunta'];
+
+        $sql = "UPDATE sugerencias_preguntas SET fecha_resolucion = NOW() WHERE pregunta_sugerida = '$final' ";
+        $this->db->execute($sql);
+
+    }
+
+
+
+
+
+
     public function getPreguntasPorCategoria($id_categoria, $terminoBusqueda = ''): array
     {
         $where = "p.id_categoria = $id_categoria";
