@@ -34,7 +34,7 @@ class ReporteController
         exit();
     }
 
-    private function limpiarSesionPregunta(): void
+    private function limpiarSesionPregunta()
     {
         unset(
             $_SESSION['nombre_categoria'],

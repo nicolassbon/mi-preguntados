@@ -9,7 +9,8 @@ $rutasPublicas = [
     'registro/procesar',
     'registro/success',
     'registro/verificar',
-    'login/logout'
+    'login/logout',
+    '/'
 ];
 
 $controller = $_GET['controller'] ?? null;
@@ -18,7 +19,7 @@ $method = $_GET['method'] ?? null;
 $ruta = "$controller/$method";
 
 if (!isset($_SESSION['usuario_id']) && !in_array($ruta, $rutasPublicas, true)) {
-    header("Location: /login/show");
+    header("Location: /");
     exit();
 }
 

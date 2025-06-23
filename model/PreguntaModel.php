@@ -34,14 +34,18 @@ class PreguntaModel
         $stmt->execute();
     }
 
-    public function getPreguntasReportadasConDetalles($terminoBusqueda = '')
+    public function getPreguntasReportadasConDetalles($terminoBusqueda = '', $id_categoria = 'todasLasCategorias')
     {
-
         $where = "pr.estado = 'pendiente'";
 
         if (trim($terminoBusqueda) !== '') {
             $term = $this->db->escapeLike($terminoBusqueda);
             $where .= " AND p.pregunta LIKE '%$term%'";
+        }
+
+        if ($id_categoria !== 'todasLasCategorias') {
+            $id_categoria = (int) $id_categoria;
+            $where .= " AND p.id_categoria = $id_categoria";
         }
 
         $sql = "
@@ -64,7 +68,6 @@ class PreguntaModel
                 ";
 
         return $this->db->query($sql);
-
     }
 
     public function aprobarReporte($id_pregunta, $id_reporte = null)
