@@ -51,6 +51,18 @@ class EditorModel
 
     }
 
+    public function fechaResolucionSugerencia($id){
+
+        $query = "SELECT pregunta FROM preguntas WHERE id_pregunta = $id ";
+        $resultado = $this->db->query($query);
+
+        $final = $resultado[0]['pregunta'];
+
+        $sql = "UPDATE sugerencias_preguntas SET fecha_resolucion = NOW() WHERE pregunta_sugerida = '$final' ";
+        $this->db->execute($sql);
+
+    }
+
 
 
 

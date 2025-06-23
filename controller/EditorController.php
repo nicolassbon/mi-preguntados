@@ -37,7 +37,7 @@ class EditorController
         $id= $_GET['id'];
 
         $this->model->activarPreguntaSugerida($id);
-
+        $this->model->fechaResolucionSugerencia($id);
         header('Location: /editor/sugerencias');
 
     }
@@ -45,6 +45,7 @@ class EditorController
     public function desactivarPregunta(){
         $id= $_GET['id'];
         $this->model->desactivarPreguntaSugerida($id);
+        $this->model->fechaResolucionSugerencia($id);
         header('Location: /editor/sugerencias');
     }
 

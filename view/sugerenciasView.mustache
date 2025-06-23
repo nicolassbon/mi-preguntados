@@ -4,7 +4,7 @@
 <div class="container-fluid d-flex justify-content-center">
 
 
-    {{#sugeridas}}
+
     <div class="table-responsive w-75">
         <table class="table table-striped table-bordered table-hover text-center">
             <thead class="table-secondary">
@@ -18,19 +18,24 @@
             </thead>
             <tbody>
             {{#sugeridas}}
-                <tr class="p-2 align-middle">
+                <tr class="align-middle">
                     <td>{{id_pregunta}}</td>
                     <td>{{pregunta}}</td>
                     <td>{{nombre}}</td>
                     <td> <span class="badge bg-warning" >{{estado}}</span>  </td>
-                    <td> <a class="btn btn-success" href="/editor/activarPregunta?id={{id_pregunta}}">Activar</a> <a class="btn btn-danger" href="/editor/desactivarPregunta?id={{id_pregunta}}">Descartar</a> </td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                        <a class="btn btn-success btn-sm" href="/editor/activarPregunta?id={{id_pregunta}}">Activar</a>
+                        <a class="btn btn-danger btn-sm" href="/editor/desactivarPregunta?id={{id_pregunta}}">Descartar</a>
+                        </div>
+                    </td>
 
                 </tr>
             {{/sugeridas}}
             </tbody>
         </table>
     </div>
-    {{/sugeridas}}
+
 
     {{^sugeridas}}
         <div class="alert alert-dark text-center mt-3 fw-bold w-75">
