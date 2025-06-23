@@ -17,6 +17,7 @@ body {
     background-repeat: no-repeat;
 }
 
+
 .main-height {
     flex-grow: 1;
     overflow-y: auto;

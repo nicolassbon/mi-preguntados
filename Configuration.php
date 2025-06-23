@@ -35,6 +35,11 @@ require_once("model/PartidaModel.php");
 require_once("model/PreguntaModel.php");
 require_once("model/EditorModel.php");
 
+require_once("controller/CrearPreguntaController.php");
+require_once("model/CrearPreguntaModel.php");
+
+require_once("controller/MensajeCreadaCorrectamenteController.php");
+
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
 class Configuration
@@ -161,6 +166,14 @@ class Configuration
         );
     }
 
+    public function getCrearPreguntaController()
+    {
+        return new CrearPreguntaController(
+            new CrearPreguntaModel($this->getDatabase()),
+            $this->getViewer()
+        );
+    }
+
     public function getPartidaController()
     {
         return new PartidaController(
@@ -172,6 +185,13 @@ class Configuration
     public function getPerdioController()
     {
         return new PerdioController(
+            $this->getViewer()
+        );
+    }
+
+    public function getMensajeCreadaCorrectamenteController()
+    {
+        return new MensajeCreadaCorrectamenteController(
             $this->getViewer()
         );
     }
