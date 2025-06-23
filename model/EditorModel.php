@@ -17,13 +17,20 @@ class EditorModel
         return $this->db->query($sql);
     }
 
-    public function getPreguntasPorCategoria($id_categoria): array
+    public function getPreguntasPorCategoria($id_categoria, $terminoBusqueda = ''): array
     {
+        $where = "p.id_categoria = $id_categoria";
+        if (trim($terminoBusqueda) !== '') {
+            $term = $this->db->escapeLike($terminoBusqueda);
+            $where .= " AND p.pregunta LIKE '%$term%'";
+        }
+
         $sql = "
-              SELECT p.id_pregunta ,p.pregunta, c.nombre, p.activa
-              FROM preguntas p join categoria c on p.id_categoria = c.id_categoria
-              WHERE p.id_categoria = $id_categoria
-              ";
+            SELECT p.id_pregunta, p.pregunta, c.nombre, p.estado
+            FROM preguntas p
+            JOIN categoria c ON p.id_categoria = c.id_categoria
+            WHERE $where
+            ";
         return $this->db->query($sql);
     }
 
@@ -36,12 +43,21 @@ class EditorModel
               ";
         return $this->db->query($sql);
     }
-    public function getPreguntas(): array
+    public function getPreguntas($terminoBusqueda = ''): array
     {
+        $where = "1=1";
+        if (trim($terminoBusqueda) !== '') {
+            $term = $this->db->escapeLike($terminoBusqueda);
+            $where .= " AND p.pregunta LIKE '%$term%'";
+        }
+
         $sql = "
-              SELECT p.id_pregunta ,p.pregunta,c.nombre, p.activa
-              FROM preguntas p join categoria c on p.id_categoria = c.id_categoria
-              order by id_pregunta";
+            SELECT p.id_pregunta, p.pregunta, c.nombre, p.estado
+            FROM preguntas p
+            JOIN categoria c ON p.id_categoria = c.id_categoria
+            WHERE $where
+            ORDER BY p.id_pregunta
+            ";
         return $this->db->query($sql);
     }
 
@@ -49,7 +65,7 @@ class EditorModel
     {
         $sql = "
                 UPDATE preguntas
-                SET activa = 0
+                SET estado = 'deshabilitada'
                 WHERE id_pregunta = $id_pregunta";
         $this->db->execute($sql);
     }
@@ -58,7 +74,7 @@ class EditorModel
     {
         $sql = "
                 UPDATE preguntas
-                SET activa = 1
+                SET estado = 'activa'
                 WHERE id_pregunta = $id_pregunta";
         $this->db->execute($sql);
     }
@@ -74,7 +90,7 @@ class EditorModel
 
     public function getPreguntaPorId($id_pregunta)
     {
-        $sql = "SELECT p.id_pregunta, p.pregunta, p.activa 
+        $sql = "SELECT p.id_pregunta, p.pregunta, estado
                 FROM preguntas p
                 WHERE id_pregunta = $id_pregunta";
         return $this->db->query($sql);

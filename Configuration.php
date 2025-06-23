@@ -19,6 +19,7 @@ require_once("controller/RuletaController.php");
 require_once("controller/InicioController.php");
 require_once("controller/PartidaController.php");
 require_once("controller/PerdioController.php");
+require_once("controller/ReporteController.php");
 
 require_once("model/GroupModel.php");
 require_once("model/SongModel.php");
@@ -31,6 +32,7 @@ require_once("model/RankingModel.php");
 require_once("model/RolModel.php");
 require_once("model/RuletaModel.php");
 require_once("model/PartidaModel.php");
+require_once("model/PreguntaModel.php");
 require_once("model/EditorModel.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
@@ -103,7 +105,15 @@ class Configuration
     public function getEditorController()
     {
         return new EditorController(
+            $this->getViewer(),
             new EditorModel($this->getDatabase()),
+            new PreguntaModel($this->getDatabase())
+        );
+    }
+
+    public function getReporteController() {
+        return new ReporteController(
+            new PreguntaModel($this->getDatabase()),
             $this->getViewer()
         );
     }

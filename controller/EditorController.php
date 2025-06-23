@@ -4,34 +4,48 @@ class EditorController
 {
     private $view;
     private $model;
+    private $preguntaModel;
 
-    public function __construct($model, $view)
+    public function __construct($view,$model, $preguntaModel)
     {
         $this->model = $model;
         $this->view = $view;
+        $this->preguntaModel = $preguntaModel;
+    }
+
+    public function show()
+    {
+        $this->view->render("panelEditor", [
+            'title' => 'Panel Editor'
+        ]);
     }
 
     public function gestionarPreguntas()
     {
         $id_categoria = $_GET['categoria'] ?? 'todasLasCategorias';
+        $terminoBusqueda = $_GET['terminoBusqueda'] ?? '';
 
         $categorias = $this->model->getCategorias();
-
         foreach ($categorias as &$categoria) {
             $categoria['seleccionada'] = ($categoria['id_categoria'] == $id_categoria);
         }
 
         if ($id_categoria === 'todasLasCategorias') {
-            $preguntas = $this->model->getPreguntas();
+            $preguntas = $this->model->getPreguntas($terminoBusqueda);
         } else {
-            $preguntas = $this->model->getPreguntasPorCategoria((int)$id_categoria);
+            $preguntas = $this->model->getPreguntasPorCategoria((int)$id_categoria, $terminoBusqueda);
+        }
+
+        foreach ($preguntas as &$pregunta) {
+            $pregunta['activa'] = $pregunta['estado'] === 'activa';
         }
 
         $this->view->render("gestionarPreguntas", [
             'title' => 'Gestión de Preguntas',
             'categorias' => $categorias,
             'categoria_todas' => $id_categoria === 'todasLasCategorias',
-            'preguntas' => $preguntas
+            'preguntas' => $preguntas,
+            'terminoBusqueda' => $terminoBusqueda,
         ]);
     }
 
@@ -53,6 +67,12 @@ class EditorController
 
     public function editar(){
         $id_pregunta = $_GET['id_pregunta'] ?? '';
+        $id_reporte = $_GET['id_reporte'] ?? '';
+
+        if ($id_reporte) {
+            $this->preguntaModel->actualizarEstadoReporte($id_reporte, 'resuelto');
+            $this->preguntaModel->actualizarEstadoPregunta($id_pregunta, 'activa');
+        }
 
         $pregunta = $this->model->getPreguntaPorId($id_pregunta);
         $pregunta = $pregunta[0] ?? null;
@@ -84,11 +104,53 @@ class EditorController
         exit;
     }
 
-    public function show()
+    public function reportes()
     {
-        $this->view->render("panelEditor", [
-            'title' => 'Panel Editor'
+        $terminoBusqueda = $_GET['terminoBusqueda'] ?? '';
+        $id_categoria = $_GET['categoria'] ?? 'todasLasCategorias';
+
+        $categorias = $this->model->getCategorias();
+        foreach ($categorias as &$categoria) {
+            $categoria['seleccionada'] = ($categoria['id_categoria'] == $id_categoria);
+        }
+
+        // Obtener reportes filtrados
+        $preguntasReportadas = $this->preguntaModel->getPreguntasReportadasConDetalles($terminoBusqueda, $id_categoria);
+
+        $this->view->render('preguntasReportadas', [
+            'title' => 'Preguntas Reportadas',
+            'reportes' => $preguntasReportadas,
+            'terminoBusqueda' => $terminoBusqueda,
+            'hayReportes' => !empty($preguntasReportadas),
+            'categorias' => $categorias,
+            'categoria_todas' => $id_categoria === 'todasLasCategorias',
+            'id_categoria' => $id_categoria
         ]);
+
+    }
+
+    public function procesarReporte()
+    {
+        $id_reporte = (int)($_POST['id_reporte'] ?? 0);
+        $id_pregunta = (int)($_POST['id_pregunta'] ?? 0);
+        $accion = $_POST['accion'] ?? '';
+
+        if ($id_reporte && $id_pregunta && $accion) {
+            switch ($accion) {
+                case 'descartar':
+                    $this->preguntaModel->descartarReporte($id_pregunta, $id_reporte);
+                    break;
+                case 'aprobar':
+                    $this->preguntaModel->aprobarReporte($id_pregunta, $id_reporte);
+                    break;
+                case 'editar':
+                    header("Location: /editor/editar?id_pregunta={$id_pregunta}&id_reporte={$id_reporte}");
+                    exit;
+            }
+        }
+
+        header("Location: /editor/reportes");
+        exit;
     }
 
 }

@@ -91,6 +91,7 @@ class PartidaController
             'title' => 'Partida',
             'usuario_id' => $id_usuario,
             'pregunta' => $pregunta_texto,
+            'id_pregunta' => $id_pregunta,
             'categoria' => $nombre_categoria,
             'respuestas' => $respuestas,
             'id_partida' => $_SESSION['id_partida'],
