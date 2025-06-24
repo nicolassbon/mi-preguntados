@@ -4,7 +4,7 @@
 <div class="container-fluid d-flex justify-content-center">
 
 
-
+    {{#haySugeridas}}
     <div class="table-responsive w-75">
         <table class="table table-striped table-bordered table-hover text-center">
             <thead class="table-secondary">
@@ -35,13 +35,13 @@
             </tbody>
         </table>
     </div>
+    {{/haySugeridas}}
 
-
-    {{^sugeridas}}
+    {{^haySugeridas}}
         <div class="alert alert-dark text-center mt-3 fw-bold w-75">
             No hay preguntas sugeridas por ahora, Estas al día!
         </div>
-    {{/sugeridas}}
+    {{/haySugeridas}}
 
 </div>
 

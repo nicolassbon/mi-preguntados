@@ -25,10 +25,12 @@ class EditorController
 
         $preguntasSugeridas = $this->model->getPreguntasSugeridas();
 
+        $haySugeridas = !empty($preguntasSugeridas);
 
         $this->view->render("sugerencias", [
             'title' => 'Sugerencias de usuarios',
-            'sugeridas' => $preguntasSugeridas
+            'sugeridas' => $preguntasSugeridas,
+            'haySugeridas' => $haySugeridas
         ]);
     }
 
@@ -38,6 +40,7 @@ class EditorController
 
         $this->model->activarPreguntaSugerida($id);
         $this->model->fechaResolucionSugerencia($id);
+        $this->model->actualizarEstadoPregunta($id, 'aprobada');
         header('Location: /editor/sugerencias');
 
     }
@@ -46,6 +49,7 @@ class EditorController
         $id= $_GET['id'];
         $this->model->desactivarPreguntaSugerida($id);
         $this->model->fechaResolucionSugerencia($id);
+        $this->model->actualizarEstadoPregunta($id, 'rechazada');
         header('Location: /editor/sugerencias');
     }
 
