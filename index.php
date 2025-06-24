@@ -13,6 +13,9 @@ $rutasPublicas = [
     'registro/success',
     'registro/verificar',
     'login/logout',
+    'perfil/show',
+    'ranking/show',
+    'login/logout',
     '/'
 ];
 

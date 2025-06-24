@@ -1,18 +1,18 @@
 {{> navbar}}
 <main class="main-height bg-fondo d-flex justify-content-center align-items-center p-2">
-    <div class="perfil-grid">
-        <div class="card p-2" style="grid-row: span 2">
-            <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1">
-                <img src="/public/uploads/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
-                <div class="fs-1 mt-3 text-white" style="text-shadow: 1px 1px black">{{nombre_usuario}}</div>
-            </div>
-            <div class="fs-6 mt-3" style="color: #ddd">Nivel 7<br>Ranking #125</div>
-            <div class="card">
-                <div class="d-flex justify-content-center">
-                    <a href="/ranking/show" class="ranking-btn">Ver Ranking</a>
-                </div>
-            </div>
+  <div class="perfil-grid">
+    <div class="card p-2" style="grid-row: span 2">
+      <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1">
+        <img src="/public/uploads/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
+        <div class="fs-1 mt-3 text-white" style="text-shadow: 1px 1px black">{{nombre_usuario}}</div>
+      </div>
+      <div class="fs-6 mt-3" style="color: #ddd">Nivel 7<br>Ranking #125</div>
+      <div class="card">
+        <div class="d-flex justify-content-center">
+          <a href="/ranking/show" class="ranking-btn">Ver Ranking</a>
         </div>
+      </div>
+    </div>
 
         <div class="card" style="grid-column: 2">
             <p class="fs-4 text-white">Partidas:</p>
@@ -33,9 +33,12 @@
             </div>
         </div>
 
-        <div class="card justify-content-center align-items-center" style="grid-column: 3">
-            <img class="p-2" src="/public/images/ImagenQR.png" alt="QR" style="max-height: 250px;max-width: 250px">
-        </div>
+    <div class="card justify-content-center align-items-center" style="grid-column: 3">
+      <img class="p-2"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{url_perfil}}"
+        alt="QR"
+        style="max-height: 250px; max-width: 250px">
+    </div>
 
         {{#latitud}}
             <div class="card mapa-card p-2" style="grid-column: 3">

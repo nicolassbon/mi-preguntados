@@ -20,6 +20,39 @@ class EditorController
         ]);
     }
 
+
+    public function sugerencias(){
+
+        $preguntasSugeridas = $this->model->getPreguntasSugeridas();
+
+        $haySugeridas = !empty($preguntasSugeridas);
+
+        $this->view->render("sugerencias", [
+            'title' => 'Sugerencias de usuarios',
+            'sugeridas' => $preguntasSugeridas,
+            'haySugeridas' => $haySugeridas
+        ]);
+    }
+
+    public function activarPregunta(){
+
+        $id= $_GET['id'];
+
+        $this->model->activarPreguntaSugerida($id);
+        $this->model->fechaResolucionSugerencia($id);
+        $this->model->actualizarEstadoPregunta($id, 'aprobada');
+        header('Location: /editor/sugerencias');
+
+    }
+
+    public function desactivarPregunta(){
+        $id= $_GET['id'];
+        $this->model->desactivarPreguntaSugerida($id);
+        $this->model->fechaResolucionSugerencia($id);
+        $this->model->actualizarEstadoPregunta($id, 'rechazada');
+        header('Location: /editor/sugerencias');
+    }
+
     public function gestionarPreguntas()
     {
         $id_categoria = $_GET['categoria'] ?? 'todasLasCategorias';
