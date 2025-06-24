@@ -131,6 +131,12 @@ class PartidaModel
 
         $id_preg = intval($id_pregunta);
         $id_par = intval($id_partida);
+
+        // Si ya existe, no la inserto
+        if ($this->partidaPreguntaYaRegistrada($id_par,$id_preg)) {
+            return;
+        }
+        
         $id_resp = intval($id_respuesta);
         $acerto = intval($acerto);
 
@@ -139,6 +145,16 @@ class PartidaModel
     VALUES ($id_par, $id_preg, $id_resp, $acerto)";
 
         $this->db->execute($sql);
+    }
+
+    private function partidaPreguntaYaRegistrada($id_partida, $id_pregunta): bool {
+        $res = $this->db->query("
+        SELECT 1 
+        FROM partida_pregunta 
+        WHERE id_partida = $id_partida AND id_pregunta = $id_pregunta
+        LIMIT 1
+    ");
+        return !empty($res);
     }
 
     public function crearPartida($id_usuario)
