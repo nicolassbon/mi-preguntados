@@ -40,11 +40,32 @@
         style="max-height: 250px; max-width: 250px">
     </div>
 
-        <div class="card mapa-card p-2" style="grid-column: 3">
-            <p class="fs-4 text-white">Ubicación: <span></span></p>
-            <div>
-                <img src="/public/images/mapa.png" alt="Imagen del mapa" style="max-height: 200px">
+        {{#latitud}}
+            <div class="card mapa-card p-2" style="grid-column: 3">
+                <p class="fs-4 text-white">Ubicación: <span>{{nombre_ciudad}}, {{nombre_pais}}</span></p>
+                <div id="mapa-ubicacion" style="height: 200px; border-radius: 8px;"></div>
             </div>
-        </div>
+        {{/latitud}}
+        {{^latitud}}
+            <div class="card mapa-card p-2" style="grid-column: 3">
+                <p class="fs-4 text-white"><span>No tiene ubicacion cargada</span></p>
+                <div>
+                    <img src="/public/images/mapa.png" alt="Imagen del mapa" style="max-height: 200px">
+                </div>
+            </div>
+        {{/latitud}}
     </div>
 </main>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    const lat = {{latitud}};  // número float
+    const lng = {{longitud}}; // número float
+
+    const map = L.map('mapa-ubicacion').setView([lat, lng], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([lat, lng]).addTo(map);
+</script>

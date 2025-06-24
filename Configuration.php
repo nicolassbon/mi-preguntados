@@ -34,6 +34,7 @@ require_once("model/RuletaModel.php");
 require_once("model/PartidaModel.php");
 require_once("model/PreguntaModel.php");
 require_once("model/EditorModel.php");
+require_once("model/UbicacionModel.php");
 
 require_once("controller/CrearPreguntaController.php");
 require_once("model/CrearPreguntaModel.php");
@@ -77,6 +78,7 @@ class Configuration
     {
         return new RegistroController(
             new RegistroModel($this->getDatabase()),
+            new UbicacionModel($this->getDatabase()),
             $this->getViewer(),
             $this->getEmailSender()
         );
