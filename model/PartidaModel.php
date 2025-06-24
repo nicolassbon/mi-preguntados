@@ -136,7 +136,7 @@ class PartidaModel
         if ($this->partidaPreguntaYaRegistrada($id_par,$id_preg)) {
             return;
         }
-        
+
         $id_resp = intval($id_respuesta);
         $acerto = intval($acerto);
 
@@ -220,7 +220,8 @@ class PartidaModel
 
         // si se acabaron → limpio historial y recursión
         if (empty($preguntas)) {
-            $this->limpiarHistorialPreguntasVistas($id_usuario);
+            // Solo limpia las de esa categoria
+            $this->limpiarHistorialPreguntasVistas($id_usuario, $id_categoria);
             return $this->obtenerPregunta($id_usuario, $id_categoria);
         }
 
@@ -314,12 +315,15 @@ class PartidaModel
         return $this->db->query($sql);
     }
 
-    private function limpiarHistorialPreguntasVistas($id_usuario)
+    private function limpiarHistorialPreguntasVistas($id_usuario, $id_categoria)
     {
         $this->db->execute("
-            DELETE FROM usuario_pregunta
-             WHERE idUsuario = $id_usuario
-        ");
+        DELETE up
+          FROM usuario_pregunta up
+          JOIN preguntas p ON up.idPregunta = p.id_pregunta
+         WHERE up.idUsuario = $id_usuario
+           AND p.id_categoria = $id_categoria
+    ");
     }
 
     public function agruparPorNivel($preguntas): array
