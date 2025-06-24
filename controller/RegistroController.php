@@ -2,144 +2,211 @@
 
 class RegistroController
 {
-  private $model;
-  private $view;
-  private $emailSender;
+    private $model;
+    private $ubicacionModel;
+    private $view;
+    private $emailSender;
 
-  public function __construct($registroModel, $view, $emailSender)
-  {
-    $this->model = $registroModel;
-    $this->view = $view;
-    $this->emailSender = $emailSender;
-  }
-
-  public function show()
-  {
-    $this->view->render("register", [
-      'title' => 'Registrarse'
-    ]);
-  }
-
-  public function procesar()
-  {
-    $nombreCompleto = $_POST['nombre'];
-    $fechaNac = $_POST['fecha-nac'];
-    $correo = $_POST['email'];
-    $usuario = $_POST['usuario'];
-    $contrasenaHash = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $sexo = $_POST['sexo'];
-    $sexoId = ($sexo == "masculino") ? 1 : (($sexo == "femenino") ? 2 : 3);
-
-    // Hardcodeado siempre sera Buenos Aires y  Argentina hasta tener el mapa
-    $idPais = 1;
-    $idCiudad = 1;
-
-    $fotoNombre = null;
-    if (isset($_FILES['foto']) && is_uploaded_file($_FILES['foto']['tmp_name'])) {
-      $fotoNombre = $_FILES['foto']['name'];
-      $temp = $_FILES['foto']['tmp_name'];
-      $destino = __DIR__ . '/../public/uploads/' . $fotoNombre;
-
-      if (!is_dir(dirname($destino))) {
-        mkdir(dirname($destino), 0755, true);
-      }
-
-      move_uploaded_file($temp, $destino);
+    public function __construct($registroModel, $ubicacionModel, $view, $emailSender)
+    {
+        $this->model = $registroModel;
+        $this->ubicacionModel = $ubicacionModel;
+        $this->view = $view;
+        $this->emailSender = $emailSender;
     }
 
-    /*
-      Dentro del model genero un random y lo guardo en la base
-      Cuando doy de alta el usuario en la bdd con un valor random y un campo
-      validado = false
-    */
-
-    $result = $this->model->registrarUsuario(
-      $nombreCompleto,
-      $fechaNac,
-      $sexoId,
-      $idPais,
-      $idCiudad,
-      $correo,
-      $contrasenaHash,
-      $usuario,
-      $fotoNombre
-    );
-
-    $idUsuario = $result["idUsuario"];
-    $this->model->asignarRolJugador($idUsuario);
-
-    if ($idUsuario == null) {
-      $this->renderErrorView('Error de Registro', 'No se pudo crear tu cuenta. Intentá de nuevo más tarde.');
-      return;
+    public function show()
+    {
+        $this->view->render("register", [
+            'title' => 'Registrarse'
+        ]);
     }
 
-    // Cuando lo doy de alta, voy a mandar un correo
-    $body = $this->generateEmailBodyFor($result["nombreUsuario"], $result["token"], $result["idUsuario"]);
-    $mailOK = $this->emailSender->send($result["email"], $body);
+    public function pasoMapa()
+    {
+        $_SESSION['registro'] = [
+            'nombre' => $_POST['nombre'],
+            'fecha_nac' => $_POST['fecha-nac'],
+            'email' => $_POST['email'],
+            'usuario' => $_POST['usuario'],
+            'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+            'sexo' => $_POST['sexo']
+        ];
 
-    if (!$mailOK) {
-      $this->renderErrorView('Error de Envío de Email', 'Tu cuenta se creó, pero no pudimos enviarte el correo de validación.');
-      return;
+        if (isset($_FILES['foto']) && is_uploaded_file($_FILES['foto']['tmp_name'])) {
+            $fotoTmpNombre = basename($_FILES['foto']['name']);
+            $destinoTmp = __DIR__ . '/../public/uploads/tmp/' . $fotoTmpNombre; // ruta absoluta
+
+            if (!is_dir(dirname($destinoTmp))) {
+                mkdir(dirname($destinoTmp), 0755, true);
+            }
+
+            if (move_uploaded_file($_FILES['foto']['tmp_name'], $destinoTmp)) {
+                $_SESSION['foto_temp'] = $destinoTmp;
+            }
+        }
+
+        $this->redirectTo("/registro/mapa");
     }
 
-    $_SESSION['id_usuario'] = $idUsuario;
-    $_SESSION['email'] = $result["email"];
-    $this->redirectTo("/registro/success");
-  }
-
-  public function success()
-  {
-    $email = $_SESSION['email'];
-    $this->view->render("registroSuccess", [
-      'title' => 'Validacion',
-      'email' => $email
-    ]);
-  }
-
-  // Endpoint que llama el link que le llega por correo al usuario
-  public function verificar()
-  {
-    $idVerificador = $_GET["idVerificador"];
-    $idUsuario = $_GET["idUsuario"];
-
-    // EN LA BASE TENGO PARA ESE USUARIO UN VALOR RANDOM
-    // Si coincide el random con el idUsuario de la bdd, voy a cambiar el validado a true
-    $verificado = $this->model->verificarEmailUsuario($idVerificador, $idUsuario);
-
-    if (!$verificado) {
-      $this->renderErrorView('Error de validación', 'Ocurrio un error en la validacion del correo. Verifica tus credenciales.');
-      return;
+    public function mapa()
+    {
+        $this->view->render("mapaRegistro", [
+            'title' => 'Elige tu ubicación'
+        ]);
     }
 
-    $this->view->render("verificacionSuccess", [
-      'title' => '¡Cuenta verificada!',
-      'message' => 'Tu correo ha sido validado correctamente. Ya podés ingresar al sistema.'
-    ]);
-  }
+    public function getUbicacion()
+    {
+        if (!isset($_GET['lat']) || !isset($_GET['lng'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Coordenadas no válidas']);
+            return;
+        }
 
-  private function redirectTo($str)
-  {
-    header('Location: ' . $str);
-    exit();
-  }
+        $lat = $_GET['lat'];
+        $lng = $_GET['lng'];
 
-  private function generateEmailBodyFor($userName, $token, $idUsuario)
-  {
-    $url = "http://localhost/registro/verificar?idUsuario=$idUsuario&idVerificador=$token";
-    return "
+        // Usar la API de Nominatim
+        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lng}&zoom=10&addressdetails=1";
+
+        $opts = [
+            "http" => [
+                "header" => "User-Agent: /1.0\r\n"
+            ]
+        ];
+        $context = stream_context_create($opts);
+        $response = file_get_contents($url, false, $context);
+
+        if ($response === FALSE) {
+            http_response_code(500);
+            echo json_encode(['error' => 'No se pudo obtener ubicación']);
+            return;
+        }
+
+        $data = json_decode($response, true);
+
+        $pais = $data['address']['country'] ?? 'Desconocido';
+        $provincia = $data['address']['state'] ?? 'Desconocido';
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'pais' => $pais,
+            'provincia' => $provincia
+        ]);
+    }
+
+    public function procesar()
+    {
+        // Recuperar datos del registro que estan en session
+        $r = $_SESSION['registro'] ?? null;
+
+        // Datos mapa (POST)
+        $lat = $_POST['latitud'] ?? null;
+        $lng = $_POST['longitud'] ?? null;
+
+        // Obtener país y ciudad desde backend
+        $ubicacion = $this->ubicacionModel->obtenerPaisYCiudadPorCoordenadas($lat, $lng);
+
+        // Crear / Obtener ids
+        $idPais = $this->ubicacionModel->obtenerOCrearPais($ubicacion['pais']);
+        $idCiudad = $this->ubicacionModel->obtenerOCrearCiudad($ubicacion['ciudad'], $idPais);
+
+        $fotoNombre = null;
+        if (isset($_SESSION['foto_temp']) && file_exists($_SESSION['foto_temp'])) {
+            $fotoNombre = basename($_SESSION['foto_temp']);
+            $destinoFinal = "public/uploads/" . $fotoNombre;
+            rename($_SESSION['foto_temp'], $destinoFinal);
+        }
+
+        /*
+          Dentro del model genero un random y lo guardo en la base
+          Cuando doy de alta el usuario en la bdd con un valor random y un campo
+          validado = false
+        */
+
+        $res = $this->model->registrarUsuario(
+            $r['nombre'],
+            $r['fecha_nac'],
+            ($r['sexo'] === 'masculino' ? 1 : ($r['sexo'] === 'femenino' ? 2 : 3)),
+            $idPais,
+            $idCiudad,
+            $r['email'],
+            $r['password'],
+            $r['usuario'],
+            $fotoNombre,
+            $lat,
+            $lng
+        );
+        if (!$res['idUsuario']) {
+            $this->renderErrorView('Error', 'No pudimos crear tu cuenta.');
+            return;
+        }
+
+        // Asignar rol y enviar email
+        $this->model->asignarRolJugador($res['idUsuario']);
+        $body = $this->generateEmailBodyFor($res['nombreUsuario'], $res['token'], $res['idUsuario']);
+        $this->emailSender->send($res['email'], $body);
+
+        $_SESSION['id_usuario'] = $res['idUsuario'];
+        $_SESSION['email'] = $res['email'];
+        $this->redirectTo('/registro/success');
+        unset($_SESSION['registro'], $_SESSION['foto_temp']);
+    }
+
+    public function success()
+    {
+        $email = $_SESSION['email'];
+        $this->view->render("registroSuccess", [
+            'title' => 'Validacion',
+            'email' => $email
+        ]);
+    }
+
+    // Endpoint que llama el link que le llega por correo al usuario
+    public function verificar()
+    {
+        $idVerificador = $_GET["idVerificador"];
+        $idUsuario = $_GET["idUsuario"];
+
+        // EN LA BASE TENGO PARA ESE USUARIO UN VALOR RANDOM
+        // Si coincide el random con el idUsuario de la bdd, voy a cambiar el validado a true
+        $verificado = $this->model->verificarEmailUsuario($idVerificador, $idUsuario);
+
+        if (!$verificado) {
+            $this->renderErrorView('Error de validación', 'Ocurrio un error en la validacion del correo. Verifica tus credenciales.');
+            return;
+        }
+
+        $this->view->render("verificacionSuccess", [
+            'title' => '¡Cuenta verificada!',
+            'message' => 'Tu correo ha sido validado correctamente. Ya podés ingresar al sistema.'
+        ]);
+    }
+
+    private function redirectTo($str)
+    {
+        header('Location: ' . $str);
+        exit();
+    }
+
+    private function generateEmailBodyFor($userName, $token, $idUsuario)
+    {
+        $url = "http://localhost/registro/verificar?idUsuario=$idUsuario&idVerificador=$token";
+        return "
     <body>
       <p>Hola $userName,</p>
       <p>Gracias por registrarte. Por favor, valida tu cuenta haciendo click en el siguiente enlace:</p>
       <p><a href='$url'>Validar cuenta</a></p>
     </body>
   ";
-  }
+    }
 
-  private function renderErrorView($title, $message)
-  {
-    $this->view->render("error", [
-      'title' => $title,
-      'message' => $message
-    ]);
-  }
+    private function renderErrorView($title, $message)
+    {
+        $this->view->render("error", [
+            'title' => $title,
+            'message' => $message
+        ]);
+    }
 }

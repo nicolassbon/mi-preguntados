@@ -1,0 +1,63 @@
+<main class="bg-fondo min-vh-100 d-flex flex-column flex-md-row justify-content-center align-items-center px-3 py-4 text-white">
+    <div class="bg-opacity-75 text-white rounded-4 p-4" style="background: #511F3B;max-width: 500px; width: 100%">
+        <form action="/registro/procesar" method="POST">
+            <div class="mb-3 text-center fw-bold fs-5">
+                <p>Ubicación en el mapa</p>
+            </div>
+
+            <div class="mb-3">
+                <div id="map" style="height: 300px;"></div>
+            </div>
+
+            <div class="mb-3 fw-bold fs-5">
+                <p>Ubicación seleccionada</p>
+            </div>
+
+            <div class="mb-3">
+                <p>País: <span id="pais">Seleccione un país</span></p>
+            </div>
+
+            <div class="mb-3">
+                <p>Ciudad: <span id="ciudad">Seleccione una ciudad</span></p>
+            </div>
+
+            <input type="hidden" name="latitud" id="input-latitud">
+            <input type="hidden" name="longitud" id="input-longitud">
+            <button type="submit" class="btn btn-form w-100 mb-3 text-white">Registrarse</button>
+        </form>
+    </div>
+
+    <div class="d-flex flex-column align-items-center ms-md-5 text-center text-md-start">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <img src="/public/images/logo.png" alt="Logo de Preguntopolis" style="max-width: 100px"/>
+            <h1 class="fs-1" style="font-family: 'Baloo', cursive;">Preguntopolis</h1>
+        </div>
+        <p>Regístrate para comenzar tu aventura</p>
+    </div>
+</main>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker;
+    map.on('click', e => {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(e.latlng).addTo(map);
+
+        const lat = e.latlng.lat, lng = e.latlng.lng;
+        document.getElementById('input-latitud').value = lat;
+        document.getElementById('input-longitud').value = lng;
+
+        // Obtener pais y ciudad
+        fetch(`/registro/getUbicacion?lat=${lat}&lng=${lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("pais").textContent = data.pais;
+                    document.getElementById("ciudad").textContent = data.provincia;
+                });
+    });
+</script>

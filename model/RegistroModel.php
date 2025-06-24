@@ -14,17 +14,17 @@ class RegistroModel
     $this->database->query("SELECT * FROM usuarios");
   }
 
-  public function registrarUsuario($nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil)
+  public function registrarUsuario($nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $latitud, $longitud)
   {
 
     $tokenVerificacion = md5(uniqid(rand(), true));
 
-    $stmt = $this->database->prepare(
-      "INSERT INTO usuarios (nombre_completo, anio_nacimiento, id_sexo, id_pais, id_ciudad, email, contrasena_hash, nombre_usuario, foto_perfil_url, token_verificacion)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)"
-    );
+      $stmt = $this->database->prepare(
+          "INSERT INTO usuarios (nombre_completo, anio_nacimiento, id_sexo, id_pais, id_ciudad, email, contrasena_hash, nombre_usuario, foto_perfil_url, token_verificacion, latitud, longitud)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      );
 
-    $stmt->bind_param("siiiisssss", $nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $tokenVerificacion);
+    $stmt->bind_param("siiiisssssdd", $nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $tokenVerificacion, $latitud, $longitud);
     $stmt->execute();
 
     $idUsuario = $this->database->getLastInsertId();
