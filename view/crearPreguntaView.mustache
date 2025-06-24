@@ -1,0 +1,65 @@
+
+<div style="background-color: #6b4468;" class="p-3 container-fluid d-flex w-100 justify-content-center align-items-center text-white">
+    <a href="/lobby/show">
+        <img src="/public/images/logo.png" alt="" style="width: 50px;">
+    </a>
+
+    <div class=" text-center container-fluid d-flex flex-column ">
+        <h1 class="w-100 p-0 m-0 fw-bold" style="text-shadow: 1px 1px 2px white;">Crear pregunta</h1>
+        <p class="m-0 pb-1">Agrega la pregunta que sientas necesaria para que mejores</p>
+    </div>
+
+    <a class="btn btn-dark" style="font-size: 0.8rem" href="/perfil/show">{{user}}</a>
+</div>
+
+<div class="container-fluid text-white bg-fondo w-100 m-0 p-4 vh-100 d-flex justify-content-center">
+    <div class="d-flex justify-content-center align-items-center text-dark p-3 rounded-3 w-75" style="background-color: rgba(255,255,255,0.35)">
+
+
+    <form action="/crearPregunta/guardarPregunta" method="post" class="d-flex flex-column w-75">
+        <label for="pregunta" class="fw-bold" style="color: #6B4468">Escriba su pregunta</label>
+        <input type="text" name="pregunta" id="pregunta" placeholder="» Ej: ¿Cuantos continentes existen?" class="rounded-1 p-2 text-secondary" style="border: none;">
+
+        <br>
+
+        <label for="opcion" class="fw-bold" style="color: #6B4468">Cargue sus opciones</label>
+        <input type="text" name="opcion" id="opcion" placeholder="» Ej: 3" class="rounded-1 p-2 mb-1 text-secondary" style="border: none;">
+        <input type="text" name="opcion2" id="opcion2" placeholder="» Ej: 8" class="rounded-1 p-2 mb-1 text-secondary" style="border: none;">
+        <input type="text" name="opcion3" id="opcion3" placeholder="» Ej: 5" class="rounded-1 p-2 mb-1 text-secondary" style="border: none;">
+        <input type="text" name="opcion4" id="opcion4" placeholder="» Ej: 10" class="rounded-1 p-2 text-secondary" style="border: none;">
+
+        <br>
+
+        <label for="opcionCorrecta" class="fw-bold" style="color: #6B4468">Indique opcion correcta</label>
+        <select name="opcionCorrecta" id="opcionCorrecta" class="rounded-1 p-2 text-secondary" style="border: none;">
+            <option value="" disabled selected hidden>» Indicar cual es la opcion correcta</option>
+            <option value="1">A</option>
+            <option value="2">B</option>
+            <option value="3">C</option>
+            <option value="4">D</option>
+        </select>
+
+        <br>
+
+        <label for="categoria" class="fw-bold" style="color: #6B4468">Seleccione la categoria de la pregunta</label>
+        <select name="categoria" id="categoria" class="rounded-1 p-2 text-secondary" style="border: none;">
+            <option value="" disabled selected hidden>» Indicar categoría</option>
+            <option value="1">Gastronomía</option>
+            <option value="2">Historia</option>
+            <option value="3">Deporte</option>
+            <option value="4">Tecnología</option>
+            <option value="5">Naturaleza</option>
+            <option value="6">Geografía</option>
+            <option value="7">Música</option>
+            <option value="8">Entretenimiento</option>
+        </select>
+        <br>
+
+        <div class="d-flex justify-content-center align-items-center">
+            <button class="btn fw-bold w-50 text-center text-white" style="background-color: #70465c;" type="submit">Cargar Pregunta</button>
+        </div>
+
+
+    </form>
+</div>
+</div>

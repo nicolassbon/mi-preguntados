@@ -198,7 +198,8 @@ class PartidaModel
             $estadisticas['acertadas']
         );
 
-        // Preguntas no vistas
+        // Preguntas no vistas y con estado 'activa'
+        // Con estado 'reportada' trae las que no fueron reportadas por ese usuario
         $preguntas = $this->getPreguntasNoVistas($id_usuario, $id_categoria);
 
         // si se acabaron → limpio historial y recursión
@@ -270,17 +271,31 @@ class PartidaModel
         return 'intermedio';
     }
 
+    // Trae preguntas que el usuario no vio, de la categoría dada,
+    // con estado activa/reportada (pero no las que él mismo reportó),
     private function getPreguntasNoVistas($id_usuario, $id_categoria): array
     {
-        return $this->db->query("
-            SELECT p.*
-              FROM preguntas p
-              LEFT JOIN usuario_pregunta up
-                ON p.id_pregunta = up.idPregunta
-               AND up.idUsuario   = $id_usuario
-             WHERE up.idPregunta IS NULL
-               AND p.id_categoria = $id_categoria
-        ");
+
+        $sql = "
+        SELECT p.*
+          FROM preguntas p
+
+          LEFT JOIN usuario_pregunta up
+            ON p.id_pregunta = up.idPregunta
+           AND up.idUsuario   = $id_usuario
+
+          LEFT JOIN preguntas_reportadas pr
+            ON p.id_pregunta      = pr.id_pregunta
+           AND pr.id_reportador   = $id_usuario
+           
+        WHERE 
+            up.idPregunta IS NULL                           
+            AND pr.id_reporte IS NULL                       
+            AND p.id_categoria  = $id_categoria                         
+            AND p.estado IN ('activa','reportada')                               
+    ";
+
+        return $this->db->query($sql);
     }
 
     private function limpiarHistorialPreguntasVistas($id_usuario)

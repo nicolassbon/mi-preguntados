@@ -19,6 +19,7 @@ require_once("controller/RuletaController.php");
 require_once("controller/InicioController.php");
 require_once("controller/PartidaController.php");
 require_once("controller/PerdioController.php");
+require_once("controller/ReporteController.php");
 
 require_once("model/GroupModel.php");
 require_once("model/SongModel.php");
@@ -31,6 +32,13 @@ require_once("model/RankingModel.php");
 require_once("model/RolModel.php");
 require_once("model/RuletaModel.php");
 require_once("model/PartidaModel.php");
+require_once("model/PreguntaModel.php");
+require_once("model/EditorModel.php");
+
+require_once("controller/CrearPreguntaController.php");
+require_once("model/CrearPreguntaModel.php");
+
+require_once("controller/MensajeCreadaCorrectamenteController.php");
 
 include_once('vendor/mustache/src/Mustache/Autoloader.php');
 
@@ -102,6 +110,15 @@ class Configuration
     public function getEditorController()
     {
         return new EditorController(
+            $this->getViewer(),
+            new EditorModel($this->getDatabase()),
+            new PreguntaModel($this->getDatabase())
+        );
+    }
+
+    public function getReporteController() {
+        return new ReporteController(
+            new PreguntaModel($this->getDatabase()),
             $this->getViewer()
         );
     }
@@ -149,6 +166,14 @@ class Configuration
         );
     }
 
+    public function getCrearPreguntaController()
+    {
+        return new CrearPreguntaController(
+            new CrearPreguntaModel($this->getDatabase()),
+            $this->getViewer()
+        );
+    }
+
     public function getPartidaController()
     {
         return new PartidaController(
@@ -160,6 +185,13 @@ class Configuration
     public function getPerdioController()
     {
         return new PerdioController(
+            $this->getViewer()
+        );
+    }
+
+    public function getMensajeCreadaCorrectamenteController()
+    {
+        return new MensajeCreadaCorrectamenteController(
             $this->getViewer()
         );
     }

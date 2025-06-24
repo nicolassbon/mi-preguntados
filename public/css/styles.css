@@ -1,153 +1,157 @@
 body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  height: 100vh;
-  color: #fff;
-  font-family: 'Poppins', serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100vh;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Poppins', serif;
 }
 
 .bg-fondo {
-  background-image: url("../images/fondo.png");
-  background-position: center center;
-  background-size: cover;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+    background-image: url("../images/fondo.png");
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
+
 .main-height {
-  height: calc(100vh - 80px);
-  max-height: 100vh;
+    flex-grow: 1;
+    overflow-y: auto;
 }
 
 .btn-form {
-  background: #732F69;
+    background: #732F69;
 }
 
 .btn-form:hover {
-  background: #8d3b7f;
+    background: #8d3b7f;
 }
 
 .input {
-  background: #3B152B;
-  color: #fff;
-  border: none;
-  font-size: 0.9rem;
-  padding: 0.5rem 0.75rem;
+    background: #3B152B;
+    color: #fff;
+    border: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
 }
 
 .input::placeholder {
-  color: #ffffffb3;
+    color: #ffffffb3;
 }
 
 .input:focus {
-  background: #4d1d3d;
-  color: #fff;
-  box-shadow: none;
+    background: #4d1d3d;
+    color: #fff;
+    box-shadow: none;
 }
 
 .sexo-group {
-  margin-bottom: 1rem;
-  color: #fff;
-  font-weight: 500;
+    margin-bottom: 1rem;
+    color: #fff;
+    font-weight: 500;
 }
 
 .sexo-group legend {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .sexo-group label {
-  margin-right: 1rem;
-  cursor: pointer;
-  font-weight: 400;
-  font-size: 0.9rem;
+    margin-right: 1rem;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 0.9rem;
 }
 
 .navbar-container {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
-  padding: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
-  text-align: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    text-align: center;
 }
 
 .perfil-img {
-  width: 250px;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 4px solid white;
-  margin-bottom: 10px;
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid white;
+    margin-bottom: 10px;
 }
 
 .perfil-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 2fr;
-  gap: 20px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 2fr;
+    gap: 20px;
 }
 
 .tabla-ranking {
-  width: 90%;
-  margin: 20px auto;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 tr:hover {
-  background-color: rgba(167, 106, 198, 0.2);
+    background-color: rgba(167, 106, 198, 0.2);
 }
 
 .foto-perfil {
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border: 2px solid #a76ac6;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border: 2px solid #a76ac6;
 }
 
 .cantidad-partidas {
-  text-align: center;
-  color: #4c1765;
-  font-weight: bold;
-  margin-bottom: 10px;
+    text-align: center;
+    color: #4c1765;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .tabla-titulo {
-  text-align: center;
-  font-size: 1.2em;
-  color: #4c1765;
-  margin-top: 20px;
-  margin-bottom: 5px;
+    text-align: center;
+    font-size: 1.2em;
+    color: #4c1765;
+    margin-top: 20px;
+    margin-bottom: 5px;
 }
+
 .jugador-btn {
-  background: none;
-  border: none;
-  color: #4c1765;
-  font-weight: bold;
-  font-size: 1em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    background: none;
+    border: none;
+    color: #4c1765;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .jugador-btn:hover {
-  color: #d50d7d;
+    color: #d50d7d;
 }
