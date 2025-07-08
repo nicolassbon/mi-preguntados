@@ -77,7 +77,7 @@ class LoginController
                 break;
         }
     }
-    
+
     public
     function logout()
     {

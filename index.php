@@ -3,20 +3,18 @@ session_start();
 
 // Rutas accesibles sin estar logueado
 $rutasPublicas = [
-    'login/show',
+    'login/',
     'login/procesar',
-    'registro/show',
+    'login/logout',
+    'registro/',
     'registro/pasoMapa',
     'registro/mapa',
     'registro/getUbicacion',
     'registro/procesar',
     'registro/success',
     'registro/verificar',
-    'login/logout',
     'perfil/show',
     'ranking/show',
-    'login/logout',
-    'login/'
 ];
 
 $controller = $_GET['controller'] ?? null;
@@ -36,14 +34,14 @@ if (isset($_SESSION['usuario_id'])) {
     if ($rolUsuario !== 'editor' && str_starts_with($ruta, 'editor/')) {
         session_unset();
         session_destroy();
-        header("Location: /login/show?error=trampa");
+        header("Location: /login?error=trampa");
         exit();
     }
 
     if ($rolUsuario !== 'admin' && str_starts_with($ruta, 'admin/')) {
         session_unset();
         session_destroy();
-        header("Location: /login/show?error=trampa");
+        header("Location: /login?error=trampa");
         exit();
     }
 }
