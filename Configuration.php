@@ -4,17 +4,14 @@ require_once "core/MustachePresenter.php";
 require_once "core/Router.php";
 require_once "core/EmailSender.php";
 
-require_once "controller/HomeController.php";
 require_once "controller/RegistroController.php";
 require_once "controller/LoginController.php";
 require_once "controller/PerfilController.php";
 require_once "controller/RankingController.php";
 require_once "controller/EditorController.php";
-require_once "controller/LobbyController.php";
+require_once "controller/HomeController.php";
 require_once "controller/RuletaController.php";
-require_once "controller/InicioController.php";
 require_once "controller/PartidaController.php";
-require_once "controller/PerdioController.php";
 require_once "controller/ReporteController.php";
 
 require_once "model/RegistroModel.php";
@@ -122,12 +119,7 @@ class Configuration
 
     public function getHomeController(): HomeController
     {
-        return new HomeController($this->getViewer());
-    }
-
-    public function getLobbyController(): LobbyController
-    {
-        return new LobbyController(
+        return new HomeController(
             $this->getViewer()
         );
     }
@@ -152,27 +144,14 @@ class Configuration
     {
         return new PartidaController(
             new PartidaModel($this->getDatabase()),
-            $this->getViewer()
-        );
-    }
-
-    public function getPerdioController(): PerdioController
-    {
-        return new PerdioController(
-            $this->getViewer()
+            $this->getViewer(),
+            new PreguntaModel($this->getDatabase())
         );
     }
 
     public function getMensajeCreadaCorrectamenteController(): MensajeCreadaCorrectamenteController
     {
         return new MensajeCreadaCorrectamenteController(
-            $this->getViewer()
-        );
-    }
-
-    public function getInicioController(): InicioController
-    {
-        return new InicioController(
             $this->getViewer()
         );
     }

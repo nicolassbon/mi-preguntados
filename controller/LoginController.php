@@ -16,7 +16,7 @@ class LoginController
     public function show()
     {
         if (isset($_SESSION['usuario_id'])) {
-            $this->redirigirPorRol($_SESSION['roles'] ?? []);
+            $this->redirigirPorRol($_SESSION['rol_usuario'] ?? '');
             return;
         }
 
@@ -58,8 +58,11 @@ class LoginController
 
         $rolUsuario = $this->rolModel->getRolDelUsuario($usuario['id_usuario']);
         $_SESSION['rol_usuario'] = $rolUsuario;
+        $_SESSION['esEditor'] = $rolUsuario === 'editor' ?? false;
+        $_SESSION['esAdmin'] = $rolUsuario === 'admin' ?? false;
+        $_SESSION['esJugador'] = $rolUsuario === 'jugador' ?? false;
 
-        $this->redirigirPorRol($rolUsuario);
+        $this->redirectTo("/lobby");
     }
 
     private function redirigirPorRol(string $rol): void
