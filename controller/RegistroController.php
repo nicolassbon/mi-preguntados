@@ -4,13 +4,15 @@ class RegistroController
 {
     private $model;
     private $ubicacionModel;
+    private $rolModel;
     private $view;
     private $emailSender;
 
-    public function __construct($registroModel, $ubicacionModel, $view, $emailSender)
+    public function __construct($registroModel, $ubicacionModel,$rolModel, $view, $emailSender)
     {
         $this->model = $registroModel;
         $this->ubicacionModel = $ubicacionModel;
+        $this->rolModel = $rolModel;
         $this->view = $view;
         $this->emailSender = $emailSender;
     }
@@ -144,7 +146,7 @@ class RegistroController
         }
 
         // Asignar rol y enviar email
-        $this->model->asignarRolJugador($res['idUsuario']);
+        $this->rolModel->asignarRolJugador($res['idUsuario']);
         $body = $this->generateEmailBodyFor($res['nombreUsuario'], $res['token'], $res['idUsuario']);
         $this->emailSender->send($res['email'], $body);
 

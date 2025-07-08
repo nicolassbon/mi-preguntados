@@ -72,6 +72,7 @@ class Configuration
         return new RegistroController(
             new RegistroModel($this->getDatabase()),
             new UbicacionModel($this->getDatabase()),
+            new RolModel($this->getDatabase()),
             $this->getViewer(),
             $this->getEmailSender()
         );

@@ -16,7 +16,7 @@ $rutasPublicas = [
     'perfil/show',
     'ranking/show',
     'login/logout',
-    '/'
+    'login/'
 ];
 
 $controller = $_GET['controller'] ?? null;
@@ -25,23 +25,25 @@ $method = $_GET['method'] ?? null;
 $ruta = "$controller/$method";
 
 if (!isset($_SESSION['usuario_id']) && !in_array($ruta, $rutasPublicas, true)) {
-    header("Location: /");
+    header("Location: /login");
     exit();
 }
 
 if (isset($_SESSION['usuario_id'])) {
-    $roles = $_SESSION['roles'] ?? [];
+    $rolUsuario = $_SESSION['rol_usuario'] ?? null;
 
-    // Si la ruta empieza con 'editor/', solo los editores pueden acceder
-    if (str_starts_with($ruta, 'editor/') && !in_array('editor', $roles, true)) {
-        header("Location: /lobby/show");
+
+    if ($rolUsuario !== 'editor' && str_starts_with($ruta, 'editor/')) {
+        session_unset();
+        session_destroy();
+        header("Location: /login/show?error=trampa");
         exit();
     }
 
-    // Si el usuario es EDITOR, solo puede acceder a rutas que empiezan con 'editor/'
-    // Tambien puede acceder a las rutas publicas
-    if (in_array('editor', $roles, true) && !str_starts_with($ruta, 'editor/') && !in_array($ruta, $rutasPublicas, true)) {
-        header("Location: /editor/show");
+    if ($rolUsuario !== 'admin' && str_starts_with($ruta, 'admin/')) {
+        session_unset();
+        session_destroy();
+        header("Location: /login/show?error=trampa");
         exit();
     }
 }
