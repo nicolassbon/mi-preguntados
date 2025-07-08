@@ -40,11 +40,9 @@ if (isset($_SESSION['usuario_id'])) {
 
     // Si el usuario es EDITOR, solo puede acceder a rutas que empiezan con 'editor/'
     // Tambien puede acceder a las rutas publicas
-    if (in_array('editor', $roles, true)) {
-        if (!str_starts_with($ruta, 'editor/') && !in_array($ruta, $rutasPublicas, true)) {
-            header("Location: /editor/show");
-            exit();
-        }
+    if (in_array('editor', $roles, true) && !str_starts_with($ruta, 'editor/') && !in_array($ruta, $rutasPublicas, true)) {
+        header("Location: /editor/show");
+        exit();
     }
 }
 
