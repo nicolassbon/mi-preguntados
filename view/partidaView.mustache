@@ -20,9 +20,9 @@
             {{#respuestas}}
                 <div class="container d-flex w-100 justify-content-center align-items-center m-0 p-0">
                     <form method="POST" action="/partida/responder" class="m-0 p-0 w-75">
-                        <input type="hidden" name="id_respuesta" value={{id}}>
+                        <input type="hidden" name="id_respuesta" value={{id_respuesta}}>
                         <button type="submit" name="respuesta" class="btn btn-light respuesta w-100 m-1 {{clase}}"
-                                {{#disabled}}disabled{{/disabled}}>{{texto_respuesta}}</button>
+                                {{#disabled}}disabled{{/disabled}}>{{respuesta}}</button>
                     </form>
                 </div>
             {{/respuestas}}

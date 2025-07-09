@@ -56,7 +56,7 @@ CREATE TABLE `partida_pregunta`
 (
     `id_partida`           int(11)    NOT NULL,
     `id_pregunta`          int(11)    NOT NULL,
-    `id_respuesta_elegida` int(11)    NOT NULL,
+    `id_respuesta_elegida` int(11),
     `acerto`               tinyint(1) NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -443,8 +443,7 @@ ALTER TABLE `partidas`
 
 ALTER TABLE `partida_pregunta`
     ADD CONSTRAINT `partida_ibfk_1` FOREIGN KEY (`id_partida`) REFERENCES `partidas` (`id_partida`) ON DELETE CASCADE ON UPDATE CASCADE,
-    ADD CONSTRAINT `pregunta_ibfk_2` FOREIGN KEY (`id_pregunta`) REFERENCES `preguntas` (`id_pregunta`) ON DELETE CASCADE ON UPDATE CASCADE,
-    ADD CONSTRAINT `respuesta_ibfk_3` FOREIGN KEY (`id_respuesta_elegida`) REFERENCES `respuestas` (`id_respuesta`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `pregunta_ibfk_2` FOREIGN KEY (`id_pregunta`) REFERENCES `preguntas` (`id_pregunta`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `preguntas`
     ADD CONSTRAINT `categoria_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`);

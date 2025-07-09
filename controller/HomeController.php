@@ -31,6 +31,17 @@ class HomeController
         }
     }
 
+    public function error() {
+        $message = $_SESSION['error_message'] ?? null;
+
+        $this->view->render("error", [
+            'title' => 'Error',
+            'message' => $message
+        ]);
+
+        unset($_SESSION['error_message']);
+    }
+
     private
     function redirectTo($str)
     {

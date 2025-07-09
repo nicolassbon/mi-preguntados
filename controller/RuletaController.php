@@ -4,16 +4,16 @@ class RuletaController
 {
 
     private $view;
-    private $model;
+    private $categoriaModel;
 
-    public function __construct($model, $view){
+    public function __construct($view, $categoriaModel){
         $this->view = $view;
-        $this->model = $model;
+        $this->categoriaModel = $categoriaModel;
     }
 
     public function show(){
 
-        $categorias = $this->model->getCategorias();
+        $categorias = $this->categoriaModel->getCategorias();
         $categoriasRepetidas = $this->repetirCategorias($categorias, 5);
 
         $yaGiro = isset($_SESSION['categoria']);
@@ -33,9 +33,9 @@ class RuletaController
 
     public function girar()
     {
-        $categoria = $this->model->getCategoriaAleatoria();
+        $categoria = $this->categoriaModel->getCategoriaAleatoria();
         $_SESSION["categoria"] = $categoria;
-        $categorias = $this->model->getCategorias();
+        $categorias = $this->categoriaModel->getCategorias();
 
         $posicionGanadora = $this->calcularPosicionGanadora($categoria, $categorias);
 

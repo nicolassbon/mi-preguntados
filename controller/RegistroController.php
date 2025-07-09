@@ -2,15 +2,16 @@
 
 class RegistroController
 {
-    private $model;
-    private $ubicacionModel;
-    private $rolModel;
     private $view;
     private $emailSender;
+    private $usuarioModel;
+    private $ubicacionModel;
+    private $rolModel;
 
-    public function __construct($registroModel, $ubicacionModel,$rolModel, $view, $emailSender)
+
+    public function __construct($view, $emailSender, $usuarioModel, $ubicacionModel, $rolModel)
     {
-        $this->model = $registroModel;
+        $this->usuarioModel = $usuarioModel;
         $this->ubicacionModel = $ubicacionModel;
         $this->rolModel = $rolModel;
         $this->view = $view;
@@ -110,6 +111,14 @@ class RegistroController
         // Obtener país y ciudad desde backend
         $ubicacion = $this->ubicacionModel->obtenerPaisYCiudadPorCoordenadas($lat, $lng);
 
+        if (!$ubicacion || $ubicacion['pais'] === 'Desconocido' || $ubicacion['ciudad'] === 'Desconocido') {
+            $this->view->render("mapaRegistro", [
+                'title' => 'Elige tu ubicacion',
+                'error' => 'Seleccioná una ubicación válida en el mapa.'
+            ]);
+            return;
+        }
+
         // Crear / Obtener ids
         $idPais = $this->ubicacionModel->obtenerOCrearPais($ubicacion['pais']);
         $idCiudad = $this->ubicacionModel->obtenerOCrearCiudad($ubicacion['ciudad'], $idPais);
@@ -127,7 +136,7 @@ class RegistroController
           validado = false
         */
 
-        $res = $this->model->registrarUsuario(
+        $res = $this->usuarioModel->registrarUsuario(
             $r['nombre'],
             $r['fecha_nac'],
             ($r['sexo'] === 'masculino' ? 1 : ($r['sexo'] === 'femenino' ? 2 : 3)),
@@ -173,7 +182,7 @@ class RegistroController
 
         // EN LA BASE TENGO PARA ESE USUARIO UN VALOR RANDOM
         // Si coincide el random con el idUsuario de la bdd, voy a cambiar el validado a true
-        $verificado = $this->model->verificarEmailUsuario($idVerificador, $idUsuario);
+        $verificado = $this->usuarioModel->verificarEmailUsuario($idVerificador, $idUsuario);
 
         if (!$verificado) {
             $this->renderErrorView('Error de validación', 'Ocurrio un error en la validacion del correo. Verifica tus credenciales.');
@@ -210,5 +219,33 @@ class RegistroController
             'title' => $title,
             'message' => $message
         ]);
+    }
+
+    public function checkEmail()
+    {
+        $email = $_POST['email'] ?? '';
+
+        if (empty($email)) {
+            echo json_encode(['exists' => false]);
+            return;
+        }
+
+        $exists = $this->usuarioModel->existeEmail($email);
+        header('Content-Type: application/json');
+        echo json_encode(['exists' => $exists]);
+    }
+
+    public function checkUsuario()
+    {
+        $usuario = $_POST['usuario'] ?? '';
+
+        if (empty($usuario)) {
+            echo json_encode(['exists' => false]);
+            return;
+        }
+
+        $exists = $this->usuarioModel->existeUsuario($usuario);
+        header('Content-Type: application/json');
+        echo json_encode(['exists' => $exists]);
     }
 }

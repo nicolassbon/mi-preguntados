@@ -1,5 +1,7 @@
 <?php
 session_start();
+// Setea la zona horaria de la aplicación
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 // Rutas accesibles sin estar logueado
 $rutasPublicas = [
@@ -13,6 +15,8 @@ $rutasPublicas = [
     'registro/procesar',
     'registro/success',
     'registro/verificar',
+    'registro/checkUsuario',
+    'registro/checkEmail',
     'perfil/show',
     'ranking/show',
 ];

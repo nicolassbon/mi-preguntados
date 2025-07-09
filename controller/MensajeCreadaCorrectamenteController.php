@@ -11,7 +11,7 @@ class MensajeCreadaCorrectamenteController
 
     public function show()
     {
-        $this->view->render("mensajeCreadaCorrectamente", [
+        $this->view->render("crearPreguntaSuccess", [
             'title' => 'Creada Con Exito'
         ]);
     }

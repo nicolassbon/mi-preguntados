@@ -4,12 +4,12 @@ use Couchbase\View;
 
 class RankingController
 {
-    private $model;
     private $view;
+    private $model;
 
-    public function __construct($model, $view){
-        $this->model = $model;
+    public function __construct($view, $model){
         $this->view = $view;
+        $this->model = $model;
     }
 
     public function show(){

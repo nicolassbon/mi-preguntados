@@ -2,31 +2,32 @@
 
 class PartidaController
 {
-
-    private $model;
     private $view;
+    private $partidaModel;
     private $preguntaModel;
+    private $usuarioModel;
+    private $juegoModel;
 
-    public function __construct($model, $view, $preguntaModel)
+    public function __construct($view, $partidaModel, $preguntaModel, $usuarioModel, $juegoModel)
     {
-        $this->model = $model;
         $this->view = $view;
+        $this->partidaModel = $partidaModel;
         $this->preguntaModel = $preguntaModel;
+        $this->usuarioModel = $usuarioModel;
+        $this->juegoModel = $juegoModel;
     }
 
     public function crearPartida()
     {
         $id_usuario = $_SESSION['usuario_id'] ?? null;
 
-        // Si ya hay una partida en curso, no crear otra
         if (isset($_SESSION['id_partida'])) {
             header('Location: /ruleta/show');
             exit();
         }
 
-        // Si no hay partida, crearla
         $_SESSION['puntaje'] = 0;
-        $id_partida = $this->model->crearPartida($id_usuario);
+        $id_partida = $this->partidaModel->crearPartida($id_usuario);
         $_SESSION['id_partida'] = $id_partida;
 
         header('Location: /ruleta');
@@ -37,73 +38,60 @@ class PartidaController
     {
 
         $id_usuario = $_SESSION['usuario_id'] ?? null;
+        $categoria = $_SESSION['categoria'] ?? null;
 
-        // Verificar si ya tiene una pregunta
-        if (isset($_SESSION['id_pregunta'])) {
-            $nombre_categoria = $_SESSION['nombre_categoria'] ?? null;
+        if (isset($_SESSION['pregunta'])) {
             $id_pregunta = $_SESSION['id_pregunta'];
             $pregunta_texto = $_SESSION['pregunta'];
-            $respuestas = $this->model->getRespuestasPorIdPreguntaAleatoria($id_pregunta);
+            $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
+            $user = $_SESSION["nombre_usuario"];
+            $tiempo_restante = $this->partidaModel->getTiempoRestante();
 
-            $fondo = $this->model->getColorCategoria($nombre_categoria);
-            $foto = $this->model->getFotoCategoria($nombre_categoria);
-            $user = $this->model->getUsuario($id_usuario);
-
-            $tiempo_restante = $this->model->getTiempo();
             $this->view->render("partida", [
                 'title' => 'Partida',
                 'usuario_id' => $id_usuario,
                 'pregunta' => $pregunta_texto,
-                'categoria' => $nombre_categoria,
+                'categoria' => $categoria['nombre'],
                 'respuestas' => $respuestas,
                 'id_partida' => $_SESSION['id_partida'],
                 'tiempo_restante' => $tiempo_restante,
-                'fondo' => $fondo,
-                'foto' => $foto,
+                'fondo' => $categoria['color'],
+                'foto' => $categoria['foto_categoria'],
                 'user' => $user
             ]);
             return;
         }
 
-        $categoria = $_SESSION['categoria'];
-        $nombre_categoria = $categoria["nombre"];
-
-        $pregunta = $this->model->obtenerPregunta($id_usuario, $categoria["id_categoria"]);
-
+        $pregunta = $this->juegoModel->obtenerPregunta($id_usuario, $categoria["id_categoria"]);
         $id_pregunta = $pregunta["id_pregunta"];
-
         $pregunta_texto = $pregunta["pregunta"];
 
-        $respuestas = $this->model->getRespuestasPorIdPreguntaAleatoria($id_pregunta);
+        $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
 
         $_SESSION['id_pregunta'] = $id_pregunta;
         $_SESSION['pregunta'] = $pregunta_texto;
-        $_SESSION['nombre_categoria'] = $nombre_categoria;
         $_SESSION['opciones'] = $respuestas;
         $_SESSION['inicio_pregunta'] = time();
 
-        $fondo = $this->model->getColorCategoria($nombre_categoria);
-        $foto = $this->model->getFotoCategoria($nombre_categoria);
-        $user = $this->model->getUsuario($id_usuario);
+        $user = $_SESSION["nombre_usuario"];
 
-        $tiempo_restante = $this->model->getTiempo();
+        $tiempo_restante = $this->partidaModel->getTiempoRestante();
 
-        // Se le entrego la pregunta, actualizar datos bdd
-        $this->model->incrementarEntregas($id_pregunta);
-        $this->model->incrementarEntregadasUsuario($id_usuario);
-        $this->model->marcarPreguntaComoVista($id_usuario, $id_pregunta);
+        $this->preguntaModel->incrementarEntregadasPregunta($id_pregunta);
+        $this->juegoModel->marcarPreguntaComoVista($id_usuario, $id_pregunta);
+        $this->usuarioModel->incrementarEntregadasUsuario($id_usuario);
 
         $this->view->render("partida", [
             'title' => 'Partida',
             'usuario_id' => $id_usuario,
             'pregunta' => $pregunta_texto,
             'id_pregunta' => $id_pregunta,
-            'categoria' => $nombre_categoria,
+            'categoria' => $categoria['nombre'],
             'respuestas' => $respuestas,
             'id_partida' => $_SESSION['id_partida'],
             'tiempo_restante' => $tiempo_restante,
-            'fondo' => $fondo,
-            'foto' => $foto,
+            'fondo' => $categoria['color'],
+            'foto' => $categoria['foto_categoria'],
             'user' => $user
         ]);
 
@@ -125,14 +113,13 @@ class PartidaController
         $color = $tiempo_agotado ? 'text-warning' : 'text-danger';
         $id_respuesta = $_POST['id_respuesta'] ?? null;
 
-        // Se acabó el tiempo o no respondió
         if ($tiempo_agotado || $id_respuesta === -1) {
-            $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, null, 0);
+            $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, null, 0);
             $this->finalizarPartida();
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_respuesta'])) {
-            $respuestas = $this->model->getRespuestasPorPregunta($id_pregunta);
+            $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
 
             foreach ($respuestas as $respuesta) {
                 if ($respuesta['esCorrecta']) {
@@ -141,37 +128,39 @@ class PartidaController
                         $texto = "¡CORRECTA!";
                         $color = 'text-success';
 
-                        $this->model->incrementoPuntaje($id_partida);
-                        $this->model->incremetoPreguntaRespondidaCorrectamente($id_partida);
-                        $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
-                        $this->model->acumularPuntajeUsuario($id_usuario);
-                        $this->model->incrementarCorrectasPregunta($id_pregunta);
-                        $this->model->incrementarCorrectasUsuario($id_usuario);
+                        $_SESSION['puntaje'] += 5;
+                        $this->partidaModel->incrementarPuntaje($id_partida);
+                        $this->partidaModel->incrementarPreguntaRespondidaCorrectamente($id_partida);
+                        $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
+                        $this->preguntaModel->incrementarCorrectasPregunta($id_pregunta);
+                        $this->usuarioModel->sumarPuntajeUsuario($id_usuario);
+                        $this->usuarioModel->incrementarCorrectasUsuario($id_usuario);
                         break;
                     }
                 }
             }
 
             if (!$respuestaCorrecta) {
-                $this->model->crearRegistroPreguntaRespondida($id_partida, $id_pregunta, $_POST['id_respuesta'], 0);
+                $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $_POST['id_respuesta'], 0);
                 $this->finalizarPartida();
             }
         } else {
             echo 'error';
         }
 
-        $_SESSION['cantidad'] = intval($this->model->getCantidadDePreguntas($id_partida));
+        $_SESSION['cantidad'] = (int)$this->partidaModel->getCantidadPreguntasCorrectas($id_partida);
         $this->mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color, false);
     }
 
-    public function perdio() {
-        unset($_SESSION["nombre_categoria"], $_SESSION["id_pregunta"], $_SESSION["pregunta"], $_SESSION["inicio_pregunta"], $_SESSION['id_partida']);
-
+    public function perdio()
+    {
         $this->view->render("perdio", [
             'title' => 'Partida Perdida',
             'puntaje' => $_SESSION['puntaje'],
             'cantidad' => $_SESSION['cantidad'] ?? 0
         ]);
+
+        unset($_SESSION['puntaje'], $_SESSION['cantidad']);
     }
 
     public function reportarPregunta()
@@ -184,7 +173,6 @@ class PartidaController
         $this->preguntaModel->insertarReportePregunta($idPregunta, $idUsuario, $motivo);
         $this->preguntaModel->actualizarEstadoPregunta($idPregunta, 'reportada');
 
-        // Finalizar la partida si aun esta activa
         if ($idPartida !== null) {
             $this->finalizarPartida();
         }
@@ -199,7 +187,7 @@ class PartidaController
 
     private function mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color, $reportado)
     {
-        $respuestas = $this->model->getRespuestasPorPregunta($id_pregunta);
+        $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
 
         foreach ($respuestas as &$respuesta) {
             $respuesta['id'] = $respuesta['id_respuesta'];
@@ -216,24 +204,23 @@ class PartidaController
             $respuesta['disabled'] = true;
         }
 
-        $fondo = $this->model->getColorCategoria($_SESSION['nombre_categoria']);
-        $foto = $this->model->getFotoCategoria($_SESSION['nombre_categoria']);
-        $user = $this->model->getUsuario($id_usuario);
+        $categoria = $_SESSION['categoria'] ?? null;
+        $user = $_SESSION["nombre_usuario"];
 
         $this->view->render("partida", [
             'title' => 'Partida',
             'usuario_id' => $id_usuario,
             'pregunta' => $_SESSION['pregunta'],
             'respuestas' => $respuestas,
-            'categoria' => $_SESSION['nombre_categoria'],
+            'categoria' => $categoria['nombre'],
             'correcto' => $respuestaCorrecta,
             'respondido' => true,
             'texto' => $texto,
             'color' => $color,
             'puntaje' => $_SESSION['puntaje'],
             'ocultar' => 'display:none',
-            'foto' => $foto,
-            'fondo' => $fondo,
+            'fondo' => $categoria['color'],
+            'foto' => $categoria['foto_categoria'],
             'user' => $user,
             'reportado' => $reportado,
             'id_pregunta' => $id_pregunta
@@ -246,7 +233,6 @@ class PartidaController
     {
         unset(
             $_SESSION['categoria'],
-            $_SESSION['nombre_categoria'],
             $_SESSION['id_pregunta'],
             $_SESSION['pregunta'],
             $_SESSION['inicio_pregunta']
@@ -257,10 +243,10 @@ class PartidaController
     {
         if (!isset($_SESSION['id_pregunta'])) {
             if (!empty($_SESSION['id_partida'])) {
-                $this->model->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
+                $this->partidaModel->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
             }
             session_destroy();
-            header("Location: /login/show?error=trampa");
+            header("Location: /login?error=trampa");
             exit;
         }
     }
@@ -268,7 +254,7 @@ class PartidaController
     private function finalizarPartida()
     {
         if (isset($_SESSION['id_partida'])) {
-            $this->model->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
+            $this->partidaModel->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
             unset($_SESSION['id_partida']);
         }
     }

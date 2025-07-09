@@ -2,56 +2,72 @@
 
 class PerfilController
 {
-  private $model;
-  private $view;
+    private $view;
+    private $usuarioModel;
 
-  public function __construct($model, $view)
-  {
-    $this->model = $model;
-    $this->view = $view;
-  }
+    public function __construct($view, $usuarioModel)
+    {
+        $this->view = $view;
+        $this->usuarioModel = $usuarioModel;
+    }
 
-  public function show()
-  {
-      $id_usuario = $_GET['idUsuario'] ?? ($_SESSION['usuario_id'] ?? null);
+    public function show()
+    {
+        $id_usuario = $_GET['idUsuario'] ?? ($_SESSION['usuario_id'] ?? null);
 
-      if ($id_usuario === null) {
-          $this->redirectTo('/login');
-      }
+        if (!$id_usuario) {
+            $this->redirectTo("/error");
+        }
 
-      $datos = $this->model->getDatos($id_usuario);
+        $datos = $this->usuarioModel->getDatosPerfil($id_usuario);
 
-      if (!empty($datos) && is_array($datos)) {
-          $usuario = $datos[0];
-      } else {
-          $usuario = ['nombre_usuario' => 'Invitado'];
-      }
+        if (empty($datos)) {
+            $_SESSION['error_message'] = "Usuario no encontrado";
+            $this->redirectTo("/home/error");
+        }
 
-      // Obtiene el host dinamico para no estar cambiandolo manualmente
-      $host = $_SERVER['HTTP_HOST'];
-      $es_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
-      $protocolo = $es_https ? 'https' : 'http';
+        if ($datos[0]['nombre_rol'] === 'admin' || $datos[0]['nombre_rol'] === 'editor') {
+            $this->redirectTo("/home/error");
+        }
 
-      $url_perfil = "$protocolo://$host/perfil?idUsuario=$id_usuario";
+        $usuario = $datos[0];
 
-      $this->view->render("perfil", array_merge(
-          [
-              'title' => 'Perfil Usuario',
-              'url_perfil' => $url_perfil
-          ],
-          $usuario
-      ));
-  }
+        $cantidadPartidas = $this->usuarioModel->getCantidadPartidasJugadas($id_usuario);
+        $tieneEstadisticas = $cantidadPartidas !== "0";
 
-  private function redirectTo($str)
-  {
-    header('Location: ' . $str);
-    exit();
-  }
+        $totalPreguntas = $this->usuarioModel->getTotalPreguntasRespondidas($id_usuario);
+        $porcentajeAcierto = $this->usuarioModel->getPorcentajeAcierto($id_usuario);
+        $mayorPuntaje = $this->usuarioModel->getMayorPuntajePartida($id_usuario);
+        $categoriasDestacadas = $this->usuarioModel->getCategoriasDestacadas($id_usuario);
+        $posicionRanking = $this->usuarioModel->getPosicionRanking($id_usuario);
 
-  private function isLogueado(): bool
-  {
-    return !($_SESSION['usuario_id'] === null);
-  }
+        // Construir la URL del perfil
+        $host = $_SERVER['HTTP_HOST'];
+        $es_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        $protocolo = $es_https ? 'https' : 'http';
+        $url_perfil = "$protocolo://$host/perfil?idUsuario=$id_usuario";
+
+        // Renderizar vista
+        $this->view->render("perfil", array_merge(
+            [
+                'title' => 'Perfil Usuario',
+                'url_perfil' => $url_perfil,
+                'cantidad_partidas' => $cantidadPartidas,
+                'total_preguntas' => $totalPreguntas,
+                'porcentaje_acierto' => $porcentajeAcierto,
+                'mayor_puntaje' => $mayorPuntaje,
+                'categorias_destacadas' => $categoriasDestacadas,
+                'posicion_ranking' => $posicionRanking,
+                'tiene_estadisticas' => $tieneEstadisticas
+            ],
+            $usuario
+        ));
+    }
+
+    private function redirectTo($str)
+    {
+        header('Location: ' . $str);
+        exit();
+    }
 
 }

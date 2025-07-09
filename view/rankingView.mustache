@@ -1,54 +1,56 @@
 {{> navbar}}
-<main class="p-2 main-ranking" style="font-family: 'Segoe UI',serif; background: linear-gradient(to bottom right, #d6b4fc, #f8e8ff);">
-  <h1 class="mt-2 text-center mb-2" style="color: #4c1765">{{title}}</h1>
-  <table class="tabla-ranking">
-    <tr>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Posición</th>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Jugador</th>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Foto</th>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Puntaje</th>
-    </tr>
-    {{#ranking}}
-      <tr>
-        <td class="text-center p-2" style="color: #333">{{posicionJugador}}</td>
-        <td class="text-center p-2" style="color: #333">
-          <form method="GET" action="/perfil/show" class="d-flex justify-content-center">
-            <input type="hidden" name="idUsuario" value="{{id_usuario}}">
-            <button type="submit" class="jugador-btn">
-              {{nombre_usuario}}
-            </button>
-          </form>
-        </td>
-        <td class="text-center p-2" style="color: #333"><img src="/public/uploads/{{foto_perfil_url}}" width="50" alt="" class="foto-perfil"></td>
-        <td class="text-center p-2" style="color: #333">{{puntaje_acumulado}}</td>
-      </tr>
-    {{/ranking}}
-  </table>
+<main class="p-2 main-ranking"
+      style="font-family: 'Segoe UI',serif; background: linear-gradient(to bottom right, #d6b4fc, #f8e8ff);flex-grow: 1;overflow-y: auto;">
+    <h1 class="mt-2 text-center mb-2" style="color: #4c1765">{{title}}</h1>
+    <table class="tabla-ranking">
+        <tr>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Posición</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Jugador</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Foto</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Puntaje</th>
+        </tr>
+        {{#ranking}}
+            <tr>
+                <td class="text-center p-2" style="color: #333">{{posicionJugador}}</td>
+                <td class="text-center p-2" style="color: #333">
+                    <form method="GET" action="/perfil" class="d-flex justify-content-center">
+                        <input type="hidden" name="idUsuario" value="{{id_usuario}}">
+                        <button type="submit" class="jugador-btn">
+                            {{nombre_usuario}}
+                        </button>
+                    </form>
+                </td>
+                <td class="text-center p-2" style="color: #333"><img src="/public/uploads/{{foto_perfil_url}}"
+                                                                     width="50" alt="" class="foto-perfil"></td>
+                <td class="text-center p-2" style="color: #333">{{puntaje_acumulado}}</td>
+            </tr>
+        {{/ranking}}
+    </table>
 
-  <h2 class="mt-2 text-center mb-2" style="color: #4c1765">{{title2}}</h2>
-  <table class="tabla-ranking">
-    <tr>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Top</th>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Jugador</th>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Inicio</th>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Fin</th>
-      <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Puntaje</th>
-    </tr>
-    {{#partidas}}
-      <tr>
-        <td class="text-center p-2" style="color: #333">{{posicionPartida}}</td>
-        <td class="text-center p-2" style="color: #333">
-          <form method="GET" action="/perfil/show" class="d-flex justify-content-center">
-            <input type="hidden" name="idUsuario" value="{{id_usuario}}">
-            <button type="submit" class="jugador-btn">
-              {{nombre_usuario}}
-            </button>
-          </form>
-        </td>
-        <td class="text-center p-2" style="color: #333">{{fecha_inicio}}</td>
-        <td class="text-center p-2" style="color: #333">{{fecha_fin}}</td>
-        <td class="text-center p-2" style="color: #333">{{puntaje_final}}</td>
-      </tr>
-    {{/partidas}}
-  </table>
+    <h2 class="mt-2 text-center mb-2" style="color: #4c1765">{{title2}}</h2>
+    <table class="tabla-ranking">
+        <tr>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Top</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Jugador</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Inicio</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Fin</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Puntaje</th>
+        </tr>
+        {{#partidas}}
+            <tr>
+                <td class="text-center p-2" style="color: #333">{{posicionPartida}}</td>
+                <td class="text-center p-2" style="color: #333">
+                    <form method="GET" action="/perfil/show" class="d-flex justify-content-center">
+                        <input type="hidden" name="idUsuario" value="{{id_usuario}}">
+                        <button type="submit" class="jugador-btn">
+                            {{nombre_usuario}}
+                        </button>
+                    </form>
+                </td>
+                <td class="text-center p-2" style="color: #333">{{fecha_inicio}}</td>
+                <td class="text-center p-2" style="color: #333">{{fecha_fin}}</td>
+                <td class="text-center p-2" style="color: #333">{{puntaje_final}}</td>
+            </tr>
+        {{/partidas}}
+    </table>
 </main>

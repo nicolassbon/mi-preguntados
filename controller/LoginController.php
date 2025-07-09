@@ -2,13 +2,13 @@
 
 class LoginController
 {
-    private $model;
     private $view;
+    private $usuarioModel;
     private $rolModel;
 
-    public function __construct($model, $view, $rolModel)
+    public function __construct($view, $usuarioModel, $rolModel)
     {
-        $this->model = $model;
+        $this->usuarioModel = $usuarioModel;
         $this->view = $view;
         $this->rolModel = $rolModel;
     }
@@ -39,7 +39,7 @@ class LoginController
         $email = $_POST["email"];
         $password = $_POST["password"];
 
-        $usuario = $this->model->buscarUsuarioPorEmail($email);
+        $usuario = $this->usuarioModel->buscarUsuarioPorEmail($email);
 
         if (!$usuario || !password_verify($password, $usuario["contrasena_hash"])) {
             $_SESSION['login_error'] = 'Correo o contraseña incorrectos';
@@ -81,8 +81,7 @@ class LoginController
         }
     }
 
-    public
-    function logout()
+    public function logout()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_unset();
@@ -91,8 +90,7 @@ class LoginController
         }
     }
 
-    private
-    function redirectTo($str)
+    private function redirectTo($str)
     {
         header('Location: ' . $str);
         exit();
