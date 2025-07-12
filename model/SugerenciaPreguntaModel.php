@@ -44,9 +44,9 @@ class SugerenciaPreguntaModel
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function getPreguntasSugeridas($terminoBusqueda = '', $id_categoria = 'todasLasCategorias'): array
+    public function getPreguntasSugeridas(string $terminoBusqueda = '', string|int $id_categoria = 'todasLasCategorias', string $estado = 'pendiente'): array
     {
-        $where = "p.estado = 'sugerida'";
+        $where = "1=1";
 
         if ($terminoBusqueda !== '') {
             $term = $this->db->escapeLike($terminoBusqueda);
@@ -57,13 +57,18 @@ class SugerenciaPreguntaModel
             $where .= " AND p.id_categoria = " . (int)$id_categoria;
         }
 
+        if ($estado !== 'todos') {
+            $where .= " AND s.estado = '$estado'";
+        }
+
         $sql = "
-            SELECT DISTINCT p.id_pregunta, p.pregunta, c.nombre, u.nombre_usuario, u.email, p.estado
+            SELECT DISTINCT p.id_pregunta, p.pregunta, c.nombre, u.nombre_usuario, u.email, s.estado
             FROM preguntas p
             JOIN categoria c ON p.id_categoria = c.id_categoria
             JOIN sugerencias_preguntas s ON s.id_pregunta = p.id_pregunta
             JOIN usuarios u ON s.id_usuario = u.id_usuario
             WHERE $where
+            ORDER BY s.fecha_envio DESC
         ";
         return $this->db->query($sql);
     }

@@ -9,10 +9,9 @@ class ReportePreguntaModel
         $this->db = $db;
     }
 
-    public function getPreguntasReportadasConDetalles(string|int $id_categoria = 'todasLasCategorias', string $terminoBusqueda = '')
+    public function getPreguntasReportadasConDetalles(string|int $id_categoria = 'todasLasCategorias', string $terminoBusqueda = '', string $estado = 'pendiente')
     {
-        $where = "pr.estado = 'pendiente'";
-
+        $where = '1=1';
         if (trim($terminoBusqueda) !== '') {
             $term = $this->db->escapeLike($terminoBusqueda);
             $where .= " AND p.pregunta LIKE '%$term%'";
@@ -21,6 +20,10 @@ class ReportePreguntaModel
         if ($id_categoria !== 'todasLasCategorias') {
             $id_categoria = (int)$id_categoria;
             $where .= " AND p.id_categoria = $id_categoria";
+        }
+
+        if ($estado !== 'todos') {
+            $where .= " AND pr.estado = '$estado'";
         }
 
         $sql = "
@@ -33,7 +36,8 @@ class ReportePreguntaModel
                 u.nombre_usuario AS reportador_usuario,
                 u.email AS reportador_email,
                 pr.fecha_reporte,
-                pr.motivo
+                pr.motivo,
+                pr.estado
             FROM preguntas_reportadas pr
             JOIN preguntas p ON pr.id_pregunta = p.id_pregunta
             JOIN categoria c ON p.id_categoria = c.id_categoria
@@ -59,9 +63,9 @@ class ReportePreguntaModel
         $this->actualizarEstadoRespuestas($id_pregunta, 0);
 
         if ($id_reporte) {
-            $this->actualizarEstadoReporte($id_reporte, 'resuelto');
+            $this->actualizarEstadoReporte($id_reporte, 'aprobado');
         } else {
-            $sql = "UPDATE preguntas_reportadas SET estado = 'resuelto'
+            $sql = "UPDATE preguntas_reportadas SET estado = 'aprobado'
                     WHERE id_pregunta = ? AND estado = 'pendiente'";
             $stmt = $this->db->prepare($sql);
             $stmt->bind_param("i", $id_pregunta);

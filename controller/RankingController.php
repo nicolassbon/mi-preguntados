@@ -47,5 +47,5 @@ class RankingController
             'hasta' => substr($hasta, 0, 10)
         ]);
     }
-    
+
 }
