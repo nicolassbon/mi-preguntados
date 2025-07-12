@@ -321,8 +321,7 @@ INSERT INTO `preguntas` (`id_pregunta`, `pregunta`, `id_categoria`, `entregadas`
 (197, '¿Quién compuso la banda sonora de \"Piratas del Caribe\"?', 8, 0, 0, 'activa', '2025-07-11 20:46:15'),
 (198, '¿Qué actor protagoniza la serie \"Breaking Bad\"?', 8, 0, 0, 'activa', '2025-07-11 20:46:15'),
 (199, '¿Cuál es el nombre del famoso mago en la serie \"Merlín\"?', 8, 0, 0, 'activa', '2025-07-11 20:46:15'),
-(200, '¿Qué película animada es famosa por la canción \"Let It Go\"?', 8, 0, 0, 'activa', '2025-07-11 20:46:15'),
-(201, '¿En qué serie un maestro de ajedrez entrena a una joven prodigio en los años 60?', 8, 0, 0, 'activa', '2025-07-11 22:38:43');
+(200, '¿Qué película animada es famosa por la canción \"Let It Go\"?', 8, 0, 0, 'activa', '2025-07-11 20:46:15');
 
 -- --------------------------------------------------------
 
@@ -1157,11 +1156,7 @@ INSERT INTO `respuestas` (`id_respuesta`, `respuesta`, `esCorrecta`, `id_pregunt
 (797, 'Enredados', 0, 200, 1),
 (798, 'Moana', 0, 200, 1),
 (799, 'Coco', 0, 200, 1),
-(800, 'Frozen', 1, 200, 1),
-(801, 'The Crown', 0, 201, 1),
-(802, 'Gambito de dama', 1, 201, 1),
-(803, 'The Great', 0, 201, 1),
-(804, 'La maravillosa Sra. Maisel', 0, 201, 1);
+(800, 'Frozen', 1, 200, 1);
 
 -- --------------------------------------------------------
 

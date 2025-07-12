@@ -37,7 +37,8 @@ class RuletaController
      */
     public function girar(): void
     {
-        $categoria = $this->categoriaModel->getCategoriaAleatoria();
+        $id_partida = $_SESSION['id_partida'] ?? null;
+        $categoria = $this->categoriaModel->elegirCategoriaParaPartida($id_partida);
         $_SESSION["categoria"] = $categoria;
         $categorias = $this->categoriaModel->getCategorias();
 
