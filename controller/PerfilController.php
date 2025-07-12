@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class PerfilController
 {
     private $view;
@@ -11,7 +13,7 @@ class PerfilController
         $this->usuarioModel = $usuarioModel;
     }
 
-    public function show()
+    public function show(): void
     {
         $id_usuario = $_GET['idUsuario'] ?? ($_SESSION['usuario_id'] ?? null);
 
@@ -58,13 +60,14 @@ class PerfilController
                 'mayor_puntaje' => $mayorPuntaje,
                 'categorias_destacadas' => $categoriasDestacadas,
                 'posicion_ranking' => $posicionRanking,
+                'tiene_posicion' => $posicionRanking !== null,
                 'tiene_estadisticas' => $tieneEstadisticas
             ],
             $usuario
         ));
     }
 
-    private function redirectTo($str)
+    #[NoReturn] private function redirectTo($str): void
     {
         header('Location: ' . $str);
         exit();

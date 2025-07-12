@@ -28,8 +28,6 @@ require_once "model/JuegoModel.php";
 require_once "model/ReportePreguntaModel.php";
 require_once "model/AdminModel.php";
 
-require_once "controller/MensajeCreadaCorrectamenteController.php";
-
 include_once 'vendor/mustache/src/Mustache/Autoloader.php';
 
 class Configuration
@@ -68,7 +66,7 @@ class Configuration
         return $this->emailSender;
     }
 
-    public function getIniConfig()
+    public function getIniConfig(): bool|array
     {
         return parse_ini_file("configuration/config.ini", true);
     }
@@ -81,7 +79,7 @@ class Configuration
         return $this->viewer;
     }
 
-    public function getPdfGenerator()
+    public function getPdfGenerator(): PdfGenerator
     {
         return new PdfGenerator();
     }
@@ -149,7 +147,7 @@ class Configuration
         );
     }
 
-    public function getAdminController()
+    public function getAdminController(): AdminController
     {
         return new AdminController(
             $this->getViewer(),
@@ -188,7 +186,7 @@ class Configuration
         $preguntaModel = $this->getPreguntaModel();
         $partidaModel = new PartidaModel($db);
         $usuarioModel = $this->getUsuarioModel();
-        $juegoModel = new JuegoModel($db, $preguntaModel);
+        $juegoModel = new JuegoModel($db);
 
         return new PartidaController(
             $this->getViewer(),
@@ -196,13 +194,6 @@ class Configuration
             $preguntaModel,
             $usuarioModel,
             $juegoModel
-        );
-    }
-
-    public function getMensajeCreadaCorrectamenteController(): MensajeCreadaCorrectamenteController
-    {
-        return new MensajeCreadaCorrectamenteController(
-            $this->getViewer()
         );
     }
 

@@ -11,7 +11,8 @@ class RuletaController
         $this->categoriaModel = $categoriaModel;
     }
 
-    public function show(){
+    public function show(): void
+    {
 
         $categorias = $this->categoriaModel->getCategorias();
         $categoriasRepetidas = $this->repetirCategorias($categorias, 5);
@@ -31,7 +32,10 @@ class RuletaController
         ]);
     }
 
-    public function girar()
+    /**
+     * @throws JsonException
+     */
+    public function girar(): void
     {
         $categoria = $this->categoriaModel->getCategoriaAleatoria();
         $_SESSION["categoria"] = $categoria;
@@ -42,11 +46,13 @@ class RuletaController
         echo json_encode(['posicion' => $posicionGanadora], JSON_THROW_ON_ERROR);
     }
 
-    private function repetirCategorias($categorias, $veces): array
+    private function repetirCategorias(array $categorias, int $veces): array
     {
         $resultado = [];
         for ($i = 0; $i < $veces; $i++) {
-            $resultado = array_merge($resultado, $categorias);
+            foreach ($categorias as $item) {
+                $resultado[] = $item;
+            }
         }
         return $resultado;
     }

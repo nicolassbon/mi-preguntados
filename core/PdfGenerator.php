@@ -12,11 +12,12 @@ class PdfGenerator
         $this->dompdf = new Dompdf();
     }
 
-    public function generarPdf($html, $nombreArchivo = "documento.pdf", $descargar = false) {
+    public function generarPdf($html, $nombreArchivo = "documento.pdf", $descargar = false): void
+    {
         try {
             $this->dompdf->loadHtml($html);
 
-            $this->dompdf->setPaper('A4', 'portrait');
+            $this->dompdf->setPaper('A4');
 
             $this->dompdf->render();
 
@@ -25,7 +26,6 @@ class PdfGenerator
             exit;
         } catch (Exception $e) {
             error_log("PdfGenerator error: " . $e->getMessage());
-            throw new \RuntimeException("No se pudo generar el PDF.");
         }
     }
 

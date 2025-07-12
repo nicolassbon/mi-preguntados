@@ -10,7 +10,7 @@ class CategoriaModel
     }
 
     public function getCategorias() {
-        $sql = "SELECT id_categoria, nombre, foto_categoria FROM categoria ORDER BY id_categoria ASC";
+        $sql = "SELECT id_categoria, nombre, foto_categoria FROM categoria ORDER BY id_categoria";
         return $this->db->query($sql);
     }
 

@@ -3,12 +3,10 @@
 class JuegoModel
 {
     private $db;
-    private $preguntaModel;
 
-    public function __construct($db, PreguntaModel $preguntaModel)
+    public function __construct($db)
     {
         $this->db = $db;
-        $this->preguntaModel = $preguntaModel;
     }
 
     /*
@@ -17,7 +15,7 @@ class JuegoModel
     * 3. El usuario no la vio (usuario_pregunta)
     * 4. Sea de esa categoria
     */
-    public function obtenerPregunta($id_usuario, $id_categoria)
+    public function obtenerPregunta($id_usuario, $id_categoria): array
     {
         // estadisticas del usuario
         $estadisticas = $this->getEstadisticasUsuario($id_usuario);
@@ -42,16 +40,15 @@ class JuegoModel
         // agrupo y selecciono según nivel
         $grupos = $this->agruparPorNivel($preguntas);
 
-        $preg = $this->elegirPorNivelUsuario($grupos, $nivelUsuario);
-        return $preg;
+        return $this->elegirPorNivelUsuario($grupos, $nivelUsuario);
     }
 
-    private function seDebeCalcularNivelUsuario($entregadas)
+    private function seDebeCalcularNivelUsuario($entregadas): bool
     {
         return $entregadas >= 5;
     }
 
-    private function seDebeCalcularNivelPregunta($pregunta)
+    private function seDebeCalcularNivelPregunta($pregunta): bool
     {
         return $pregunta["entregadas"] >= 5;
     }
@@ -72,34 +69,36 @@ class JuegoModel
 
     private function getNivelUsuario($entregadas, $acertadas): string
     {
+        $nivel = 'intermedio';
         if (!$this->seDebeCalcularNivelUsuario($entregadas)) {
-            return "intermedio";
+            return $nivel;
         }
 
         $ratio = $acertadas / $entregadas;
         if ($ratio > 0.7) {
-            return 'facil';
+            $nivel = 'facil';
         }
         if ($ratio < 0.3) {
-            return 'dificil';
+            $nivel = 'dificil';
         }
-        return 'intermedio';
+        return $nivel;
     }
 
     private function getDificultadPregunta($pregunta): string
     {
+        $dificultad = 'intermedio';
         if (!$this->seDebeCalcularNivelPregunta($pregunta)) {
-            return 'intermedio';
+            return $dificultad;
         }
 
         $ratio = $pregunta['correctas'] / $pregunta['entregadas'];
         if ($ratio > 0.7) {
-            return 'facil';
+            $dificultad = 'facil';
         }
         if ($ratio < 0.3) {
-            return 'dificil';
+            $dificultad = 'dificil';
         }
-        return 'intermedio';
+        return $dificultad;
     }
 
     // Trae preguntas que el usuario no vio, de la categoría dada,
@@ -108,36 +107,26 @@ class JuegoModel
     {
 
         $sql = "
-        SELECT p.*
-          FROM preguntas p
-
-          LEFT JOIN usuario_pregunta up
-            ON p.id_pregunta = up.idPregunta
-           AND up.idUsuario   = $id_usuario
-
-          LEFT JOIN preguntas_reportadas pr
-            ON p.id_pregunta      = pr.id_pregunta
-           AND pr.id_reportador   = $id_usuario
-           
-        WHERE 
-            up.idPregunta IS NULL                           
-            AND pr.id_reporte IS NULL                       
-            AND p.id_categoria  = $id_categoria                         
-            AND p.estado IN ('activa','reportada')                               
-    ";
+            SELECT p.*
+            FROM preguntas p
+            LEFT JOIN usuario_pregunta up ON p.id_pregunta = up.idPregunta AND up.idUsuario = $id_usuario
+            LEFT JOIN preguntas_reportadas pr ON p.id_pregunta = pr.id_pregunta AND pr.id_reportador = $id_usuario
+            WHERE up.idPregunta IS NULL AND pr.id_reporte IS NULL
+            AND p.id_categoria  = $id_categoria AND p.estado IN ('activa','reportada')
+        ";
 
         return $this->db->query($sql);
     }
 
-    private function limpiarHistorialPreguntasVistas($id_usuario, $id_categoria)
+    private function limpiarHistorialPreguntasVistas($id_usuario, $id_categoria): void
     {
-        $this->db->execute("
-        DELETE up
-          FROM usuario_pregunta up
-          JOIN preguntas p ON up.idPregunta = p.id_pregunta
-         WHERE up.idUsuario = $id_usuario
-           AND p.id_categoria = $id_categoria
-    ");
+        $sql = "
+            DELETE up
+            FROM usuario_pregunta up
+            JOIN preguntas p ON up.idPregunta = p.id_pregunta
+            WHERE up.idUsuario = $id_usuario AND p.id_categoria = $id_categoria
+        ";
+        $this->db->execute($sql);
     }
 
     private function agruparPorNivel($preguntas): array
@@ -176,7 +165,7 @@ class JuegoModel
         return [];
     }
 
-    public function marcarPreguntaComoVista(int $id_usuario, int $id_pregunta)
+    public function marcarPreguntaComoVista(int $id_usuario, int $id_pregunta): void
     {
         $sql = "INSERT INTO usuario_pregunta (idUsuario, idPregunta, fechaVisto) VALUES (?, ?, NOW())";
         $stmt = $this->db->prepare($sql);

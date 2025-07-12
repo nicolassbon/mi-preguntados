@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class RegistroController
 {
     private $view;
@@ -18,14 +20,14 @@ class RegistroController
         $this->emailSender = $emailSender;
     }
 
-    public function show()
+    public function show(): void
     {
         $this->view->render("register", [
             'title' => 'Registrarse'
         ]);
     }
 
-    public function pasoMapa()
+    #[NoReturn] public function pasoMapa(): void
     {
         $_SESSION['registro'] = [
             'nombre' => $_POST['nombre'],
@@ -52,18 +54,21 @@ class RegistroController
         $this->redirectTo("/registro/mapa");
     }
 
-    public function mapa()
+    public function mapa(): void
     {
         $this->view->render("mapaRegistro", [
             'title' => 'Elige tu ubicación'
         ]);
     }
 
-    public function getUbicacion()
+    /**
+     * @throws JsonException
+     */
+    public function getUbicacion(): void
     {
-        if (!isset($_GET['lat']) || !isset($_GET['lng'])) {
+        if (!isset($_GET['lat'], $_GET['lng'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Coordenadas no válidas']);
+            echo json_encode(['error' => 'Coordenadas no válidas'], JSON_THROW_ON_ERROR);
             return;
         }
 
@@ -71,7 +76,7 @@ class RegistroController
         $lng = $_GET['lng'];
 
         // Usar la API de Nominatim
-        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lng}&zoom=10&addressdetails=1";
+        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=10&addressdetails=1";
 
         $opts = [
             "http" => [
@@ -81,25 +86,24 @@ class RegistroController
         $context = stream_context_create($opts);
         $response = file_get_contents($url, false, $context);
 
-        if ($response === FALSE) {
+        if ($response === false) {
             http_response_code(500);
-            echo json_encode(['error' => 'No se pudo obtener ubicación']);
+            echo json_encode(['error' => 'No se pudo obtener ubicación'], JSON_THROW_ON_ERROR);
             return;
         }
 
-        $data = json_decode($response, true);
+        $data = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
 
         $pais = $data['address']['country'] ?? 'Desconocido';
         $provincia = $data['address']['state'] ?? 'Desconocido';
 
-        header('Content-Type: application/json');
-        echo json_encode([
+        $this->responderJson([
             'pais' => $pais,
             'provincia' => $provincia
         ]);
     }
 
-    public function procesar()
+    public function procesar(): void
     {
         // Recuperar datos del registro que estan en session
         $r = $_SESSION['registro'] ?? null;
@@ -130,16 +134,17 @@ class RegistroController
             rename($_SESSION['foto_temp'], $destinoFinal);
         }
 
-        /*
-          Dentro del model genero un random y lo guardo en la base
-          Cuando doy de alta el usuario en la bdd con un valor random y un campo
-          validado = false
-        */
+        $sexo = 3;
+        if ($r['sexo'] === 'masculino') {
+            $sexo = 1;
+        } elseif ($r['sexo'] === 'femenino') {
+            $sexo = 2;
+        }
 
         $res = $this->usuarioModel->registrarUsuario(
             $r['nombre'],
             $r['fecha_nac'],
-            ($r['sexo'] === 'masculino' ? 1 : ($r['sexo'] === 'femenino' ? 2 : 3)),
+            $sexo,
             $idPais,
             $idCiudad,
             $r['email'],
@@ -161,11 +166,11 @@ class RegistroController
 
         $_SESSION['id_usuario'] = $res['idUsuario'];
         $_SESSION['email'] = $res['email'];
-        $this->redirectTo('/registro/success');
         unset($_SESSION['registro'], $_SESSION['foto_temp']);
+        $this->redirectTo('/registro/success');
     }
 
-    public function success()
+    public function success(): void
     {
         $email = $_SESSION['email'];
         $this->view->render("registroSuccess", [
@@ -174,8 +179,7 @@ class RegistroController
         ]);
     }
 
-    // Endpoint que llama el link que le llega por correo al usuario
-    public function verificar()
+    public function verificar(): void
     {
         $idVerificador = $_GET["idVerificador"];
         $idUsuario = $_GET["idUsuario"];
@@ -195,13 +199,13 @@ class RegistroController
         ]);
     }
 
-    private function redirectTo($str)
+    #[NoReturn] private function redirectTo($str): void
     {
         header('Location: ' . $str);
         exit();
     }
 
-    private function generateEmailBodyFor($userName, $token, $idUsuario)
+    private function generateEmailBodyFor($userName, $token, $idUsuario): string
     {
         $url = "http://localhost/registro/verificar?idUsuario=$idUsuario&idVerificador=$token";
         return "
@@ -213,7 +217,7 @@ class RegistroController
   ";
     }
 
-    private function renderErrorView($title, $message)
+    private function renderErrorView($title, $message): void
     {
         $this->view->render("error", [
             'title' => $title,
@@ -221,31 +225,45 @@ class RegistroController
         ]);
     }
 
-    public function checkEmail()
+    /**
+     * @throws JsonException
+     */
+    public function checkEmail(): void
     {
         $email = $_POST['email'] ?? '';
 
         if (empty($email)) {
-            echo json_encode(['exists' => false]);
+            $this->responderJson(['exists' => false]);
             return;
         }
 
         $exists = $this->usuarioModel->existeEmail($email);
-        header('Content-Type: application/json');
-        echo json_encode(['exists' => $exists]);
+        $this->responderJson(['exists' => $exists]);
     }
 
-    public function checkUsuario()
+    /**
+     * @throws JsonException
+     */
+    public function checkUsuario(): void
     {
         $usuario = $_POST['usuario'] ?? '';
 
         if (empty($usuario)) {
-            echo json_encode(['exists' => false]);
+            $this->responderJson(['exists' => false]);
             return;
         }
 
         $exists = $this->usuarioModel->existeUsuario($usuario);
+        $this->responderJson(['exists' => $exists]);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function responderJson(array $data): void
+    {
         header('Content-Type: application/json');
-        echo json_encode(['exists' => $exists]);
+        echo json_encode($data, JSON_THROW_ON_ERROR);
     }
 }
+

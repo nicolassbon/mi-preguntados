@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class EditorController
 {
     private $view;
@@ -17,14 +19,14 @@ class EditorController
         $this->reportePreguntaModel = $reportePreguntaModel;
     }
 
-    public function show()
+    public function show(): void
     {
         $this->view->render("panelEditor", [
             'title' => 'Panel Editor'
         ]);
     }
 
-    public function sugerencias()
+    public function sugerencias(): void
     {
         $filtros = $this->prepararFiltrosYCategorias();
 
@@ -41,7 +43,7 @@ class EditorController
         ]);
     }
 
-    public function verSugerencia()
+    public function verSugerencia(): void
     {
         $id_pregunta = $_GET['id_pregunta'] ?? null;
         $origen = $_GET['origen'] ?? 'sugerencias';
@@ -67,7 +69,7 @@ class EditorController
         ]);
     }
 
-    public function aceptarSugerencia()
+    #[NoReturn] public function aceptarSugerencia(): void
     {
         $id = $_GET['id'];
         $this->sugerenciaPreguntaModel->activarPreguntaSugerida($id);
@@ -76,7 +78,7 @@ class EditorController
         $this->redirectTo("/editor/sugerencias");
     }
 
-    public function descartarSugerencia()
+    #[NoReturn] public function descartarSugerencia(): void
     {
         $id = $_GET['id'];
         $this->sugerenciaPreguntaModel->desactivarPreguntaSugerida($id);
@@ -85,7 +87,7 @@ class EditorController
         $this->redirectTo("/editor/sugerencias");
     }
 
-    public function gestionarPreguntas()
+    public function gestionarPreguntas(): void
     {
         $filtros = $this->prepararFiltrosYCategorias();
         $categorias = $filtros['categorias'];
@@ -101,6 +103,7 @@ class EditorController
             $pregunta['es_reportada'] = $estado === 'reportada';
             $pregunta['es_sugerida'] = $estado === 'sugerida';
         }
+        unset($pregunta);
 
         $this->view->render("gestionarPreguntas", [
             'title' => 'Gestión de Preguntas',
@@ -112,7 +115,7 @@ class EditorController
         ]);
     }
 
-    public function desactivarPregunta()
+    #[NoReturn] public function desactivarPregunta(): void
     {
         $id_pregunta = $_GET['id_pregunta'] ?? '';
         $this->preguntaModel->desactivarPregunta($id_pregunta);
@@ -120,7 +123,7 @@ class EditorController
         $this->redirectTo("/editor/gestionarPreguntas");
     }
 
-    public function activarPregunta()
+    #[NoReturn] public function activarPregunta(): void
     {
         $id_pregunta = $_GET['id_pregunta'] ?? '';
         $this->preguntaModel->activarPregunta($id_pregunta);
@@ -128,7 +131,7 @@ class EditorController
         $this->redirectTo("/editor/gestionarPreguntas");
     }
 
-    public function editarPregunta()
+    public function editarPregunta(): void
     {
         $id_pregunta = $_GET['id_pregunta'] ?? '';
         $id_reporte = $_GET['id_reporte'] ?? '';
@@ -144,7 +147,7 @@ class EditorController
         ]);
     }
 
-    public function guardarEdicion()
+    #[NoReturn] public function guardarEdicion(): void
     {
         $id_pregunta = $_POST['id_pregunta'] ?? null;
         $id_reporte = $_POST['id_reporte'] ?? null;
@@ -169,11 +172,11 @@ class EditorController
         $this->redirectTo("/editor/gestionarPreguntas");
     }
 
-    public function reportes()
+    public function reportes(): void
     {
         $filtros = $this->prepararFiltrosYCategorias();
 
-        $preguntasReportadas = $this->reportePreguntaModel->getPreguntasReportadasConDetalles($filtros['terminoBusqueda'], $filtros['id_categoria']);
+        $preguntasReportadas = $this->reportePreguntaModel->getPreguntasReportadasConDetalles($filtros['id_categoria'],$filtros['terminoBusqueda']);
 
         $this->view->render('reportes', [
             'title' => 'Preguntas Reportadas',
@@ -186,7 +189,7 @@ class EditorController
         ]);
     }
 
-    public function aprobarReporte()
+    #[NoReturn] public function aprobarReporte(): void
     {
         $id_reporte = (int)($_POST['id_reporte'] ?? 0);
         $id_pregunta = (int)($_POST['id_pregunta'] ?? 0);
@@ -198,7 +201,7 @@ class EditorController
         $this->redirectTo("/editor/reportes");
     }
 
-    public function descartarReporte()
+    #[NoReturn] public function descartarReporte(): void
     {
         $id_reporte = (int)($_POST['id_reporte'] ?? 0);
         $id_pregunta = (int)($_POST['id_pregunta'] ?? 0);
@@ -217,7 +220,7 @@ class EditorController
 
         $categorias = $this->categoriaModel->getCategorias();
         foreach ($categorias as &$categoria) {
-            $categoria['seleccionada'] = ($categoria['id_categoria'] == $id_categoria);
+            $categoria['seleccionada'] = ($categoria['id_categoria'] === $id_categoria);
         }
 
         return [
@@ -228,7 +231,7 @@ class EditorController
         ];
     }
 
-    private function redirectTo($str)
+    #[NoReturn] private function redirectTo($str): void
     {
         header('Location: ' . $str);
         exit();

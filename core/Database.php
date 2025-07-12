@@ -5,24 +5,22 @@ class Database
 
     private $conn;
 
-    function __construct($servername, $username, $dbname, $password)
+    public function __construct($servername, $username, $dbname, $password)
     {
         $this->conn = new Mysqli($servername, $username, $password, $dbname) or die("Error de conexion " . mysqli_connect_error());
     }
 
-    public function query($sql)
+    public function query($sql): array
     {
-        $result = $this->conn->query($sql);
-
-        return $result->fetch_all(MYSQLI_ASSOC);
+        return $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function execute($sql)
+    public function execute($sql): void
     {
         $this->conn->query($sql);
     }
 
-    public function prepare($sql)
+    public function prepare($sql): bool|mysqli_stmt
     {
         return $this->conn->prepare($sql);
     }
@@ -32,12 +30,12 @@ class Database
         return $this->conn->insert_id;
     }
 
-    function __destruct()
+    public function __destruct()
     {
         $this->conn->close();
     }
 
-    public function escapeLike($string)
+    public function escapeLike($string): string
     {
         return $this->conn->real_escape_string($string);
     }

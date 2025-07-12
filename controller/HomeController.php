@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class HomeController
 {
 
@@ -11,7 +13,7 @@ class HomeController
         $this->view = $view;
     }
 
-    public function show()
+    public function show(): void
     {
         $rol = $_SESSION['rol_usuario'] ?? null;
 
@@ -31,7 +33,8 @@ class HomeController
         }
     }
 
-    public function error() {
+    public function error(): void
+    {
         $message = $_SESSION['error_message'] ?? null;
 
         $this->view->render("error", [
@@ -42,8 +45,8 @@ class HomeController
         unset($_SESSION['error_message']);
     }
 
-    private
-    function redirectTo($str)
+    #[NoReturn] private
+    function redirectTo($str): void
     {
         header('Location: ' . $str);
         exit();

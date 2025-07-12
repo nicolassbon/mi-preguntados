@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class PartidaController
 {
     private $view;
@@ -17,7 +19,7 @@ class PartidaController
         $this->juegoModel = $juegoModel;
     }
 
-    public function crearPartida()
+    #[NoReturn] public function crearPartida(): void
     {
         $id_usuario = $_SESSION['usuario_id'] ?? null;
 
@@ -34,7 +36,7 @@ class PartidaController
         exit();
     }
 
-    public function jugar()
+    public function jugar(): void
     {
 
         $id_usuario = $_SESSION['usuario_id'] ?? null;
@@ -97,73 +99,88 @@ class PartidaController
 
     }
 
-    public function responder()
+    public function responder(): void
     {
         $this->detectarTrampaYExpulsar();
 
         $id_usuario = $_SESSION['usuario_id'] ?? null;
         $id_pregunta = $_SESSION['id_pregunta'];
         $id_partida = $_SESSION['id_partida'];
-
         $inicio = $_SESSION['inicio_pregunta'] ?? null;
-        $tiempo_agotado = $inicio !== null && (time() - $inicio) > 10;
 
+        $tiempo_agotado = $inicio !== null && (time() - $inicio) > 10;
         $respuestaCorrecta = false;
         $texto = $tiempo_agotado ? '¡TIEMPO AGOTADO!' : '¡INCORRECTA!';
         $color = $tiempo_agotado ? 'text-warning' : 'text-danger';
         $id_respuesta = $_POST['id_respuesta'] ?? null;
 
         if ($tiempo_agotado || $id_respuesta === -1) {
-            $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, null, 0);
+            $this->procesarTiempoAgotado($id_partida, $id_pregunta);
             $this->finalizarPartida();
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_respuesta'])) {
-            $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
-
-            foreach ($respuestas as $respuesta) {
-                if ($respuesta['esCorrecta']) {
-                    if ($respuesta['id_respuesta'] == $_POST['id_respuesta']) {
-                        $respuestaCorrecta = true;
-                        $texto = "¡CORRECTA!";
-                        $color = 'text-success';
-
-                        $_SESSION['puntaje'] += 5;
-                        $this->partidaModel->incrementarPuntaje($id_partida);
-                        $this->partidaModel->incrementarPreguntaRespondidaCorrectamente($id_partida);
-                        $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
-                        $this->preguntaModel->incrementarCorrectasPregunta($id_pregunta);
-                        $this->usuarioModel->sumarPuntajeUsuario($id_usuario);
-                        $this->usuarioModel->incrementarCorrectasUsuario($id_usuario);
-                        break;
-                    }
-                }
-            }
-
-            if (!$respuestaCorrecta) {
-                $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $_POST['id_respuesta'], 0);
-                $this->finalizarPartida();
-            }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_respuesta'])) {
+            $respuestaCorrecta = $this->procesarRespuesta((int)$id_respuesta, $id_pregunta, $id_partida, $id_usuario, $texto, $color);
         } else {
-            echo 'error';
+            echo "error";
+            return;
         }
 
         $_SESSION['cantidad'] = (int)$this->partidaModel->getCantidadPreguntasCorrectas($id_partida);
-        $this->mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color, false);
+        $this->mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color);
     }
 
-    public function perdio()
+    private function procesarTiempoAgotado($id_partida, $id_pregunta): void
+    {
+        $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, null, 0);
+    }
+
+    private function procesarRespuesta(int $id_respuesta, int $id_pregunta, int $id_partida, int $id_usuario, string &$texto, string &$color): bool
+    {
+        $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
+
+        foreach ($respuestas as $respuesta) {
+            $respuesta_id = (int)$respuesta['id_respuesta'];
+
+            if ($respuesta['esCorrecta'] && $respuesta_id === $id_respuesta) {
+                $this->procesarCorrecta($respuesta, $id_pregunta, $id_partida, $id_usuario);
+                $texto = "¡CORRECTA!";
+                $color = 'text-success';
+                return true;
+            }
+        }
+
+        $this->procesarIncorrecta($id_partida, $id_pregunta, $id_respuesta);
+        return false;
+    }
+
+    private function procesarCorrecta(array $respuesta, int $id_pregunta, int $id_partida, int $id_usuario): void
+    {
+        $_SESSION['puntaje'] += 5;
+        $this->partidaModel->incrementarPuntaje($id_partida);
+        $this->partidaModel->incrementarPreguntaRespondidaCorrectamente($id_partida);
+        $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
+        $this->preguntaModel->incrementarCorrectasPregunta($id_pregunta);
+        $this->usuarioModel->sumarPuntajeUsuario($id_usuario);
+        $this->usuarioModel->incrementarCorrectasUsuario($id_usuario);
+    }
+
+    private function procesarIncorrecta(int $id_partida, int $id_pregunta, int $id_respuesta): void
+    {
+        $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta, 0);
+        $this->finalizarPartida();
+    }
+
+    public function perdio(): void
     {
         $this->view->render("perdio", [
             'title' => 'Partida Perdida',
             'puntaje' => $_SESSION['puntaje'],
-            'cantidad' => $_SESSION['cantidad'] ?? 0
+            'cantidad' => $_SESSION['cantidad']
         ]);
 
         unset($_SESSION['puntaje'], $_SESSION['cantidad']);
     }
 
-    public function reportarPregunta()
+    public function reportarPregunta(): void
     {
         $idPregunta = (int)$_POST['id_pregunta'];
         $idUsuario = $_SESSION['usuario_id'] ?? null;
@@ -180,29 +197,29 @@ class PartidaController
         $this->view->render("reporteCreado", [
             'title' => 'Reporte enviado',
             'mensaje' => 'Gracias por reportar la pregunta. Será revisada por un editor.',
-            'puntaje' => $_SESSION['puntaje'] ?? 0,
-            'cantidad' => $_SESSION['cantidad'] ?? 0
+            'puntaje' => $_SESSION['puntaje'],
+            'cantidad' => $_SESSION['cantidad']
         ]);
     }
 
-    private function mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color, $reportado)
+    private function mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color): void
     {
         $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
 
         foreach ($respuestas as &$respuesta) {
-            $respuesta['id'] = $respuesta['id_respuesta'];
-            $respuesta['texto_respuesta'] = $respuesta['respuesta'];
+            $respuesta_id = (int)$respuesta['id_respuesta'];
+            $post_id = isset($_POST['id_respuesta']) ? (int)$_POST['id_respuesta'] : null;
 
             if ($respuesta['esCorrecta']) {
                 $respuesta['clase'] = 'bg-success';
             } else {
-                $respuesta['clase'] = ($respuesta['id_respuesta'] == ($_POST['id_respuesta'] ?? null))
+                $respuesta['clase'] = ($respuesta_id === $post_id)
                     ? 'bg-danger'
                     : 'bg-light';
             }
-
             $respuesta['disabled'] = true;
         }
+        unset($respuesta);
 
         $categoria = $_SESSION['categoria'] ?? null;
         $user = $_SESSION["nombre_usuario"];
@@ -222,14 +239,13 @@ class PartidaController
             'fondo' => $categoria['color'],
             'foto' => $categoria['foto_categoria'],
             'user' => $user,
-            'reportado' => $reportado,
             'id_pregunta' => $id_pregunta
         ]);
 
         $this->limpiarSesionPregunta();
     }
 
-    private function limpiarSesionPregunta()
+    private function limpiarSesionPregunta(): void
     {
         unset(
             $_SESSION['categoria'],
@@ -239,7 +255,7 @@ class PartidaController
         );
     }
 
-    private function detectarTrampaYExpulsar()
+    private function detectarTrampaYExpulsar(): void
     {
         if (!isset($_SESSION['id_pregunta'])) {
             if (!empty($_SESSION['id_partida'])) {
@@ -251,7 +267,7 @@ class PartidaController
         }
     }
 
-    private function finalizarPartida()
+    private function finalizarPartida(): void
     {
         if (isset($_SESSION['id_partida'])) {
             $this->partidaModel->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);

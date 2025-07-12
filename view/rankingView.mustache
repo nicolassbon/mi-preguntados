@@ -25,6 +25,13 @@
                 <td class="text-center p-2" style="color: #333">{{puntaje_acumulado}}</td>
             </tr>
         {{/ranking}}
+        {{^ranking}}
+            <tr>
+                <td colspan="4" class="text-center p-3 text-alert" style="color: #7a3e90;">
+                    ¡Todavía no existen estadísticas!
+                </td>
+            </tr>
+        {{/ranking}}
     </table>
 
     <h2 class="mt-2 text-center mb-2" style="color: #4c1765">{{title2}}</h2>
@@ -50,6 +57,13 @@
                 <td class="text-center p-2" style="color: #333">{{fecha_inicio}}</td>
                 <td class="text-center p-2" style="color: #333">{{fecha_fin}}</td>
                 <td class="text-center p-2" style="color: #333">{{puntaje_final}}</td>
+            </tr>
+        {{/partidas}}
+        {{^partidas}}
+            <tr>
+                <td colspan="5" class="text-center p-3 text-alert" style="color: #7a3e90;">
+                    ¡Todavía no hay partidas registradas!
+                </td>
             </tr>
         {{/partidas}}
     </table>

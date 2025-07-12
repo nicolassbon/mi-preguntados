@@ -23,7 +23,8 @@ class RolModel
         return $resultado[0]['nombre_rol'] ?? null;
     }
 
-    public function asignarRolJugador($id_usuario) {
+    public function asignarRolJugador($id_usuario): void
+    {
         $result = $this->db->query("SELECT id_rol FROM roles WHERE nombre_rol = 'jugador'");
         $id_rol = $result[0]['id_rol'] ?? null;
 

@@ -13,7 +13,7 @@ class Router
         $this->configuration = $configuration;
     }
 
-    public function go($controllerName, $methodName)
+    public function go($controllerName, $methodName): void
     {
         $controller = $this->getControllerFrom($controllerName);
         $this->executeMethodFromController($controller, $methodName);
@@ -26,9 +26,9 @@ class Router
         return call_user_func(array($this->configuration, $validController));
     }
 
-    private function executeMethodFromController($controller, $method)
+    private function executeMethodFromController($controller, $method): void
     {
         $validMethod = method_exists($controller, $method) ? $method : $this->defaultMethod;
-        call_user_func(array($controller, $validMethod));
+        $controller->$validMethod();
     }
 }

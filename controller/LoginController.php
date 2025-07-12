@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class LoginController
 {
     private $view;
@@ -13,11 +15,10 @@ class LoginController
         $this->rolModel = $rolModel;
     }
 
-    public function show()
+    public function show(): void
     {
         if (isset($_SESSION['usuario_id'])) {
             $this->redirigirPorRol($_SESSION['rol_usuario'] ?? '');
-            return;
         }
 
         $error = $_SESSION['login_error'] ?? null;
@@ -34,7 +35,7 @@ class LoginController
         ]);
     }
 
-    public function procesar()
+    #[NoReturn] public function procesar(): void
     {
         $email = $_POST["email"];
         $password = $_POST["password"];
@@ -44,13 +45,11 @@ class LoginController
         if (!$usuario || !password_verify($password, $usuario["contrasena_hash"])) {
             $_SESSION['login_error'] = 'Correo o contraseña incorrectos';
             $this->redirectTo("/login/show");
-            return;
         }
 
         if (!$usuario["es_validado"]) {
             $_SESSION['login_error'] = 'Tu cuenta aún no fue validada. Por favor revisá tu correo.';
             $this->redirectTo("/login/show");
-            return;
         }
 
         $_SESSION["usuario_id"] = $usuario["id_usuario"];
@@ -58,14 +57,11 @@ class LoginController
 
         $rolUsuario = $this->rolModel->getRolDelUsuario($usuario['id_usuario']);
         $_SESSION['rol_usuario'] = $rolUsuario;
-        $_SESSION['esEditor'] = $rolUsuario === 'editor' ?? false;
-        $_SESSION['esAdmin'] = $rolUsuario === 'admin' ?? false;
-        $_SESSION['esJugador'] = $rolUsuario === 'jugador' ?? false;
 
         $this->redirectTo("/lobby");
     }
 
-    private function redirigirPorRol(string $rol): void
+    #[NoReturn] private function redirigirPorRol(string $rol): void
     {
         switch ($rol) {
             case 'admin':
@@ -81,7 +77,7 @@ class LoginController
         }
     }
 
-    public function logout()
+    public function logout(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_unset();
@@ -90,7 +86,7 @@ class LoginController
         }
     }
 
-    private function redirectTo($str)
+    #[NoReturn] private function redirectTo($str): void
     {
         header('Location: ' . $str);
         exit();

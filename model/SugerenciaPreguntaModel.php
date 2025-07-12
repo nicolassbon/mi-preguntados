@@ -9,10 +9,9 @@ class SugerenciaPreguntaModel
         $this->db = $db;
     }
 
-    public function agregarSugerencia($id_usuario, $id_pregunta, $id_categoria)
+    public function agregarSugerencia($id_usuario, $id_pregunta, $id_categoria): void
     {
-        $sql = "INSERT INTO sugerencias_preguntas 
-            (id_usuario, id_pregunta, id_categoria, fecha_envio, estado, fecha_resolucion)
+        $sql = "INSERT INTO sugerencias_preguntas(id_usuario, id_pregunta, id_categoria, fecha_envio, estado, fecha_resolucion)
             VALUES (?, ?, ?, NOW(), ?, ?)";
         $stmt = $this->db->prepare($sql);
 
@@ -22,7 +21,7 @@ class SugerenciaPreguntaModel
         $stmt->execute();
     }
 
-    public function actualizarEstadoSugerencia($id_pregunta, $estado)
+    public function actualizarEstadoSugerencia($id_pregunta, $estado): void
     {
         $sql = "UPDATE sugerencias_preguntas SET estado = ?, fecha_resolucion = NOW() WHERE id_pregunta = ?";
         $stmt = $this->db->prepare($sql);
@@ -30,13 +29,13 @@ class SugerenciaPreguntaModel
         $stmt->execute();
     }
 
-    public function obtenerSugerenciasPendientes()
+    public function obtenerSugerenciasPendientes(): array
     {
         $sql = "SELECT * FROM sugerencias_preguntas WHERE estado = 'pendiente'";
         return $this->db->query($sql);
     }
 
-    public function obtenerSugerenciasPorUsuario($id_usuario)
+    public function obtenerSugerenciasPorUsuario($id_usuario): array
     {
         $sql = "SELECT * FROM sugerencias_preguntas WHERE id_usuario = ?";
         $stmt = $this->db->prepare($sql);
@@ -45,7 +44,7 @@ class SugerenciaPreguntaModel
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function getPreguntasSugeridas($terminoBusqueda = '', $id_categoria = 'todasLasCategorias')
+    public function getPreguntasSugeridas($terminoBusqueda = '', $id_categoria = 'todasLasCategorias'): array
     {
         $where = "p.estado = 'sugerida'";
 
@@ -59,30 +58,30 @@ class SugerenciaPreguntaModel
         }
 
         $sql = "
-        SELECT DISTINCT p.id_pregunta, p.pregunta, c.nombre, u.nombre_usuario, u.email, p.estado
-        FROM preguntas p
-        JOIN categoria c ON p.id_categoria = c.id_categoria
-        JOIN sugerencias_preguntas s ON s.id_pregunta = p.id_pregunta
-        JOIN usuarios u ON s.id_usuario = u.id_usuario
-        WHERE $where
-    ";
+            SELECT DISTINCT p.id_pregunta, p.pregunta, c.nombre, u.nombre_usuario, u.email, p.estado
+            FROM preguntas p
+            JOIN categoria c ON p.id_categoria = c.id_categoria
+            JOIN sugerencias_preguntas s ON s.id_pregunta = p.id_pregunta
+            JOIN usuarios u ON s.id_usuario = u.id_usuario
+            WHERE $where
+        ";
         return $this->db->query($sql);
     }
 
     public function getAutorDePreguntaSugerida($id_pregunta)
     {
         $sql = "
-        SELECT u.nombre_usuario, u.email
-        FROM sugerencias_preguntas sp
-        JOIN usuarios u ON sp.id_usuario = u.id_usuario
-        WHERE sp.id_pregunta = $id_pregunta
-        LIMIT 1
-    ";
+            SELECT u.nombre_usuario, u.email
+            FROM sugerencias_preguntas sp
+            JOIN usuarios u ON sp.id_usuario = u.id_usuario
+            WHERE sp.id_pregunta = $id_pregunta
+            LIMIT 1
+        ";
         $resultado = $this->db->query($sql);
         return $resultado[0] ?? null;
     }
 
-    public function activarPreguntaSugerida($id)
+    public function activarPreguntaSugerida($id): void
     {
 
         $estado = 'activa';
@@ -95,7 +94,7 @@ class SugerenciaPreguntaModel
 
     }
 
-    public function desactivarPreguntaSugerida($id)
+    public function desactivarPreguntaSugerida($id): void
     {
         $estado = 'deshabilitada';
 
@@ -107,14 +106,14 @@ class SugerenciaPreguntaModel
 
     }
 
-    public function fechaResolucionSugerencia($id)
+    public function fechaResolucionSugerencia($id): void
     {
         $sql = "UPDATE sugerencias_preguntas SET fecha_resolucion = NOW() WHERE id_pregunta = $id";
         $this->db->execute($sql);
     }
 
 
-    public function actualizarEstadoPregunta($id, $estado)
+    public function actualizarEstadoPregunta($id, $estado): void
     {
         $sql = "UPDATE sugerencias_preguntas SET estado = '$estado' WHERE id_pregunta = $id";
         $this->db->execute($sql);

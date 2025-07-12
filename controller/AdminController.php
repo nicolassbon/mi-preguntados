@@ -1,6 +1,7 @@
 <?php
 
-class AdminController{
+class AdminController
+{
 
     private $view;
     private $pdfGenerator;
@@ -13,7 +14,10 @@ class AdminController{
         $this->model = $model;
     }
 
-    public function show()
+    /**
+     * @throws JsonException
+     */
+    public function show(): void
     {
         $filtro = $_GET['filtro'] ?? 'mes';
         $data = $this->prepararDatosPanel($filtro, $_GET);
@@ -21,7 +25,10 @@ class AdminController{
         $this->view->render("panelAdmin", $data);
     }
 
-    public function generarPdfDashboard()
+    /**
+     * @throws JsonException
+     */
+    public function generarPdfDashboard(): void
     {
         $filtro = $_POST['filtro'] ?? 'mes';
         $data = $this->prepararDatosPanel($filtro, $_POST);
@@ -36,7 +43,8 @@ class AdminController{
         $this->pdfGenerator->generarPdf($html, "Dashboard.pdf", false);
     }
 
-    private function getRangoFechas($filtro, $parametros): array {
+    private function getRangoFechas($filtro, $parametros): array
+    {
         switch ($filtro) {
             case 'dia':
                 $desde = (new DateTime())->setTime(0, 0)->format('Y-m-d H:i:s');
@@ -74,6 +82,9 @@ class AdminController{
         return ['desde' => $desde, 'hasta' => $hasta];
     }
 
+    /**
+     * @throws JsonException
+     */
     private function prepararDatosPanel($filtro, $parametros): array
     {
         $rangoFechas = $this->getRangoFechas($filtro, $parametros);
@@ -83,18 +94,36 @@ class AdminController{
         $edad = ['menor' => 0, 'media' => 0, 'mayor' => 0];
         foreach ($this->model->obtenerDistribucionPorRangoEdad($desde, $hasta) as $fila) {
             switch ($fila['rangoEdad']) {
-                case 'Menor': $edad['menor'] = (int)$fila['cantidad']; break;
-                case 'Mediana edad': $edad['media'] = (int)$fila['cantidad']; break;
-                case 'Mayor': $edad['mayor'] = (int)$fila['cantidad']; break;
+                case 'Menor':
+                    $edad['menor'] = (int)$fila['cantidad'];
+                    break;
+                case 'Mediana edad':
+                    $edad['media'] = (int)$fila['cantidad'];
+                    break;
+                case 'Mayor':
+                    $edad['mayor'] = (int)$fila['cantidad'];
+                    break;
+                default:
+                    error_log("Rango de edad desconocido: " . $fila['rangoEdad']);
+                    break;
             }
         }
 
         $genero = ['femenino' => 0, 'masculino' => 0, 'otro' => 0];
         foreach ($this->model->obtenerDistribucionPorGenero($desde, $hasta) as $fila) {
             switch ($fila['descripcion']) {
-                case 'Femenino': $genero['femenino'] = (int)$fila['cantidad']; break;
-                case 'Masculino': $genero['masculino'] = (int)$fila['cantidad']; break;
-                case 'Prefiero no cargarlo': $genero['otro'] = (int)$fila['cantidad']; break;
+                case 'Femenino':
+                    $genero['femenino'] = (int)$fila['cantidad'];
+                    break;
+                case 'Masculino':
+                    $genero['masculino'] = (int)$fila['cantidad'];
+                    break;
+                case 'Prefiero no cargarlo':
+                    $genero['otro'] = (int)$fila['cantidad'];
+                    break;
+                default:
+                    error_log("Género desconocido: " . $fila['descripcion']);
+                    break;
             }
         }
 
@@ -128,7 +157,7 @@ class AdminController{
             'porcentaje_general' => $porcentajeGeneral,
             'hay_datos_porcentaje' => isset($porcentajeGeneral[0]['porcentajeCorrectas']),
 
-            'json_paises_usuarios' => json_encode($usuariosPais),
+            'json_paises_usuarios' => json_encode($usuariosPais, JSON_THROW_ON_ERROR),
             'hay_datos_paises' => count($usuariosPais) > 0,
 
             'rendimiento_usuarios' => $rendimientoUsuarios

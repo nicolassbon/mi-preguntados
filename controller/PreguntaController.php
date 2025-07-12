@@ -1,12 +1,14 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class PreguntaController
 {
     private $view;
     private $preguntaModel;
     private $sugerenciaModel;
 
-    public function __construct($view,$preguntaModel, $sugerenciaModel)
+    public function __construct($view, $preguntaModel, $sugerenciaModel)
     {
         $this->view = $view;
         $this->preguntaModel = $preguntaModel;
@@ -22,7 +24,7 @@ class PreguntaController
         ]);
     }
 
-    public function crearSugerencia()
+    #[NoReturn] public function crearSugerencia(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST'
             || empty($_POST['pregunta'])
@@ -46,7 +48,7 @@ class PreguntaController
         $opcion2 = $_POST['opcion2'];
         $opcion3 = $_POST['opcion3'];
         $opcion4 = $_POST['opcion4'];
-        $opcionCorrecta = $_POST['opcionCorrecta'];
+        $opcionCorrecta = (int)$_POST['opcionCorrecta'];
         $id_categoria = $_POST['categoria'];
 
         $this->preguntaModel->agregarPregunta($pregunta, $id_categoria);
@@ -65,16 +67,6 @@ class PreguntaController
         $this->view->render("sugerenciaSuccess", [
             'title' => 'Sugerir Pregunta'
         ]);
-    }
-
-    private function limpiarSesionPregunta()
-    {
-        unset(
-            $_SESSION['categoria'],
-            $_SESSION['id_pregunta'],
-            $_SESSION['pregunta'],
-            $_SESSION['inicio_pregunta']
-        );
     }
 
 }

@@ -10,13 +10,12 @@ class UbicacionModel
     }
 
     /**
-     * Hace reverse‐geocoding sobre lat/lng usando Nominatim
-     * y devuelve ['pais' => string, 'ciudad' => string] o null.
+     * @throws JsonException
      */
-    public function obtenerPaisYCiudadPorCoordenadas(float $lat, float $lng)
+    public function obtenerPaisYCiudadPorCoordenadas(float $lat, float $lng): ?array
     {
         $url = "https://nominatim.openstreetmap.org/reverse?"
-            . "format=json&lat={$lat}&lon={$lng}&zoom=10&addressdetails=1";
+            . "format=json&lat=$lat&lon=$lng&zoom=10&addressdetails=1";
 
         $opts = [
             "http" => [
@@ -29,7 +28,7 @@ class UbicacionModel
             return null;
         }
 
-        $data = json_decode($json, true);
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         $pais = $data['address']['country'] ?? null;
         // usar 'city' o 'town' o fallback a 'state'
         $ciudad = $data['address']['city']

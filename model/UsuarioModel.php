@@ -9,19 +9,19 @@ class UsuarioModel
         $this->db = $database;
     }
 
-    public function buscarUsuarioPorEmail($email){
+    public function buscarUsuarioPorEmail($email)
+    {
         $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
 
-        $resultado = $stmt->get_result();
-        return $resultado->fetch_assoc();
+        return $stmt->get_result()->fetch_assoc();
     }
 
-    public function registrarUsuario($nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $latitud, $longitud)
+    public function registrarUsuario($nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $latitud, $longitud): array
     {
 
-        $tokenVerificacion = md5(uniqid(rand(), true));
+        $tokenVerificacion = md5(uniqid(mt_rand(), true));
 
         $stmt = $this->db->prepare(
             "INSERT INTO usuarios (nombre_completo, anio_nacimiento, id_sexo, id_pais, id_ciudad, email, contrasena_hash, nombre_usuario, foto_perfil_url, token_verificacion, latitud, longitud)
@@ -41,14 +41,14 @@ class UsuarioModel
         ];
     }
 
-    public function verificarEmailUsuario($idVerificador, $idUsuario)
+    public function verificarEmailUsuario($idVerificador, $idUsuario): bool
     {
         $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE token_verificacion = ? AND id_usuario = ?");
         $stmt->bind_param("si", $idVerificador, $idUsuario);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        if ($result->num_rows == 1) {
+        if ($result->num_rows === 1) {
             $update = $this->db->prepare("UPDATE usuarios SET es_validado = 1 WHERE id_usuario = ?");
             $update->bind_param("i", $idUsuario);
             $update->execute();
@@ -58,7 +58,7 @@ class UsuarioModel
         return false;
     }
 
-    public function existeEmail($email)
+    public function existeEmail($email): bool
     {
         $stmt = $this->db->prepare("SELECT id_usuario FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -67,7 +67,7 @@ class UsuarioModel
         return $stmt->num_rows > 0;
     }
 
-    public function existeUsuario($usuario)
+    public function existeUsuario($usuario): bool
     {
         $stmt = $this->db->prepare("SELECT id_usuario FROM usuarios WHERE nombre_usuario = ?");
         $stmt->bind_param("s", $usuario);
@@ -76,38 +76,40 @@ class UsuarioModel
         return $stmt->num_rows > 0;
     }
 
-    public function incrementarEntregadasUsuario($id_usuario)
+    public function incrementarEntregadasUsuario($id_usuario): void
     {
         $sql = "UPDATE usuarios SET preguntas_entregadas = preguntas_entregadas + 1 WHERE id_usuario = $id_usuario ";
         $this->db->execute($sql);
 
     }
 
-    public function incrementarCorrectasUsuario($id_usuario)
+    public function incrementarCorrectasUsuario($id_usuario): void
     {
         $stmt = $this->db->prepare("UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = ?");
         $stmt->bind_param("i", $id_usuario);
         $stmt->execute();
     }
 
-    public function sumarPuntajeUsuario($id_usuario)
+    public function sumarPuntajeUsuario($id_usuario): void
     {
 
         $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + 5 WHERE id_usuario = $id_usuario ";
         $this->db->execute($sql);
     }
 
-    public function getDatosPerfil($id_usuario)
+    public function getDatosPerfil($id_usuario): array
     {
+        $sql = "
+            SELECT u.nombre_usuario, u.foto_perfil_url,u.latitud,u.longitud,
+                   p.nombre_pais, c.nombre_ciudad, r.nombre_rol
+            FROM usuarios u
+            JOIN paises p ON u.id_pais = p.id_pais
+            JOIN ciudades c ON u.id_ciudad = c.id_ciudad
+            JOIN roles r ON u.id_rol = r.id_rol
+            WHERE u.id_usuario = $id_usuario
+        ";
 
-        $resultado = $this->db->query("
-        SELECT u.nombre_usuario, u.foto_perfil_url,u.latitud,u.longitud,
-               p.nombre_pais, c.nombre_ciudad, r.nombre_rol
-        FROM usuarios u
-        JOIN paises p ON u.id_pais = p.id_pais
-        JOIN ciudades c ON u.id_ciudad = c.id_ciudad
-        JOIN roles r ON u.id_rol = r.id_rol
-        WHERE u.id_usuario = $id_usuario");
+        $resultado = $this->db->query($sql);
 
         return $resultado ?? [];
     }
@@ -126,7 +128,7 @@ class UsuarioModel
         return $resultado[0]['preguntas_entregadas'] ?? 0;
     }
 
-    public function getPorcentajeAcierto($id_usuario)
+    public function getPorcentajeAcierto($id_usuario): float|int
     {
         $sql = "SELECT preguntas_acertadas, preguntas_entregadas FROM usuarios WHERE id_usuario = $id_usuario";
         $resultado = $this->db->query($sql);
@@ -151,32 +153,38 @@ class UsuarioModel
     public function getCategoriasDestacadas($id_usuario)
     {
         $sql = "
-        SELECT c.nombre, c.color
-        FROM categoria c
-        JOIN preguntas p ON p.id_categoria = c.id_categoria
-        JOIN partida_pregunta pp ON pp.id_pregunta = p.id_pregunta
-        JOIN partidas par ON par.id_partida = pp.id_partida
-        WHERE par.id_usuario = $id_usuario
-          AND pp.acerto = 1
-        GROUP BY c.id_categoria
-        ORDER BY COUNT(*) DESC
-        LIMIT 3
-    ";
+            SELECT c.nombre, c.color
+            FROM categoria c
+            JOIN preguntas p ON p.id_categoria = c.id_categoria
+            JOIN partida_pregunta pp ON pp.id_pregunta = p.id_pregunta
+            JOIN partidas par ON par.id_partida = pp.id_partida
+            WHERE par.id_usuario = $id_usuario
+              AND pp.acerto = 1
+            GROUP BY c.id_categoria
+            ORDER BY COUNT(*) DESC
+            LIMIT 3
+        ";
         return $this->db->query($sql);
     }
 
     public function getPosicionRanking($id_usuario)
     {
+        $puntaje = $this->db->query("SELECT puntaje_acumulado FROM usuarios WHERE id_usuario = $id_usuario");
+
+        if (!$puntaje || $puntaje[0]['puntaje_acumulado'] === "0") {
+            return null;
+        }
+
         $sql = "
-        SELECT COUNT(*) + 1 AS posicion
-        FROM usuarios u
-        WHERE u.id_rol = 1
-          AND u.puntaje_acumulado > (
-              SELECT puntaje_acumulado
-              FROM usuarios
-              WHERE id_usuario = $id_usuario
-          )
-    ";
+            SELECT COUNT(*) + 1 AS posicion
+            FROM usuarios u
+            WHERE u.id_rol = 1
+              AND u.puntaje_acumulado > (
+                  SELECT puntaje_acumulado
+                  FROM usuarios
+                  WHERE id_usuario = $id_usuario
+              )
+        ";
 
         $resultado = $this->db->query($sql);
         return $resultado[0]['posicion'] ?? null;

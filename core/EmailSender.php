@@ -23,7 +23,7 @@ class EmailSender
     $this->port = $port;
   }
 
-  public function send($email, $body)
+  public function send($email, $body): bool
   {
     $mail = new PHPMailer(true);
 
@@ -39,7 +39,7 @@ class EmailSender
       $mail->setFrom($this->username, 'Preguntopolis');
       $mail->addAddress($email);
 
-      $mail->isHTML(true);
+      $mail->isHTML();
       $mail->Subject = 'Validacion de cuenta en Preguntopolis';
       $mail->Body = $body;
 
@@ -52,3 +52,4 @@ class EmailSender
     }
   }
 }
+

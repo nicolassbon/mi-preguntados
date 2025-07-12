@@ -6,7 +6,12 @@
                 <img src="/public/uploads/{{foto_perfil_url}}" alt="perfil" class="perfil-img">
                 <div class="fs-1 mt-3 text-white" style="text-shadow: 1px 1px black">{{nombre_usuario}}</div>
             </div>
-            <div class="fs-4 mb-3" style="color: #ddd">Ranking #{{posicion_ranking}}</div>
+            {{#tiene_posicion}}
+                <div class="fs-4 mb-3" style="color: #ddd">Ranking #{{posicion_ranking}}</div>
+            {{/tiene_posicion}}
+            {{^tiene_posicion}}
+                <div class="fs-6 mb-3 alert alert-secondary text-center">Todavía no tiene posición en el ranking</div>
+            {{/tiene_posicion}}
             <a href="/ranking" class="btn btn-dark">Ver Ranking</a>
         </div>
 
@@ -21,25 +26,23 @@
                 </div>
             {{/tiene_estadisticas}}
             {{^tiene_estadisticas}}
-                <div class="d-flex flex-column align-items-center gap-2">
-                    <span class="fs-5 alert alert-danger">Todavia no tiene estadisticas!</span>
-                </div>
+                <div class="fs-6 mb-3 alert alert-secondary text-center">Todavía no tiene estadisticas</div>
             {{/tiene_estadisticas}}
         </div>
 
         <div class="card" style="grid-column: 2;grid-row: 2">
             <p class="fs-4 text-white">Categorías destacadas:</p>
-            <div class="d-flex flex-column align-items-center gap-3">
-                {{#tiene_estadisticas}}
+            {{#tiene_estadisticas}}
+                <div class="d-flex flex-column align-items-center gap-3">
                     {{#categorias_destacadas}}
                         <span class="py-2 px-3 text-white"
                               style="background: {{color}}; width: 250px; border-radius: 40px">{{nombre}}</span>
                     {{/categorias_destacadas}}
-                {{/tiene_estadisticas}}
-                {{^tiene_estadisticas}}
-                    <span class="fs-5 alert alert-danger">Todavia no tiene categorias!</span>
-                {{/tiene_estadisticas}}
-            </div>
+                </div>
+            {{/tiene_estadisticas}}
+            {{^tiene_estadisticas}}
+                <div class="fs-6 mb-3 alert alert-secondary text-center">Todavía no tiene categorias</div>
+            {{/tiene_estadisticas}}
         </div>
 
         <div class="card justify-content-center align-items-center" style="grid-column: 3">

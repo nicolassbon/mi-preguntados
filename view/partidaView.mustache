@@ -33,17 +33,15 @@
                 </form>
             {{/respondido}}
 
-            {{^reportado}}
-                {{#respondido}}
-                    <p class="mt-3">
-                        ¿Hay algo mal en esta pregunta?
-                        <button type="button" class="btn btn-link text-danger fw-bold p-0" data-bs-toggle="modal"
-                                data-bs-target="#modalReporte">
-                            REPORTAR PREGUNTA
-                        </button>
-                    </p>
-                {{/respondido}}
-            {{/reportado}}
+            {{#respondido}}
+                <p class="mt-3">
+                    ¿Hay algo mal en esta pregunta?
+                    <button type="button" class="btn btn-link text-danger fw-bold p-0" data-bs-toggle="modal"
+                            data-bs-target="#modalReporte">
+                        REPORTAR PREGUNTA
+                    </button>
+                </p>
+            {{/respondido}}
 
             {{#respondido}}
                 <p>Tu puntaje actual es <strong>{{puntaje}}</strong></p>
