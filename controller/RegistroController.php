@@ -29,12 +29,23 @@ class RegistroController
 
     #[NoReturn] public function pasoMapa(): void
     {
+        $password = $_POST['password'] ?? '';
+
+        if (!$this->esPasswordValida($password)) {
+            $this->view->render("register", [
+                'title' => 'Registrarse',
+                'error' => 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número.',
+                'datosPrevios' => $_POST
+            ]);
+            return;
+        }
+
         $_SESSION['registro'] = [
             'nombre' => $_POST['nombre'],
             'fecha_nac' => $_POST['fecha-nac'],
             'email' => $_POST['email'],
             'usuario' => $_POST['usuario'],
-            'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+            'password' => password_hash($password, PASSWORD_DEFAULT),
             'sexo' => $_POST['sexo']
         ];
 
@@ -52,6 +63,16 @@ class RegistroController
         }
 
         $this->redirectTo("/registro/mapa");
+    }
+
+    private function esPasswordValida(string $password): bool
+    {
+        $minLength = 8;
+        $tieneMayuscula = preg_match('/[A-Z]/', $password);
+        $tieneMinuscula = preg_match('/[a-z]/', $password);
+        $tieneNumero = preg_match('/[0-9]/', $password);
+
+        return strlen($password) >= $minLength && $tieneMayuscula && $tieneMinuscula && $tieneNumero;
     }
 
     public function mapa(): void
