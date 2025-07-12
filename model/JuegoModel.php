@@ -84,7 +84,7 @@ class JuegoModel
         return $nivel;
     }
 
-    private function getDificultadPregunta($pregunta): string
+    public function getDificultadPregunta($pregunta): string
     {
         $dificultad = 'intermedio';
         if (!$this->seDebeCalcularNivelPregunta($pregunta)) {

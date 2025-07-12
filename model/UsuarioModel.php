@@ -90,10 +90,9 @@ class UsuarioModel
         $stmt->execute();
     }
 
-    public function sumarPuntajeUsuario($id_usuario): void
+    public function sumarPuntajeUsuario($id_usuario, $puntos): void
     {
-
-        $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + 5 WHERE id_usuario = $id_usuario ";
+        $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + $puntos WHERE id_usuario = $id_usuario ";
         $this->db->execute($sql);
     }
 

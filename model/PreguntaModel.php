@@ -13,7 +13,7 @@ class PreguntaModel
     public function getPreguntaPorId(int $id_pregunta)
     {
         $sql = "
-            SELECT p.id_pregunta, p.pregunta, p.estado, c.nombre
+            SELECT p.id_pregunta, p.pregunta, p.estado, c.nombre, p.entregadas, p.correctas
             FROM preguntas p
             JOIN categoria c ON p.id_categoria = c.id_categoria
             WHERE p.id_pregunta = ?

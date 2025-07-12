@@ -48,10 +48,9 @@ class PartidaModel
         return $resultado[0]['correctas'];
     }
 
-    public function incrementarPuntaje($id_partida): void
+    public function incrementarPuntaje($id_partida, $puntos): void
     {
-        $puntaje = $_SESSION['puntaje'];
-        $sql = "UPDATE partidas SET puntaje_final = $puntaje  WHERE id_partida = $id_partida ";
+        $sql = "UPDATE partidas SET puntaje_final = puntaje_final + $puntos  WHERE id_partida = $id_partida ";
         $this->db->execute($sql);
     }
 
@@ -94,5 +93,20 @@ class PartidaModel
         $res = $this->db->query($sql);
 
         return !empty($res);
+    }
+
+    public function calcularPuntaje(string $dificultad, int $tiempoRestante): int
+    {
+        // Calculo los puntos por dificultad, intermedio es default
+        $base = match ($dificultad) {
+            'facil' => 3,
+            'dificil' => 7,
+            default => 5
+        };
+
+        // 1 punto cada 2 segundos restantes
+        $bonusTiempo = intdiv($tiempoRestante, 2); // Max 5 si quedan los 10 segundos
+
+        return $base + $bonusTiempo;
     }
 }

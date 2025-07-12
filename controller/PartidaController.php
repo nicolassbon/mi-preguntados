@@ -154,19 +154,29 @@ class PartidaController
 
     private function procesarCorrecta(array $respuesta, int $id_pregunta, int $id_partida, int $id_usuario): void
     {
-        $_SESSION['puntaje'] += 5;
-        $this->partidaModel->incrementarPuntaje($id_partida);
         $this->partidaModel->incrementarPreguntaRespondidaCorrectamente($id_partida);
         $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
         $this->preguntaModel->incrementarCorrectasPregunta($id_pregunta);
-        $this->usuarioModel->sumarPuntajeUsuario($id_usuario);
         $this->usuarioModel->incrementarCorrectasUsuario($id_usuario);
+        $this->sumarPuntaje($id_pregunta, $id_partida, $id_usuario);
     }
 
     private function procesarIncorrecta(int $id_partida, int $id_pregunta, int $id_respuesta): void
     {
         $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta, 0);
         $this->finalizarPartida();
+    }
+
+    private function sumarPuntaje(int $id_pregunta, int $id_partida, int $id_usuario): void {
+        $pregunta = $this->preguntaModel->getPreguntaPorId($id_pregunta);
+        $dificultad = $this->juegoModel->getDificultadPregunta($pregunta);
+        $tiempo = $this->partidaModel->getTiempoRestante();
+
+        $puntos = $this->partidaModel->calcularPuntaje($dificultad, $tiempo);
+        $_SESSION['puntaje'] += $puntos;
+
+        $this->partidaModel->incrementarPuntaje($id_partida, $puntos);
+        $this->usuarioModel->sumarPuntajeUsuario($id_usuario, $puntos);
     }
 
     public function perdio(): void
