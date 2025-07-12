@@ -97,15 +97,13 @@ class PartidaModel
 
     public function calcularPuntaje(string $dificultad, int $tiempoRestante): int
     {
-        // Calculo los puntos por dificultad, intermedio es default
         $base = match ($dificultad) {
             'facil' => 3,
             'dificil' => 7,
             default => 5
         };
 
-        // 1 punto cada 2 segundos restantes
-        $bonusTiempo = intdiv($tiempoRestante, 2); // Max 5 si quedan los 10 segundos
+        $bonusTiempo = intdiv($tiempoRestante, 2);
 
         return $base + $bonusTiempo;
     }

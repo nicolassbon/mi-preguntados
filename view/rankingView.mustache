@@ -1,6 +1,24 @@
 {{> navbar}}
 <main class="p-2 main-ranking"
       style="font-family: 'Segoe UI',serif; background: linear-gradient(to bottom right, #d6b4fc, #f8e8ff);flex-grow: 1;overflow-y: auto;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <form method="GET" class="d-flex gap-2 align-items-center">
+            <select name="filtro" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="dia" {{#filtro_dia}}selected{{/filtro_dia}}>Día</option>
+                <option value="semana" {{#filtro_semana}}selected{{/filtro_semana}}>Semana</option>
+                <option value="mes" {{#filtro_mes}}selected{{/filtro_mes}}>Mes</option>
+                <option value="anio" {{#filtro_anio}}selected{{/filtro_anio}}>Año</option>
+                <option value="personalizado" {{#filtro_personalizado}}selected{{/filtro_personalizado}}>Personalizado
+                </option>
+            </select>
+
+            {{#filtro_personalizado}}
+                <input type="date" name="desde" value="{{desde}}" class="form-control form-control-sm">
+                <input type="date" name="hasta" value="{{hasta}}" class="form-control form-control-sm">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Filtrar</button>
+            {{/filtro_personalizado}}
+        </form>
+    </div>
     <h1 class="mt-2 text-center mb-2" style="color: #4c1765">{{title}}</h1>
     <table class="tabla-ranking">
         <tr>
@@ -8,6 +26,8 @@
             <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Jugador</th>
             <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Foto</th>
             <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Puntaje</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Precisión</th>
+            <th class="text-center text-white p-3 fw-bold" style="background-color: #a76ac6">Partidas Jugadas</th>
         </tr>
         {{#ranking}}
             <tr>
@@ -23,6 +43,8 @@
                 <td class="text-center p-2" style="color: #333"><img src="/public/uploads/{{foto_perfil_url}}"
                                                                      width="50" alt="" class="foto-perfil"></td>
                 <td class="text-center p-2" style="color: #333">{{puntaje_acumulado}}</td>
+                <td class="text-center p-2" style="color: #333">{{precision}}</td>
+                <td class="text-center p-2" style="color: #333">{{partidas_jugadas}}</td>
             </tr>
         {{/ranking}}
         {{^ranking}}

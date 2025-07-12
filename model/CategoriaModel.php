@@ -14,13 +14,6 @@ class CategoriaModel
         return $this->db->query($sql);
     }
 
-    public function getCategoriaAleatoria()
-    {
-        $sql = "SELECT * FROM categoria ORDER BY RAND() LIMIT 1";
-        $resultado = $this->db->query($sql);
-        return $resultado[0] ?? null;
-    }
-
     public function getCategoriasUsadasEnPartida($id_partida): array {
         $sql = "
             SELECT DISTINCT p.id_categoria
