@@ -48,6 +48,7 @@ class PartidaController
             $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
             $user = $_SESSION["nombre_usuario"];
             $tiempo_restante = $this->partidaModel->getTiempoRestante();
+            $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
 
             $this->view->render("partida", [
                 'title' => 'Partida',
@@ -59,7 +60,10 @@ class PartidaController
                 'tiempo_restante' => $tiempo_restante,
                 'fondo' => $categoria['color'],
                 'foto' => $categoria['foto_categoria'],
-                'user' => $user
+                'user' => $user,
+                'trampitas' => $trampitas,
+                'puede_usar_trampita' => $trampitas > 0,
+                'respondido' => false
             ]);
             return;
         }
@@ -83,6 +87,8 @@ class PartidaController
         $this->juegoModel->marcarPreguntaComoVista($id_usuario, $id_pregunta);
         $this->usuarioModel->incrementarEntregadasUsuario($id_usuario);
 
+        $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
+
         $this->view->render("partida", [
             'title' => 'Partida',
             'usuario_id' => $id_usuario,
@@ -94,7 +100,11 @@ class PartidaController
             'tiempo_restante' => $tiempo_restante,
             'fondo' => $categoria['color'],
             'foto' => $categoria['foto_categoria'],
-            'user' => $user
+            'user' => $user,
+            'trampitas' => $trampitas,
+            'puede_usar_trampita' => $trampitas > 0,
+            'respondido' => false,
+            'reset_timer' => true
         ]);
 
     }
@@ -126,6 +136,36 @@ class PartidaController
 
         $_SESSION['cantidad'] = (int)$this->partidaModel->getCantidadPreguntasCorrectas($id_partida);
         $this->mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color);
+    }
+
+    public function usarTrampita(): void
+    {
+        $this->detectarTrampaYExpulsar();
+
+        $id_usuario = $_SESSION['usuario_id'];
+        $id_partida = $_SESSION['id_partida'];
+        $id_pregunta = $_SESSION['id_pregunta'];
+
+        $trampitas = $this->usuarioModel->getTrampitas($id_usuario);
+        if ($trampitas <= 0) {
+            session_destroy();
+            header("Location: /login?error=trampa");
+            exit;
+        }
+
+        $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
+        $respuestaCorrecta = null;
+        foreach ($respuestas as $respuesta) {
+            if ($respuesta['esCorrecta']) {
+                $respuestaCorrecta = $respuesta;
+                break;
+            }
+        }
+
+        $this->procesarCorrecta($respuestaCorrecta, $id_pregunta, $id_partida, $id_usuario);
+        $this->usuarioModel->usarTrampita($id_usuario);
+        $_SESSION['cantidad'] = (int)$this->partidaModel->getCantidadPreguntasCorrectas($id_partida);
+        $this->mostrarVistaRespuesta($id_usuario, $id_pregunta, true, "¡USASTE UNA TRAMPITA!", "text-warning");
     }
 
     private function procesarTiempoAgotado($id_partida, $id_pregunta): void
@@ -167,7 +207,8 @@ class PartidaController
         $this->finalizarPartida();
     }
 
-    private function sumarPuntaje(int $id_pregunta, int $id_partida, int $id_usuario): void {
+    private function sumarPuntaje(int $id_pregunta, int $id_partida, int $id_usuario): void
+    {
         $pregunta = $this->preguntaModel->getPreguntaPorId($id_pregunta);
         $dificultad = $this->juegoModel->getDificultadPregunta($pregunta);
         $tiempo = $this->partidaModel->getTiempoRestante();
@@ -181,12 +222,13 @@ class PartidaController
 
     public function perdio(): void
     {
+        $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
         $this->view->render("perdio", [
             'title' => 'Partida Perdida',
             'puntaje' => $_SESSION['puntaje'],
-            'cantidad' => $_SESSION['cantidad']
+            'cantidad' => $_SESSION['cantidad'],
+            'trampitas' => $trampitas,
         ]);
-
         unset($_SESSION['puntaje'], $_SESSION['cantidad']);
     }
 
@@ -233,6 +275,7 @@ class PartidaController
 
         $categoria = $_SESSION['categoria'] ?? null;
         $user = $_SESSION["nombre_usuario"];
+        $trampitas = $this->usuarioModel->getTrampitas($id_usuario);
 
         $this->view->render("partida", [
             'title' => 'Partida',
@@ -249,7 +292,9 @@ class PartidaController
             'fondo' => $categoria['color'],
             'foto' => $categoria['foto_categoria'],
             'user' => $user,
-            'id_pregunta' => $id_pregunta
+            'id_pregunta' => $id_pregunta,
+            'trampitas' => $trampitas,
+            'puede_usar_trampita' => false
         ]);
 
         $this->limpiarSesionPregunta();

@@ -15,6 +15,7 @@ require_once "controller/RuletaController.php";
 require_once "controller/PartidaController.php";
 require_once "controller/PreguntaController.php";
 require_once "controller/AdminController.php";
+require_once "controller/TrampitasController.php";
 
 require_once "model/RankingModel.php";
 require_once "model/RolModel.php";
@@ -159,7 +160,8 @@ class Configuration
     public function getHomeController(): HomeController
     {
         return new HomeController(
-            $this->getViewer()
+            $this->getViewer(),
+            new UsuarioModel($this->getDatabase())
         );
     }
 
@@ -167,7 +169,8 @@ class Configuration
     {
         return new RuletaController(
             $this->getViewer(),
-            new CategoriaModel($this->getDatabase())
+            new CategoriaModel($this->getDatabase()),
+            new UsuarioModel($this->getDatabase())
         );
     }
 
@@ -194,6 +197,14 @@ class Configuration
             $preguntaModel,
             $usuarioModel,
             $juegoModel
+        );
+    }
+
+    public function getTrampitasController(): TrampitasController
+    {
+        return new TrampitasController(
+            $this->getViewer(),
+            new UsuarioModel($this->getDatabase())
         );
     }
 

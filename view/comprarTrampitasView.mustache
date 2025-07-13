@@ -1,0 +1,37 @@
+{{> navbar}}
+
+<main class="main-height bg-fondo d-flex justify-content-center align-items-center p-4">
+    <div class="container text-center text-white">
+        <h1 class="mb-4" style="font-family: 'Baloo', cursive;">Comprar Trampitas</h1>
+        <p class="mb-5 fs-5">Usá trampitas para responder correctamente una pregunta automáticamente.</p>
+
+        <form method="POST" action="/trampitas/procesarCompra" class="w-50 mx-auto bg-dark p-4 rounded-3 shadow">
+            <div class="mb-3">
+                <label for="cantidad" class="form-label fs-5">¿Cuántas trampitas querés?</label>
+                <select name="cantidad" id="cantidad" class="form-select text-center fw-bold fs-5">
+                    <option value="1">1 trampita - $1</option>
+                    <option value="5">5 trampitas - $5</option>
+                    <option value="10">10 trampitas - $10</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100 mt-3 fw-bold">
+                Comprar
+            </button>
+        </form>
+
+        {{#error}}
+            <div class="alert alert-danger mt-4" role="alert">
+                {{mensaje}}
+            </div>
+        {{/error}}
+
+        {{#exito}}
+            <div class="alert alert-success mt-4" role="alert">
+                {{mensaje}}
+            </div>
+        {{/exito}}
+
+        <a href="/lobby" class="btn btn-outline-light mt-4">Volver al lobby</a>
+    </div>
+</main>

@@ -11,7 +11,12 @@ class UsuarioModel
 
     public function buscarUsuarioPorEmail($email)
     {
-        $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
+        $sql = "
+            SELECT id_usuario, nombre_usuario, contrasena_hash, es_validado, cantidad_trampitas
+            FROM usuarios
+            WHERE email = ?
+        ";
+        $stmt = $this->db->prepare($sql);
         $stmt->bind_param("s", $email);
         $stmt->execute();
 
@@ -99,7 +104,7 @@ class UsuarioModel
     public function getDatosPerfil($id_usuario): array
     {
         $sql = "
-            SELECT u.nombre_usuario, u.foto_perfil_url,u.latitud,u.longitud,
+            SELECT u.nombre_usuario, u.foto_perfil_url,u.latitud,u.longitud, u.cantidad_trampitas,
                    p.nombre_pais, c.nombre_ciudad, r.nombre_rol
             FROM usuarios u
             JOIN paises p ON u.id_pais = p.id_pais
@@ -187,5 +192,43 @@ class UsuarioModel
 
         $resultado = $this->db->query($sql);
         return $resultado[0]['posicion'] ?? null;
+    }
+
+    public function getTrampitas($id_usuario)
+    {
+        $sql = "
+            SELECT cantidad_trampitas
+            FROM usuarios
+            WHERE id_usuario = $id_usuario
+        ";
+        $res = $this->db->query($sql);
+        return $res[0]['cantidad_trampitas'] ?? 0;
+    }
+
+    public function usarTrampita($id_usuario) {
+        $sql = "
+            UPDATE usuarios
+            SET cantidad_trampitas = GREATEST(cantidad_trampitas - 1, 0)
+            WHERE id_usuario = $id_usuario
+        ";
+
+        $this->db->execute($sql);
+    }
+
+    public function sumarTrampitas($id_usuario, $cantidad) {
+        $sql = "
+            UPDATE usuarios
+            SET cantidad_trampitas = cantidad_trampitas + $cantidad
+            WHERE id_usuario = $id_usuario
+        ";
+        $this->db->execute($sql);
+    }
+
+    public function registrarCompra($id_usuario, $cantidad, $monto) {
+        $sql = "
+            INSERT INTO compras_trampitas (id_usuario, cantidad_comprada, monto_pagado, fecha_compra)
+            VALUES ($id_usuario, $cantidad, $monto, NOW())
+        ";
+        $this->db->execute($sql);
     }
 }

@@ -6,11 +6,12 @@ class HomeController
 {
 
     private $view;
+    private $usuarioModel;
 
-    public function __construct($view)
+    public function __construct($view, $usuarioModel)
     {
-
         $this->view = $view;
+        $this->usuarioModel = $usuarioModel;
     }
 
     public function show(): void
@@ -26,8 +27,10 @@ class HomeController
                 break;
             case 'jugador':
             default:
+                $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
                 $this->view->render("lobbyJugador", [
-                    'title' => 'Lobby Jugador'
+                    'title' => 'Lobby Jugador',
+                    'trampitas' => $trampitas,
                 ]);
                 break;
         }

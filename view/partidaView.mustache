@@ -12,6 +12,22 @@
     <div class="container-fluid d-flex flex-column justify-content-center align-items-center flex-grow-1">
         <h5 id="contador_texto" class="mb-3 fw-bold" style="{{ocultar}}">Tiempo: <span
                 id="contador">{{tiempo_restante}}</span> segundos</h5>
+        {{#puede_usar_trampita}}
+            <form method="POST" action="/partida/usarTrampita" class="mb-3">
+                <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">
+                <button type="submit" class="btn btn-warning d-flex align-items-center gap-2 px-3 py-2">
+                    <img src="/public/images/trampita-icono.png" alt="Trampita" width="24" height="24">
+                    <span class="fw-bold">Usar trampita ({{trampitas}})</span>
+                </button>
+            </form>
+        {{/puede_usar_trampita}}
+
+        {{^puede_usar_trampita}}
+            <div class="d-flex align-items-center bg-secondary rounded px-3 py-1 mb-3">
+                <img src="/public/images/trampita-icono.png" alt="Trampita" width="24" height="24" class="me-1">
+                <span class="text-white fw-bold">{{trampitas}}</span>
+            </div>
+        {{/puede_usar_trampita}}
         <p class="p-0 m-0 text-center fw-bold fs-3 {{color}}">{{texto}}</p>
 
         <div class="container d-flex flex-column justify-content-center align-items-center">
@@ -103,6 +119,12 @@
         });
     </script>
 {{/respondido}}
+
+{{#reset_timer}}
+    <script>
+        sessionStorage.removeItem('tiempoRestante');
+    </script>
+{{/reset_timer}}
 
 <script>
     let tiempoMaximo = 10;

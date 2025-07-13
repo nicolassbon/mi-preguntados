@@ -61,7 +61,8 @@ class PerfilController
                 'categorias_destacadas' => $categoriasDestacadas,
                 'posicion_ranking' => $posicionRanking,
                 'tiene_posicion' => $posicionRanking !== null,
-                'tiene_estadisticas' => $tieneEstadisticas
+                'tiene_estadisticas' => $tieneEstadisticas,
+                'trampitas' => $usuario['cantidad_trampitas']
             ],
             $usuario
         ));

@@ -5,10 +5,12 @@ class RuletaController
 
     private $view;
     private $categoriaModel;
+    private $usuarioModel;
 
-    public function __construct($view, $categoriaModel){
+    public function __construct($view, $categoriaModel, $usuarioModel){
         $this->view = $view;
         $this->categoriaModel = $categoriaModel;
+        $this->usuarioModel = $usuarioModel;
     }
 
     public function show(): void
@@ -24,11 +26,14 @@ class RuletaController
             $posicionGanadora = $this->calcularPosicionGanadora($_SESSION['categoria'], $categorias);
         }
 
+        $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
+
         $this->view->render("ruleta", [
             'title' => 'Ruleta',
             'categorias' => $categoriasRepetidas,
             'yaGiro' => $yaGiro,
-            'posicionGanadora' => $posicionGanadora
+            'posicionGanadora' => $posicionGanadora,
+            'trampitas' => $trampitas,
         ]);
     }
 
