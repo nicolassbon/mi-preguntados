@@ -1,8 +1,11 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
+
+require_once 'vendor/autoload.php';
+
+use App\Configuration;
 
 session_start();
-// Setea la zona horaria de la aplicación
+
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 // Rutas accesibles sin estar logueado
@@ -52,7 +55,6 @@ if (isset($_SESSION['usuario_id'])) {
     }
 }
 
-require_once "Configuration.php";
 $configuration = new Configuration();
 $router = $configuration->getRouter();
 
