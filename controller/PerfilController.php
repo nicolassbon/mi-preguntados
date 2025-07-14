@@ -4,8 +4,8 @@ use JetBrains\PhpStorm\NoReturn;
 
 class PerfilController
 {
-    private $view;
-    private $usuarioModel;
+    private MustachePresenter $view;
+    private UsuarioModel $usuarioModel;
 
     public function __construct($view, $usuarioModel)
     {
@@ -61,8 +61,7 @@ class PerfilController
                 'categorias_destacadas' => $categoriasDestacadas,
                 'posicion_ranking' => $posicionRanking,
                 'tiene_posicion' => $posicionRanking !== null,
-                'tiene_estadisticas' => $tieneEstadisticas,
-                'trampitas' => $usuario['cantidad_trampitas']
+                'tiene_estadisticas' => $tieneEstadisticas
             ],
             $usuario
         ));

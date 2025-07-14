@@ -4,15 +4,15 @@ use JetBrains\PhpStorm\NoReturn;
 
 class PreguntaController
 {
-    private $view;
-    private $preguntaModel;
-    private $sugerenciaModel;
+    private MustachePresenter $view;
+    private PreguntaModel $preguntaModel;
+    private SugerenciaPreguntaModel $sugerenciaPreguntaModel;
 
-    public function __construct($view, $preguntaModel, $sugerenciaModel)
+    public function __construct($view, $preguntaModel, $sugerenciaPreguntaModel)
     {
         $this->view = $view;
         $this->preguntaModel = $preguntaModel;
-        $this->sugerenciaModel = $sugerenciaModel;
+        $this->sugerenciaPreguntaModel = $sugerenciaPreguntaModel;
     }
 
     public function sugerir(): void
@@ -55,7 +55,7 @@ class PreguntaController
         $id_pregunta = $this->preguntaModel->buscarPreguntaCreada($pregunta);
         $this->preguntaModel->agregarRespuestas($id_pregunta, $opcion, $opcion2, $opcion3, $opcion4, $opcionCorrecta);
 
-        $this->sugerenciaModel->agregarSugerencia($id_usuario, $id_pregunta, $id_categoria);
+        $this->sugerenciaPreguntaModel->agregarSugerencia($id_usuario, $id_pregunta, $id_categoria);
         $_SESSION['sugerencia_creada'] = true;
 
         header("Location: /pregunta/sugerenciaExitosa");

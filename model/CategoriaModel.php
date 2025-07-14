@@ -2,14 +2,15 @@
 
 class CategoriaModel
 {
-    private $db;
+    private Database $db;
 
     public function __construct($database)
     {
         $this->db = $database;
     }
 
-    public function getCategorias() {
+    public function getCategorias(): array
+    {
         $sql = "SELECT id_categoria, nombre, foto_categoria FROM categoria ORDER BY id_categoria";
         return $this->db->query($sql);
     }
@@ -21,9 +22,7 @@ class CategoriaModel
             JOIN preguntas p ON pp.id_pregunta = p.id_pregunta
             WHERE pp.id_partida = $id_partida
         ";
-        $result = $this->db->query($sql);
-
-        return $result ?? [];
+        return $this->db->query($sql);
     }
 
     public function elegirCategoriaParaPartida(int $id_partida): array

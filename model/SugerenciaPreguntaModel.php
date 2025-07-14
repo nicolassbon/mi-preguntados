@@ -2,7 +2,7 @@
 
 class SugerenciaPreguntaModel
 {
-    private $db;
+    private Database $db;
 
     public function __construct(Database $db)
     {
@@ -19,29 +19,6 @@ class SugerenciaPreguntaModel
         $fecha_resolucion = null;
         $stmt->bind_param("iiiss", $id_usuario, $id_pregunta, $id_categoria, $estado, $fecha_resolucion);
         $stmt->execute();
-    }
-
-    public function actualizarEstadoSugerencia($id_pregunta, $estado): void
-    {
-        $sql = "UPDATE sugerencias_preguntas SET estado = ?, fecha_resolucion = NOW() WHERE id_pregunta = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("si", $estado, $id_pregunta);
-        $stmt->execute();
-    }
-
-    public function obtenerSugerenciasPendientes(): array
-    {
-        $sql = "SELECT * FROM sugerencias_preguntas WHERE estado = 'pendiente'";
-        return $this->db->query($sql);
-    }
-
-    public function obtenerSugerenciasPorUsuario($id_usuario): array
-    {
-        $sql = "SELECT * FROM sugerencias_preguntas WHERE id_usuario = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("i", $id_usuario);
-        $stmt->execute();
-        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
     public function getPreguntasSugeridas(string $terminoBusqueda = '', string|int $id_categoria = 'todasLasCategorias', string $estado = 'pendiente'): array

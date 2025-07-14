@@ -2,14 +2,14 @@
 
 class UsuarioModel
 {
-    private $db;
+    private Database $db;
 
     public function __construct($database)
     {
         $this->db = $database;
     }
 
-    public function buscarUsuarioPorEmail($email)
+    public function buscarUsuarioPorEmail($email): bool|array|null
     {
         $sql = "
             SELECT id_usuario, nombre_usuario, contrasena_hash, es_validado, cantidad_trampitas
@@ -113,9 +113,7 @@ class UsuarioModel
             WHERE u.id_usuario = $id_usuario
         ";
 
-        $resultado = $this->db->query($sql);
-
-        return $resultado ?? [];
+        return $this->db->query($sql);
     }
 
     public function getCantidadPartidasJugadas($id_usuario)
@@ -154,7 +152,7 @@ class UsuarioModel
         return $resultado[0]['max_puntaje'] ?? 0;
     }
 
-    public function getCategoriasDestacadas($id_usuario)
+    public function getCategoriasDestacadas($id_usuario): array
     {
         $sql = "
             SELECT c.nombre, c.color
@@ -205,7 +203,8 @@ class UsuarioModel
         return $res[0]['cantidad_trampitas'] ?? 0;
     }
 
-    public function usarTrampita($id_usuario) {
+    public function usarTrampita($id_usuario): void
+    {
         $sql = "
             UPDATE usuarios
             SET cantidad_trampitas = GREATEST(cantidad_trampitas - 1, 0)
@@ -215,7 +214,8 @@ class UsuarioModel
         $this->db->execute($sql);
     }
 
-    public function sumarTrampitas($id_usuario, $cantidad) {
+    public function sumarTrampitas($id_usuario, $cantidad): void
+    {
         $sql = "
             UPDATE usuarios
             SET cantidad_trampitas = cantidad_trampitas + $cantidad
@@ -224,7 +224,8 @@ class UsuarioModel
         $this->db->execute($sql);
     }
 
-    public function registrarCompra($id_usuario, $cantidad, $monto) {
+    public function registrarCompra($id_usuario, $cantidad, $monto): void
+    {
         $sql = "
             INSERT INTO compras_trampitas (id_usuario, cantidad_comprada, monto_pagado, fecha_compra)
             VALUES ($id_usuario, $cantidad, $monto, NOW())

@@ -2,14 +2,14 @@
 
 class RankingModel
 {
-    private $database;
+    private Database $database;
 
     public function __construct($database)
     {
         $this->database = $database;
     }
 
-    public function obtenerRanking($desde, $hasta)
+    public function obtenerRanking($desde, $hasta): array
     {
         $sql = "
             SELECT
@@ -42,7 +42,7 @@ class RankingModel
         return $this->database->query($sql);
     }
 
-    public function obtenerPartidasJugadas($desde, $hasta)
+    public function obtenerPartidasJugadas($desde, $hasta): array
     {
         $sql = "
             SELECT id_partida, nombre_usuario, fecha_inicio, fecha_fin, puntaje_final, id_usuario

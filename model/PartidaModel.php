@@ -3,7 +3,7 @@
 class PartidaModel
 {
 
-    private $db;
+    private Database $db;
 
     public function __construct($database)
     {

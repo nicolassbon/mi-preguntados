@@ -3,14 +3,14 @@
 class AdminModel
 {
 
-    private $db;
+    private Database $db;
 
     public function __construct($database)
     {
         $this->db = $database;
     }
 
-    public function obtenerDistribucionPorGenero($desde, $hasta)
+    public function obtenerDistribucionPorGenero($desde, $hasta): array
     {
         $sql = "
             SELECT s.descripcion, COUNT(*) AS cantidad
@@ -21,7 +21,7 @@ class AdminModel
         return $this->db->query($sql);
     }
 
-    public function obtenerDistribucionPorRangoEdad($desde, $hasta)
+    public function obtenerDistribucionPorRangoEdad($desde, $hasta): array
     {
         $sql = "
             SELECT
@@ -38,7 +38,7 @@ class AdminModel
         return $this->db->query($sql);
     }
 
-    public function obtenerUsuariosPorPaisPorFecha($desde, $hasta)
+    public function obtenerUsuariosPorPaisPorFecha($desde, $hasta): array
     {
         $sql = "
             SELECT p.nombre_pais, COUNT(*) AS cantidad
@@ -93,18 +93,7 @@ class AdminModel
         return $this->db->query($sql)[0]['cantidad'];
     }
 
-    public function obtenerPromedioDePreguntasRespondidasCorrectamente($desde, $hasta)
-    {
-        $sql = "
-            SELECT COUNT(*) AS totalRespuestas, SUM(pp.acerto) AS totalAciertos,
-                   ROUND(SUM(pp.acerto)/COUNT(*) * 100, 1) AS porcentaje_correctas
-            FROM partida_pregunta pp JOIN partidas p ON pp.id_partida = p.id_partida
-            WHERE p.fecha_inicio BETWEEN '$desde' AND '$hasta'
-        ";
-        return $this->db->query($sql)[0]['cantidad'];
-    }
-
-    public function obtenerPorcentajeGeneral($desde, $hasta)
+    public function obtenerPorcentajeGeneral($desde, $hasta): array
     {
         $sql = "
             SELECT ROUND(SUM(pp.acerto) / COUNT(*) * 100, 1) AS porcentajeCorrectas,
@@ -136,17 +125,6 @@ class AdminModel
             LIMIT 10;
         ";
 
-        return $this->db->query($sql);
-    }
-
-    public function obtenerUsuariosPaisPorFecha($desde, $hasta)
-    {
-        $sql = "
-            SELECT u.nombre_usuario, p.nombre_pais
-            FROM usuarios u JOIN paises p ON u.id_pais = p.id_pais
-            WHERE u.fecha_registro BETWEEN '$desde' AND '$hasta'
-            GROUP BY u.id_pais
-        ";
         return $this->db->query($sql);
     }
 

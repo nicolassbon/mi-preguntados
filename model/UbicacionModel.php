@@ -2,7 +2,7 @@
 
 class UbicacionModel
 {
-    private $db; // instancia de Database
+    private Database $db;
 
     public function __construct(Database $db)
     {

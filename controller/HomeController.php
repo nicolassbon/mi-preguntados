@@ -5,8 +5,8 @@ use JetBrains\PhpStorm\NoReturn;
 class HomeController
 {
 
-    private $view;
-    private $usuarioModel;
+    private MustachePresenter $view;
+    private UsuarioModel $usuarioModel;
 
     public function __construct($view, $usuarioModel)
     {

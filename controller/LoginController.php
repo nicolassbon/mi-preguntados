@@ -4,9 +4,9 @@ use JetBrains\PhpStorm\NoReturn;
 
 class LoginController
 {
-    private $view;
-    private $usuarioModel;
-    private $rolModel;
+    private MustachePresenter $view;
+    private UsuarioModel $usuarioModel;
+    private RolModel $rolModel;
 
     public function __construct($view, $usuarioModel, $rolModel)
     {

@@ -5,15 +5,15 @@ require_once 'helpers/FechaHelper.php';
 class AdminController
 {
 
-    private $view;
-    private $pdfGenerator;
-    private $model;
+    private MustachePresenter $view;
+    private PdfGenerator $pdfGenerator;
+    private AdminModel $adminModel;
 
-    public function __construct($view, $pdfGenerator, $model)
+    public function __construct($view, $pdfGenerator, $adminModel)
     {
         $this->view = $view;
         $this->pdfGenerator = $pdfGenerator;
-        $this->model = $model;
+        $this->adminModel = $adminModel;
     }
 
     /**
@@ -35,14 +35,13 @@ class AdminController
         $filtro = $_POST['filtro'] ?? 'mes';
         $data = $this->prepararDatosPanel($filtro, $_POST);
 
-        // Imagenes de los graficos
         $data['grafico_edad'] = $_POST['graficoEdad'] ?? null;
         $data['grafico_genero'] = $_POST['graficoGenero'] ?? null;
         $data['grafico_porcentaje'] = $_POST['graficoPorcentaje'] ?? null;
         $data['grafico_paises'] = $_POST['graficoTortaPaises'] ?? null;
 
         $html = $this->view->renderToString('panelAdminPdf', $data);
-        $this->pdfGenerator->generarPdf($html, "Dashboard.pdf", false);
+        $this->pdfGenerator->generarPdf($html, "Dashboard.pdf");
     }
 
     /**
@@ -55,7 +54,7 @@ class AdminController
         $hasta = $rangoFechas['hasta'];
 
         $edad = ['menor' => 0, 'media' => 0, 'mayor' => 0];
-        foreach ($this->model->obtenerDistribucionPorRangoEdad($desde, $hasta) as $fila) {
+        foreach ($this->adminModel->obtenerDistribucionPorRangoEdad($desde, $hasta) as $fila) {
             switch ($fila['rangoEdad']) {
                 case 'Menor':
                     $edad['menor'] = (int)$fila['cantidad'];
@@ -73,7 +72,7 @@ class AdminController
         }
 
         $genero = ['femenino' => 0, 'masculino' => 0, 'otro' => 0];
-        foreach ($this->model->obtenerDistribucionPorGenero($desde, $hasta) as $fila) {
+        foreach ($this->adminModel->obtenerDistribucionPorGenero($desde, $hasta) as $fila) {
             switch ($fila['descripcion']) {
                 case 'Femenino':
                     $genero['femenino'] = (int)$fila['cantidad'];
@@ -90,9 +89,9 @@ class AdminController
             }
         }
 
-        $porcentajeGeneral = $this->model->obtenerPorcentajeGeneral($desde, $hasta);
-        $usuariosPais = $this->model->obtenerUsuariosPorPaisPorFecha($desde, $hasta);
-        $rendimientoUsuarios = $this->model->obtenerRendimientosUsuarios($desde, $hasta);
+        $porcentajeGeneral = $this->adminModel->obtenerPorcentajeGeneral($desde, $hasta);
+        $usuariosPais = $this->adminModel->obtenerUsuariosPorPaisPorFecha($desde, $hasta);
+        $rendimientoUsuarios = $this->adminModel->obtenerRendimientosUsuarios($desde, $hasta);
 
         return [
             'title' => 'Dashboard',
@@ -106,11 +105,11 @@ class AdminController
             'hasta' => $hasta,
             'rango_mostrar' => date('d/m/Y', strtotime($desde)) . ' al ' . date('d/m/Y', strtotime($hasta)),
 
-            'total_jugadores' => $this->model->obtenerTotalUsuarios(),
-            'total_jugadores_nuevos' => $this->model->obtenerTotalUsuariosNuevosPorFecha($desde, $hasta),
-            'partidas_jugadas' => $this->model->obtenerPartidasJugadasPorFecha($desde, $hasta),
-            'total_preguntas' => $this->model->obtenerPreguntasActivas(),
-            'total_preguntas_creadas' => $this->model->obtenerPreguntasActivasPorFecha($desde, $hasta),
+            'total_jugadores' => $this->adminModel->obtenerTotalUsuarios(),
+            'total_jugadores_nuevos' => $this->adminModel->obtenerTotalUsuariosNuevosPorFecha($desde, $hasta),
+            'partidas_jugadas' => $this->adminModel->obtenerPartidasJugadasPorFecha($desde, $hasta),
+            'total_preguntas' => $this->adminModel->obtenerPreguntasActivas(),
+            'total_preguntas_creadas' => $this->adminModel->obtenerPreguntasActivasPorFecha($desde, $hasta),
 
             'edad' => $edad,
             'genero' => $genero,

@@ -3,7 +3,7 @@
 class Database
 {
 
-    private $conn;
+    private Mysqli $conn;
 
     public function __construct($servername, $username, $dbname, $password)
     {

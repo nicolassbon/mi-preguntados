@@ -4,11 +4,11 @@ use JetBrains\PhpStorm\NoReturn;
 
 class PartidaController
 {
-    private $view;
-    private $partidaModel;
-    private $preguntaModel;
-    private $usuarioModel;
-    private $juegoModel;
+    private MustachePresenter $view;
+    private PartidaModel $partidaModel;
+    private PreguntaModel $preguntaModel;
+    private UsuarioModel $usuarioModel;
+    private JuegoModel $juegoModel;
 
     public function __construct($view, $partidaModel, $preguntaModel, $usuarioModel, $juegoModel)
     {

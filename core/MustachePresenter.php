@@ -2,8 +2,8 @@
 
 class MustachePresenter
 {
-    private $mustache;
-    private $partialsPathLoader;
+    private Mustache_Engine $mustache;
+    private String $partialsPathLoader;
 
     public function __construct($partialsPathLoader)
     {

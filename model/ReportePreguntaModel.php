@@ -2,14 +2,14 @@
 
 class ReportePreguntaModel
 {
-    private $db;
+    private Database $db;
 
     public function __construct($db)
     {
         $this->db = $db;
     }
 
-    public function getPreguntasReportadasConDetalles(string|int $id_categoria = 'todasLasCategorias', string $terminoBusqueda = '', string $estado = 'pendiente')
+    public function getPreguntasReportadasConDetalles(string|int $id_categoria = 'todasLasCategorias', string $terminoBusqueda = '', string $estado = 'pendiente'): array
     {
         $where = '1=1';
         if (trim($terminoBusqueda) !== '') {

@@ -2,7 +2,7 @@
 
 class RolModel
 {
-  private $db;
+  private Database $db;
 
   public function __construct(Database $db)
   {

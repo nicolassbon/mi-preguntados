@@ -4,13 +4,13 @@ require_once 'helpers/FechaHelper.php';
 
 class RankingController
 {
-    private $view;
-    private $model;
+    private MustachePresenter $view;
+    private RankingModel $rankingModel;
 
-    public function __construct($view, $model)
+    public function __construct($view, $rankingModel)
     {
         $this->view = $view;
-        $this->model = $model;
+        $this->rankingModel = $rankingModel;
     }
 
     public function show(): void
@@ -20,8 +20,8 @@ class RankingController
         $desde = $rangoFechas['desde'];
         $hasta = $rangoFechas['hasta'];
 
-        $ranking = $this->model->obtenerRanking($desde, $hasta);
-        $partidas = $this->model->obtenerPartidasJugadas($desde, $hasta);
+        $ranking = $this->rankingModel->obtenerRanking($desde, $hasta);
+        $partidas = $this->rankingModel->obtenerPartidasJugadas($desde, $hasta);
 
         foreach ($ranking as $i => $jugador) {
             $ranking[$i]['posicionJugador'] = ($i + 1) . '°';

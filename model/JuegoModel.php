@@ -2,42 +2,29 @@
 
 class JuegoModel
 {
-    private $db;
+    private Database $db;
 
     public function __construct($db)
     {
         $this->db = $db;
     }
 
-    /*
-    * 1. Dificultad adecuada según su nivel (ratio: correctas / entregadas)
-    * 2. Haya sido entregada al menos 5 veces
-    * 3. El usuario no la vio (usuario_pregunta)
-    * 4. Sea de esa categoria
-    */
     public function obtenerPregunta($id_usuario, $id_categoria): array
     {
-        // estadisticas del usuario
         $estadisticas = $this->getEstadisticasUsuario($id_usuario);
 
-        // Nivel del usuario
         $nivelUsuario = $this->getNivelUsuario(
             $estadisticas['entregadas'],
             $estadisticas['acertadas']
         );
 
-        // Preguntas no vistas y con estado 'activa'
-        // Con estado 'reportada' trae las que no fueron reportadas por ese usuario
         $preguntas = $this->getPreguntasNoVistas($id_usuario, $id_categoria);
 
-        // si se acabaron → limpio historial y recursión
         if (empty($preguntas)) {
-            // Solo limpia las de esa categoria
             $this->limpiarHistorialPreguntasVistas($id_usuario, $id_categoria);
             return $this->obtenerPregunta($id_usuario, $id_categoria);
         }
 
-        // agrupo y selecciono según nivel
         $grupos = $this->agruparPorNivel($preguntas);
 
         return $this->elegirPorNivelUsuario($grupos, $nivelUsuario);
@@ -101,8 +88,6 @@ class JuegoModel
         return $dificultad;
     }
 
-    // Trae preguntas que el usuario no vio, de la categoría dada,
-    // con estado activa/reportada (pero no las que él mismo reportó),
     private function getPreguntasNoVistas($id_usuario, $id_categoria): array
     {
 
@@ -148,20 +133,18 @@ class JuegoModel
         $order = ['facil', 'intermedio', 'dificil'];
         $idx = array_search($nivelUsuario, $order, true);
 
-        // Intento desde el mismo nivel hacia niveles más difíciles
         for ($i = $idx, $iMax = count($order); $i < $iMax; $i++) {
             if (!empty($grupos[$order[$i]])) {
                 return $grupos[$order[$i]][array_rand($grupos[$order[$i]])];
             }
         }
-        // Si aún vacío, busco niveles más fáciles
+
         for ($i = $idx - 1; $i >= 0; $i--) {
             if (!empty($grupos[$order[$i]])) {
                 return $grupos[$order[$i]][array_rand($grupos[$order[$i]])];
             }
         }
 
-        // No debería llegar aquí
         return [];
     }
 

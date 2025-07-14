@@ -36,6 +36,7 @@ class Configuration
     private ?MustachePresenter $viewer = null;
     private ?UsuarioModel $usuarioModel = null;
     private ?PreguntaModel $preguntaModel = null;
+    private ?PdfGenerator $pdfGenerator = null;
 
     public function getDatabase(): Database
     {
@@ -80,7 +81,10 @@ class Configuration
 
     public function getPdfGenerator(): PdfGenerator
     {
-        return new PdfGenerator();
+        if ($this->pdfGenerator === null) {
+            $this->pdfGenerator = new PdfGenerator();
+        }
+        return $this->pdfGenerator;
     }
 
     public function getUsuarioModel(): UsuarioModel

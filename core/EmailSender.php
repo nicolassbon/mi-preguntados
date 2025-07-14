@@ -6,10 +6,10 @@ use PHPMailer\PHPMailer\Exception;
 class EmailSender
 {
 
-  private $host;
-  private $username;
-  private $password;
-  private $port;
+  private String $host;
+  private String $username;
+  private String $password;
+  private String $port;
 
   public function __construct($host, $username, $password, $port)
   {
@@ -42,7 +42,7 @@ class EmailSender
       $mail->send();
       return true;
 
-    } catch (Exception $e) {
+    } catch (Exception) {
       error_log('EmailSender Error: ' . $mail->ErrorInfo);
       return false;
     }

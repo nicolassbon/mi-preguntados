@@ -2,9 +2,9 @@
 
 class Router
 {
-    private $defaultController;
-    private $defaultMethod;
-    private $configuration;
+    private String $defaultController;
+    private String $defaultMethod;
+    private Configuration $configuration;
 
     public function __construct($defaultController, $defaultMethod, $configuration)
     {

@@ -1,9 +1,11 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class TrampitasController
 {
-    private $view;
-    private $usuarioModel;
+    private MustachePresenter $view;
+    private UsuarioModel $usuarioModel;
 
     public function __construct($view, $usuarioModel)
     {
@@ -35,7 +37,7 @@ class TrampitasController
         ]);
     }
 
-    public function procesarCompra(): void
+    #[NoReturn] public function procesarCompra(): void
     {
         $id_usuario = $_SESSION['usuario_id'] ?? null;
         $cantidad = (int)($_POST['cantidad'] ?? 0);

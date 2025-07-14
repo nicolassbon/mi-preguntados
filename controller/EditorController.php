@@ -4,11 +4,11 @@ use JetBrains\PhpStorm\NoReturn;
 
 class EditorController
 {
-    private $view;
-    private $preguntaModel;
-    private $categoriaModel;
-    private $sugerenciaPreguntaModel;
-    private $reportePreguntaModel;
+    private MustachePresenter $view;
+    private PreguntaModel $preguntaModel;
+    private CategoriaModel $categoriaModel;
+    private SugerenciaPreguntaModel $sugerenciaPreguntaModel;
+    private ReportePreguntaModel $reportePreguntaModel;
 
     private const REPORTES_URL = "/editor/reportes";
     private const SUGERENCIAS_URL = "/editor/sugerencias";
@@ -190,7 +190,7 @@ class EditorController
 
     public function reportes(): void
     {
-        $filtros = $this->prepararFiltrosYCategorias('reportes');
+        $filtros = $this->prepararFiltrosYCategorias();
 
         $preguntasReportadas = $this->reportePreguntaModel->getPreguntasReportadasConDetalles($filtros['id_categoria'], $filtros['terminoBusqueda'], $filtros['estado']);
 

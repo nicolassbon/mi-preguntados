@@ -4,11 +4,11 @@ use JetBrains\PhpStorm\NoReturn;
 
 class RegistroController
 {
-    private $view;
-    private $emailSender;
-    private $usuarioModel;
-    private $ubicacionModel;
-    private $rolModel;
+    private MustachePresenter $view;
+    private EmailSender $emailSender;
+    private UsuarioModel $usuarioModel;
+    private UbicacionModel $ubicacionModel;
+    private RolModel $rolModel;
 
 
     public function __construct($view, $emailSender, $usuarioModel, $ubicacionModel, $rolModel)
@@ -70,7 +70,7 @@ class RegistroController
         $minLength = 8;
         $tieneMayuscula = preg_match('/[A-Z]/', $password);
         $tieneMinuscula = preg_match('/[a-z]/', $password);
-        $tieneNumero = preg_match('/[0-9]/', $password);
+        $tieneNumero = preg_match('/\D/', $password);
 
         return strlen($password) >= $minLength && $tieneMayuscula && $tieneMinuscula && $tieneNumero;
     }
@@ -124,6 +124,9 @@ class RegistroController
         ]);
     }
 
+    /**
+     * @throws JsonException
+     */
     public function procesar(): void
     {
         // Recuperar datos del registro que estan en session

@@ -3,7 +3,7 @@
 class PreguntaModel
 {
 
-    private $db;
+    private Database $db;
 
     public function __construct($db)
     {
@@ -32,7 +32,7 @@ class PreguntaModel
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("si", $pregunta, $id_categoria);
         $stmt->execute();
-        return $this->db->insert_id;
+        return $this->db->getLastInsertId();
     }
 
     public function buscarPreguntaCreada(string $pregunta)
@@ -68,7 +68,6 @@ class PreguntaModel
             $esCorrecta = 1;
         }
 
-        $sql = $insertRespuesta;
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("siii", $opcion2, $esCorrecta, $id_pregunta, $activo);
         $stmt->execute();
@@ -79,7 +78,6 @@ class PreguntaModel
             $esCorrecta = 1;
         }
 
-        $sql = $insertRespuesta;
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("siii", $opcion3, $esCorrecta, $id_pregunta, $activo);
         $stmt->execute();
@@ -90,13 +88,12 @@ class PreguntaModel
             $esCorrecta = 1;
         }
 
-        $sql = $insertRespuesta;
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("siii", $opcion4, $esCorrecta, $id_pregunta, $activo);
         $stmt->execute();
     }
 
-    public function getRespuestasPorPregunta(int $id_pregunta)
+    public function getRespuestasPorPregunta(int $id_pregunta): array
     {
         $sql = "SELECT id_respuesta, respuesta, esCorrecta FROM respuestas WHERE id_pregunta = ?";
         $stmt = $this->db->prepare($sql);

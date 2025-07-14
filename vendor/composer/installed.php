@@ -3,7 +3,7 @@
         'name' => 'nicolas/preguntopolis',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '5d5a1d391afc9cf40e89bd9284f5c44988d3d332',
+        'reference' => '4f6f0a48edf9813c99af16999a8812cff737201b',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -58,7 +58,7 @@
         'nicolas/preguntopolis' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '5d5a1d391afc9cf40e89bd9284f5c44988d3d332',
+            'reference' => '4f6f0a48edf9813c99af16999a8812cff737201b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

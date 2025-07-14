@@ -3,9 +3,9 @@
 class RuletaController
 {
 
-    private $view;
-    private $categoriaModel;
-    private $usuarioModel;
+    private MustachePresenter $view;
+    private CategoriaModel $categoriaModel;
+    private UsuarioModel $usuarioModel;
 
     public function __construct($view, $categoriaModel, $usuarioModel){
         $this->view = $view;

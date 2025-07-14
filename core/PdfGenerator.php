@@ -5,8 +5,10 @@ use Dompdf\Exception;
 
 class PdfGenerator
 {
-    private $dompdf;
-    public function __construct() {
+    private Dompdf $dompdf;
+
+    public function __construct()
+    {
         $this->dompdf = new Dompdf();
     }
 
