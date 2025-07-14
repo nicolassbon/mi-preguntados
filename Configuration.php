@@ -29,8 +29,6 @@ require_once "model/JuegoModel.php";
 require_once "model/ReportePreguntaModel.php";
 require_once "model/AdminModel.php";
 
-include_once 'vendor/mustache/src/Mustache/Autoloader.php';
-
 class Configuration
 {
     private ?Database $database = null;

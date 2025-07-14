@@ -1,9 +1,5 @@
 <?php
 
-require_once 'vendor/phpmailer/src/Exception.php';
-require_once 'vendor/phpmailer/src/PHPMailer.php';
-require_once 'vendor/phpmailer/src/SMTP.php';
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 

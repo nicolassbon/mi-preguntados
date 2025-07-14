@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/vendor/autoload.php';
+
 session_start();
 // Setea la zona horaria de la aplicación
 date_default_timezone_set('America/Argentina/Buenos_Aires');
