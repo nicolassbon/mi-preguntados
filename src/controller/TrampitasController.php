@@ -2,30 +2,25 @@
 
 namespace App\controller;
 
+use App\core\MercadoPagoService;
 use App\core\MustachePresenter;
 use App\model\UsuarioModel;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use JsonException;
-
-use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Client\Preference\PreferenceClient;
-use MercadoPago\Exceptions\MPApiException;
-use MercadoPago\Resources\Preference;
 use MercadoPago\Client\Payment\PaymentClient;
-
 
 class TrampitasController
 {
     private MustachePresenter $view;
     private UsuarioModel $usuarioModel;
-    private const ACCESS_TOKEN = 'APP_USR-1161986002564820-112507-a3751c8d816ca6e05db73ad7ff938d68-2115199025';
-    private const BASE_URL = "https://f23dd6ee1e00.ngrok-free.app";
+    private MercadoPagoService $mercadoPagoService;
 
-    public function __construct($view, $usuarioModel)
+    public function __construct($view, $usuarioModel, $mercadoPagoService)
     {
         $this->view = $view;
         $this->usuarioModel = $usuarioModel;
+        $this->mercadoPagoService = $mercadoPagoService;
     }
 
     public function comprar(): void
@@ -67,12 +62,19 @@ class TrampitasController
             exit;
         }
 
+        $user = $this->usuarioModel->getUsuarioPorId($_SESSION['usuario_id'] ?? null);
+
         $monto = $cantidad * 1.00;
         $externalReference = "trampitas_{$id_usuario}_{$cantidad}_{$monto}_" . time();
 
-        $this->authenticate();
+        $this->mercadoPagoService->authenticate();
 
-        $preference = $this->createPaymentPreference($cantidad, $monto, $externalReference);
+        $preference = $this->mercadoPagoService->createPaymentPreference($cantidad, $monto, $externalReference, $user);
+
+        if (!$preference) {
+            header("Location: /trampitas/comprar?compra=invalid");
+            exit;
+        }
 
         header("Location: " . $preference->init_point);
         exit;
@@ -80,7 +82,7 @@ class TrampitasController
 
     public function recibirNotificacion(): void
     {
-        $this->authenticate();
+        $this->mercadoPagoService->authenticate();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty(file_get_contents('php://input'))) {
             error_log("Intento inválido de acceder manualmente al webhook");
@@ -132,77 +134,5 @@ class TrampitasController
         }
 
         http_response_code(200);
-    }
-
-    public function authenticate(): void
-    {
-        MercadoPagoConfig::setAccessToken(self::ACCESS_TOKEN);
-    }
-
-    public function createPreferenceRequest($items, $payer, $externalReference): array
-    {
-        $paymentMethods = [
-            "excluded_payment_methods" => [],
-            "installments" => 12,
-            "default_installments" => 1
-        ];
-
-        $backUrls = [
-            'success' => self::BASE_URL . "/trampitas/comprar?compra=success",
-            'failure' => self::BASE_URL . "/trampitas/comprar?compra=invalid",
-            'pending' => self::BASE_URL . "/trampitas/comprar?compra=pending"
-        ];
-
-        return [
-            "items" => $items,
-            "payer" => $payer,
-            "payment_methods" => $paymentMethods,
-            "back_urls" => $backUrls,
-            "statement_descriptor" => "NAME_DISPLAYED_IN_USER_BILLING",
-            "expires" => false,
-            "external_reference" => $externalReference,
-            "auto_return" => "all",
-            "notification_url" => self::BASE_URL . "/trampitas/recibirNotificacion"
-        ];
-    }
-
-    public function createPaymentPreference($cantidad, $precio, $externalReference): ?Preference
-    {
-        $product1 = array(
-            "id" => "1234567890",
-            "title" => "Compra $cantidad de Trampitas",
-            "currency_id" => "USD",
-            "quantity" => 1,
-            "unit_price" => $precio,
-        );
-
-        $items = array($product1);
-
-        $user = $this->usuarioModel->getUsuarioPorId($_SESSION['usuario_id'] ?? null);
-
-        $payer = array(
-            "name" => $user["nombre_completo"],
-            "email" => filter_var($user["email"], FILTER_VALIDATE_EMAIL) ?: "comprador@test.com"
-        );
-
-        $request = $this->createPreferenceRequest($items, $payer, $externalReference);
-
-        $client = new PreferenceClient();
-
-        try {
-            // Send the request that will create the new preference for user's checkout flow
-            return $client->create($request);
-        } catch (MPApiException $error) {
-            echo "<pre>";
-            echo "Mercado Pago Error: " . $error->getMessage() . "\n";
-            print_r($error->getApiResponse()->getContent());
-            echo "</pre>";
-            exit;
-        } catch (Exception $e) {
-            echo "<pre>";
-            echo "Error: " . $e->getMessage() . "\n";
-            echo "</pre>";
-            exit;
-        }
     }
 }

@@ -15,6 +15,7 @@ use App\controller\RuletaController;
 use App\controller\TrampitasController;
 use App\core\Database;
 use App\core\EmailSender;
+use App\core\MercadoPagoService;
 use App\core\MustachePresenter;
 use App\core\PdfGenerator;
 use App\core\Router;
@@ -34,12 +35,23 @@ class Configuration
 {
     private ?Database $database = null;
     private ?EmailSender $emailSender = null;
+    private ?MercadoPagoService $mercadoPagoService = null;
     private ?MustachePresenter $viewer = null;
+    private ?PdfGenerator $pdfGenerator = null;
+    private ?Router $router = null;
+    private ?AdminModel $adminModel = null;
+    private ?CategoriaModel $categoriaModel = null;
+    private ?JuegoModel $juegoModel = null;
+    private ?PartidaModel $partidaModel = null;
+    private ?RankingModel $rankingModel = null;
+    private ?ReportePreguntaModel $reportePreguntaModel = null;
+    private ?RolModel $rolModel = null;
+    private ?SugerenciaPreguntaModel $sugerenciaPreguntaModel = null;
+    private ?UbicacionModel $ubicacionModel = null;
     private ?UsuarioModel $usuarioModel = null;
     private ?PreguntaModel $preguntaModel = null;
-    private ?PdfGenerator $pdfGenerator = null;
 
-    public function getDatabase(): Database
+    private function getDatabase(): Database
     {
         if ($this->database === null) {
             $config = $this->getIniConfig();
@@ -53,7 +65,7 @@ class Configuration
         return $this->database;
     }
 
-    public function getEmailSender(): EmailSender
+    private function getEmailSender(): EmailSender
     {
         if ($this->emailSender === null) {
             $config = $this->getIniConfig();
@@ -67,12 +79,12 @@ class Configuration
         return $this->emailSender;
     }
 
-    public function getIniConfig(): bool|array
+    private function getIniConfig(): bool|array
     {
         return parse_ini_file("configuration/config.ini", true);
     }
 
-    public function getViewer(): MustachePresenter
+    private function getViewer(): MustachePresenter
     {
         if ($this->viewer === null) {
             $this->viewer = new MustachePresenter("view");
@@ -80,7 +92,7 @@ class Configuration
         return $this->viewer;
     }
 
-    public function getPdfGenerator(): PdfGenerator
+    private function getPdfGenerator(): PdfGenerator
     {
         if ($this->pdfGenerator === null) {
             $this->pdfGenerator = new PdfGenerator();
@@ -88,15 +100,51 @@ class Configuration
         return $this->pdfGenerator;
     }
 
-    public function getUsuarioModel(): UsuarioModel
+    private function getMercadoPagoService(): MercadoPagoService
     {
-        if ($this->usuarioModel === null) {
-            $this->usuarioModel = new UsuarioModel($this->getDatabase());
+        if ($this->mercadoPagoService === null) {
+            $config = $this->getIniConfig();
+            $this->mercadoPagoService = new MercadoPagoService(
+                $config["mercado_pago"]["access_token"],
+                $config["mercado_pago"]["base_url"]
+            );
         }
-        return $this->usuarioModel;
+        return $this->mercadoPagoService;
     }
 
-    public function getPreguntaModel(): PreguntaModel
+    private function getAdminModel(): AdminModel
+    {
+        if ($this->adminModel === null) {
+            $this->adminModel = new AdminModel($this->getDatabase());
+        }
+        return $this->adminModel;
+    }
+
+    private function getCategoriaModel(): CategoriaModel
+    {
+        if ($this->categoriaModel === null) {
+            $this->categoriaModel = new CategoriaModel($this->getDatabase());
+        }
+        return $this->categoriaModel;
+    }
+
+    private function getJuegoModel(): JuegoModel
+    {
+        if ($this->juegoModel === null) {
+            $this->juegoModel = new JuegoModel($this->getDatabase());
+        }
+        return $this->juegoModel;
+    }
+
+    private function getPartidaModel(): PartidaModel
+    {
+        if ($this->partidaModel === null) {
+            $this->partidaModel = new PartidaModel($this->getDatabase());
+        }
+        return $this->partidaModel;
+    }
+
+    private function getPreguntaModel(): PreguntaModel
     {
         if ($this->preguntaModel === null) {
             $this->preguntaModel = new PreguntaModel($this->getDatabase());
@@ -104,14 +152,63 @@ class Configuration
         return $this->preguntaModel;
     }
 
+    private function getRankingModel(): RankingModel
+    {
+        if ($this->rankingModel === null) {
+            $this->rankingModel = new RankingModel($this->getDatabase());
+        }
+        return $this->rankingModel;
+    }
+
+    private function getReportePreguntaModel(): ReportePreguntaModel
+    {
+        if ($this->reportePreguntaModel === null) {
+            $this->reportePreguntaModel = new ReportePreguntaModel($this->getDatabase());
+        }
+        return $this->reportePreguntaModel;
+    }
+
+    private function getRolModel(): RolModel
+    {
+        if ($this->rolModel === null) {
+            $this->rolModel = new RolModel($this->getDatabase());
+        }
+        return $this->rolModel;
+    }
+
+    private function getSugerenciaPreguntaModel(): SugerenciaPreguntaModel
+    {
+        if ($this->sugerenciaPreguntaModel === null) {
+            $this->sugerenciaPreguntaModel = new SugerenciaPreguntaModel($this->getDatabase());
+        }
+        return $this->sugerenciaPreguntaModel;
+    }
+
+    private function getUbicacionModel(): UbicacionModel
+    {
+        if ($this->ubicacionModel === null) {
+            $this->ubicacionModel = new UbicacionModel($this->getDatabase());
+        }
+        return $this->ubicacionModel;
+    }
+
+    private function getUsuarioModel(): UsuarioModel
+    {
+        if ($this->usuarioModel === null) {
+            $this->usuarioModel = new UsuarioModel($this->getDatabase());
+        }
+        return $this->usuarioModel;
+    }
+
+
     public function getRegistroController(): RegistroController
     {
         return new RegistroController(
             $this->getViewer(),
             $this->getEmailSender(),
             $this->getUsuarioModel(),
-            new UbicacionModel($this->getDatabase()),
-            new RolModel($this->getDatabase())
+            $this->getUbicacionModel(),
+            $this->getRolModel()
         );
     }
 
@@ -119,7 +216,7 @@ class Configuration
     {
         return new RankingController(
             $this->getViewer(),
-            new RankingModel($this->getDatabase())
+            $this->getRankingModel()
         );
     }
 
@@ -136,7 +233,7 @@ class Configuration
         return new LoginController(
             $this->getViewer(),
             $this->getUsuarioModel(),
-            new RolModel($this->getDatabase())
+            $this->getRolModel()
         );
     }
 
@@ -145,9 +242,9 @@ class Configuration
         return new EditorController(
             $this->getViewer(),
             $this->getPreguntaModel(),
-            new CategoriaModel($this->getDatabase()),
-            new SugerenciaPreguntaModel($this->getDatabase()),
-            new ReportePreguntaModel($this->getDatabase())
+            $this->getCategoriaModel(),
+            $this->getSugerenciaPreguntaModel(),
+            $this->getReportePreguntaModel()
         );
     }
 
@@ -156,7 +253,7 @@ class Configuration
         return new AdminController(
             $this->getViewer(),
             $this->getPdfGenerator(),
-            new AdminModel($this->getDatabase())
+            $this->getAdminModel()
         );
     }
 
@@ -164,7 +261,7 @@ class Configuration
     {
         return new HomeController(
             $this->getViewer(),
-            new UsuarioModel($this->getDatabase())
+            $this->getUsuarioModel()
         );
     }
 
@@ -172,8 +269,8 @@ class Configuration
     {
         return new RuletaController(
             $this->getViewer(),
-            new CategoriaModel($this->getDatabase()),
-            new UsuarioModel($this->getDatabase())
+            $this->getCategoriaModel(),
+            $this->getUsuarioModel()
         );
     }
 
@@ -182,24 +279,18 @@ class Configuration
         return new PreguntaController(
             $this->getViewer(),
             $this->getPreguntaModel(),
-            new SugerenciaPreguntaModel($this->getDatabase())
+            $this->getSugerenciaPreguntaModel()
         );
     }
 
     public function getPartidaController(): PartidaController
     {
-        $db = $this->getDatabase();
-        $preguntaModel = $this->getPreguntaModel();
-        $partidaModel = new PartidaModel($db);
-        $usuarioModel = $this->getUsuarioModel();
-        $juegoModel = new JuegoModel($db);
-
         return new PartidaController(
             $this->getViewer(),
-            $partidaModel,
-            $preguntaModel,
-            $usuarioModel,
-            $juegoModel
+            $this->getPartidaModel(),
+            $this->getPreguntaModel(),
+            $this->getUsuarioModel(),
+            $this->getJuegoModel(),
         );
     }
 
@@ -207,12 +298,16 @@ class Configuration
     {
         return new TrampitasController(
             $this->getViewer(),
-            new UsuarioModel($this->getDatabase())
+            $this->getUsuarioModel(),
+            $this->getMercadoPagoService()
         );
     }
 
     public function getRouter(): Router
     {
-        return new Router("getHomeController", "show", $this);
+        if ($this->router === null) {
+            $this->router = new Router("getHomeController", "show", $this);
+        }
+        return $this->router;
     }
 }
