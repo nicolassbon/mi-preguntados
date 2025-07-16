@@ -18,39 +18,43 @@
         <td style="padding: 8px; border: 1px solid #ccc;">{{total_jugadores_nuevos}}</td>
     </tr>
 </table>
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <tr>
+        <th style="padding: 8px; border: 1px solid #ccc;">Ganancia total por Trampitas</th>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ccc;text-align: center">${{ganancia_trampitas}}</td>
+    </tr>
+</table>
 <hr>
+{{#hay_graficos}}
+    <h3>Gráficos</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 50px;">
+        <tr>
+            {{#grafico_edad}}
+                <td style="width: 50%; text-align: center; vertical-align: top; padding: 10px;">
+                    <h4 style="margin-bottom: 5px;">Usuarios por Edad</h4>
+                    <img src="{{grafico_edad}}" style="width: 100%; max-height: 300px; object-fit: contain;">
+                </td>
+            {{/grafico_edad}}
 
-{{#grafico_edad}}
-    <div>
-        <h3>Usuarios por Grupo de Edad</h3>
-        <img src="{{grafico_edad}}" style="max-width: 100%;"/>
-    </div>
-{{/grafico_edad}}
-
-{{#grafico_genero}}
-    <div>
-        <h3>Usuarios por Género</h3>
-        <img src="{{grafico_genero}}" style="max-width: 100%;"/>
-    </div>
-{{/grafico_genero}}
-
-
-{{#grafico_paises}}
-    <div>
-        <h3>Distribución por País</h3>
-        <img src="{{grafico_paises}}" style="max-width: 100%;"/>
-    </div>
-{{/grafico_paises}}
-
-
-{{#grafico_porcentaje}}
-    <div>
-        <h3>Porcentaje de Respuestas</h3>
-        <img src="{{grafico_porcentaje}}" style="max-width: 100%;"/>
-    </div>
-{{/grafico_porcentaje}}
-
-<hr>
+            {{#grafico_genero}}
+                <td style="width: 50%; text-align: center; vertical-align: top; padding: 10px;">
+                    <h4 style="margin-bottom: 5px;">Usuarios por Género</h4>
+                    <img src="{{grafico_genero}}" style="width: 100%; max-height: 300px; object-fit: contain;">
+                </td>
+            {{/grafico_genero}}
+        </tr>
+        <tr>
+            {{#grafico_paises}}
+                <td style="width: 50%; text-align: center; vertical-align: top; padding: 10px;">
+                    <h4 style="margin-bottom: 5px;">Distribución por País</h4>
+                    <img src="{{grafico_paises}}" style="width: 100%; max-height: 300px; object-fit: contain;">
+                </td>
+            {{/grafico_paises}}
+        </tr>
+    </table>
+{{/hay_graficos}}
 
 <h3>Rendimiento por Usuario</h3>
 <table style="width: 100%; border-collapse: collapse;">
@@ -71,10 +75,37 @@
     {{/rendimiento_usuarios}}
     {{^rendimiento_usuarios}}
         <tr>
-            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">No hay datos de
-                rendimiento.
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">No hay datos para esta
+                tabla.
             </td>
         </tr>
     {{/rendimiento_usuarios}}
+    </tbody>
+</table>
+
+<h3>Balance de Trampitas por Usuario</h3>
+<table style="width: 100%; border-collapse: collapse;">
+    <thead>
+    <tr>
+        <th style="padding: 8px; border: 1px solid #ccc;">Usuario</th>
+        <th style="padding: 8px; border: 1px solid #ccc;">Total Gastado (USD)</th>
+        <th style="padding: 8px; border: 1px solid #ccc;">Trampitas Actuales</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#balance_trampitas}}
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ccc;">{{nombre_usuario}}</td>
+            <td style="padding: 8px; border: 1px solid #ccc;">${{total_gastado}}</td>
+            <td style="padding: 8px; border: 1px solid #ccc;">{{cantidad_trampitas}}</td>
+        </tr>
+    {{/balance_trampitas}}
+    {{^balance_trampitas}}
+        <tr>
+            <td colspan="3" style="padding: 8px; border: 1px solid #ccc; text-align: center;">No hay datos para esta
+                tabla.
+            </td>
+        </tr>
+    {{/balance_trampitas}}
     </tbody>
 </table>

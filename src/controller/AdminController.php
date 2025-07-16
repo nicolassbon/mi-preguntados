@@ -6,6 +6,7 @@ use App\core\MustachePresenter;
 use App\core\PdfGenerator;
 use App\helpers\FechaHelper;
 use App\model\AdminModel;
+use JsonException;
 
 class AdminController
 {
@@ -42,8 +43,9 @@ class AdminController
 
         $data['grafico_edad'] = $_POST['graficoEdad'] ?? null;
         $data['grafico_genero'] = $_POST['graficoGenero'] ?? null;
-        $data['grafico_porcentaje'] = $_POST['graficoPorcentaje'] ?? null;
         $data['grafico_paises'] = $_POST['graficoTortaPaises'] ?? null;
+
+        $data['hay_graficos'] = !empty($data['grafico_edad']) || !empty($data['grafico_genero']) || !empty($data['grafico_paises']);
 
         $html = $this->view->renderToString('panelAdminPdf', $data);
         $this->pdfGenerator->generarPdf($html, "Dashboard.pdf");
@@ -94,9 +96,10 @@ class AdminController
             }
         }
 
-        $porcentajeGeneral = $this->adminModel->obtenerPorcentajeGeneral($desde, $hasta);
         $usuariosPais = $this->adminModel->obtenerUsuariosPorPaisPorFecha($desde, $hasta);
         $rendimientoUsuarios = $this->adminModel->obtenerRendimientosUsuarios($desde, $hasta);
+        $balanceTrampitas = $this->adminModel->obtenerBalanceTrampitasPorUsuarioConFecha($desde, $hasta);
+        $gananciaTrampitas = $this->adminModel->obtenerGananciaTotalTrampitas($desde, $hasta);
 
         return [
             'title' => 'Dashboard',
@@ -121,13 +124,15 @@ class AdminController
             'hay_datos_edad' => array_sum($edad) > 0,
             'hay_datos_genero' => array_sum($genero) > 0,
 
-            'porcentaje_general' => $porcentajeGeneral,
-            'hay_datos_porcentaje' => isset($porcentajeGeneral[0]['porcentajeCorrectas']),
-
             'json_paises_usuarios' => json_encode($usuariosPais, JSON_THROW_ON_ERROR),
             'hay_datos_paises' => count($usuariosPais) > 0,
 
-            'rendimiento_usuarios' => $rendimientoUsuarios
+            'rendimiento_usuarios' => $rendimientoUsuarios,
+            'hay_rendimiento_usuarios' => count($rendimientoUsuarios) > 0,
+
+            'balance_trampitas' => $balanceTrampitas,
+            'hay_balance_trampitas' => count($balanceTrampitas) > 0,
+            'ganancia_trampitas' => $gananciaTrampitas
         ];
     }
 }

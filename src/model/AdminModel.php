@@ -132,4 +132,32 @@ class AdminModel
         return $this->db->query($sql);
     }
 
+    public function obtenerBalanceTrampitasPorUsuarioConFecha(string $desde, string $hasta): array
+    {
+        $query = "
+            SELECT
+                u.nombre_usuario,
+                u.cantidad_trampitas,
+                SUM(c.monto_pagado) AS total_gastado
+            FROM usuarios u
+            INNER JOIN compras_trampitas c ON u.id_usuario = c.id_usuario
+            WHERE c.fecha_compra BETWEEN '$desde' AND '$hasta'
+            GROUP BY u.id_usuario
+            ORDER BY total_gastado DESC
+        ";
+
+        return $this->db->query($query);
+    }
+
+    public function obtenerGananciaTotalTrampitas(string $desde, string $hasta): float
+    {
+        $query = "
+            SELECT SUM(c.monto_pagado) as total
+            FROM compras_trampitas c
+            WHERE c.fecha_compra BETWEEN '$desde' AND '$hasta'
+        ";
+        $result = $this->db->query($query);
+        return (float)$result[0]['total'];
+    }
+
 }
