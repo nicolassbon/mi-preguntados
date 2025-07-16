@@ -3,7 +3,7 @@
         'name' => 'nicolas/preguntopolis',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '4f6f0a48edf9813c99af16999a8812cff737201b',
+        'reference' => '7dd51494fd554aed530584ca8d823b3d4898cfbc',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -46,6 +46,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'mercadopago/dx-php' => array(
+            'pretty_version' => '3.5.1',
+            'version' => '3.5.1.0',
+            'reference' => '657be1bf17b08b3c887891245825e56111006883',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mercadopago/dx-php',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'mustache/mustache' => array(
             'pretty_version' => 'v3.0.0',
             'version' => '3.0.0.0',
@@ -58,7 +67,7 @@
         'nicolas/preguntopolis' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '4f6f0a48edf9813c99af16999a8812cff737201b',
+            'reference' => '7dd51494fd554aed530584ca8d823b3d4898cfbc',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

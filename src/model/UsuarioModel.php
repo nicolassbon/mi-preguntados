@@ -13,6 +13,15 @@ class UsuarioModel
         $this->db = $database;
     }
 
+    public function getUsuarioPorId($idUsuario) {
+        $sql = "SELECT id_usuario, nombre_completo, email FROM usuarios WHERE id_usuario = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $idUsuario);
+        $stmt->execute();
+
+        return $stmt->get_result()->fetch_assoc();
+    }
+
     public function buscarUsuarioPorEmail($email): bool|array|null
     {
         $sql = "
@@ -228,12 +237,22 @@ class UsuarioModel
         $this->db->execute($sql);
     }
 
-    public function registrarCompra($id_usuario, $cantidad, $monto): void
+    public function registrarCompra($id_usuario, $cantidad, $monto,$referencia): void
     {
         $sql = "
-            INSERT INTO compras_trampitas (id_usuario, cantidad_comprada, monto_pagado, fecha_compra)
-            VALUES ($id_usuario, $cantidad, $monto, NOW())
+            INSERT INTO compras_trampitas (id_usuario, cantidad_comprada, monto_pagado, fecha_compra, referencia_externa)
+            VALUES (?, ?, ?, NOW(), ?)
         ";
-        $this->db->execute($sql);
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("iids", $id_usuario, $cantidad, $monto, $referencia);
+        $stmt->execute();
+    }
+
+    public function compraYaProcesada(string $externalReference): bool {
+        $sql = "SELECT 1 FROM compras_trampitas WHERE referencia_externa = ? LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("s", $externalReference);
+        $stmt->execute();
+        return $stmt->get_result()->num_rows > 0;
     }
 }

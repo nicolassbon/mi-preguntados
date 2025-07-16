@@ -19,6 +19,7 @@ class ComposerStaticInitfa8b2535480bcd418417e12bf04716cd
         'M' => 
         array (
             'Mustache\\' => 9,
+            'MercadoPago\\' => 12,
             'Masterminds\\' => 12,
         ),
         'F' => 
@@ -51,6 +52,10 @@ class ComposerStaticInitfa8b2535480bcd418417e12bf04716cd
         'Mustache\\' => 
         array (
             0 => __DIR__ . '/..' . '/mustache/mustache/src',
+        ),
+        'MercadoPago\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mercadopago/dx-php/src/MercadoPago',
         ),
         'Masterminds\\' => 
         array (

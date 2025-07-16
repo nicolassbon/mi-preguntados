@@ -24,6 +24,7 @@ $rutasPublicas = [
     'registro/checkEmail',
     'perfil/show',
     'ranking/show',
+    'trampitas/recibirNotificacion'
 ];
 
 $controller = $_GET['controller'] ?? null;
