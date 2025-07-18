@@ -24,19 +24,6 @@ class PartidaModel
 
     }
 
-    public function getTiempoRestante()
-    {
-        $inicio = $_SESSION['inicio_pregunta'] ?? null;
-        if (!$inicio) {
-            return 0;
-        }
-
-        $ahora = time();
-        $tiempo_total = 10;
-        $tiempo_pasado = $ahora - $inicio;
-        return max(0, $tiempo_total - $tiempo_pasado);
-    }
-
     public function actualizarFechaPartidaFinalizada($id_partida): void
     {
 

@@ -10,8 +10,7 @@
 
 <main class="bg-fondo d-flex justify-content-center p-2" style="height: calc(100vh - 66px); max-height: 100vh">
     <div class="container-fluid d-flex flex-column justify-content-center align-items-center flex-grow-1">
-        <h5 id="contador_texto" class="mb-3 fw-bold" style="{{ocultar}}">Tiempo: <span
-                id="contador">{{tiempo_restante}}</span> segundos</h5>
+        <h5 id="contador_texto" class="mb-3 fw-bold" style="{{ocultar}}">Tiempo: <span id="contador">10</span> segundos</h5>
         {{#puede_usar_trampita}}
             <form method="POST" action="/partida/usarTrampita" class="mb-3">
                 <input type="hidden" name="id_pregunta" value="{{id_pregunta}}">
@@ -127,49 +126,57 @@
 {{/reset_timer}}
 
 <script>
-    let tiempoMaximo = 10;
-    let tiempo = sessionStorage.getItem('tiempoRestante');
-    if (tiempo === null) {
-        tiempo = {{tiempo_restante}};
-        if (typeof tiempo === 'undefined' || tiempo === null) tiempo = tiempoMaximo;
-    } else {
-        tiempo = parseInt(tiempo);
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const contadorSpan = document.getElementById("contador");
+        const contadorTexto = document.getElementById("contador_texto");
+        const audioAlerta = document.getElementById("alertaTiempo");
+        const formTiempoAgotado = document.getElementById("formTiempoAgotado");
 
-    const contador = document.getElementById("contador");
-    const contador_texto = document.getElementById("contador_texto");
-    const audioAlerta = document.getElementById("alertaTiempo");
-    contador.textContent = tiempo;
+        // Datos que vienen del backend
+        const inicioPregunta = {{inicio_pregunta}}; // Timestamp de inicio
+        const tiempoMaximo = {{tiempo_maximo}};   // Ej: 10 segundos
 
-    const timer = setInterval(() => {
-        contador.textContent = tiempo;
+        // Si no hay un contador en la página, no hagas nada.
+        if (!contadorSpan) return;
 
-        if (tiempo === 4) {
-            for (let i = 0; i <= 3; i++) {
-                setTimeout(() => {
-                    audioAlerta.currentTime = 0;
-                    audioAlerta.play();
-                }, i * 1000);
+        // Función que se ejecuta cada segundo
+        const actualizarContador = () => {
+            const ahora = Math.floor(Date.now() / 1000);
+            const tiempoTranscurrido = ahora - inicioPregunta;
+            let tiempoRestante = tiempoMaximo - tiempoTranscurrido;
+
+            if (tiempoRestante <= 0) {
+                tiempoRestante = 0;
+                clearInterval(timer); // Detiene el intervalo
+                contadorTexto.innerHTML = '<span class="text-danger">¡TIEMPO AGOTADO!</span>';
+
+                // Envía el formulario de tiempo agotado automáticamente
+                if (formTiempoAgotado) {
+                    formTiempoAgotado.submit();
+                }
             }
-        }
 
-        if (tiempo <= 0) {
-            clearInterval(timer);
-            sessionStorage.removeItem('tiempoRestante');
-            contador_texto.innerHTML = '';
-            contador_texto.textContent = 'TIEMPO AGOTADO';
-            contador_texto.style.color = 'red';
-            document.getElementById("formTiempoAgotado").submit();
-        } else {
-            tiempo--;
-            sessionStorage.setItem('tiempoRestante', tiempo);
-        }
-    }, 1000);
+            // Actualiza el número en la pantalla
+            contadorSpan.textContent = tiempoRestante;
 
-    document.querySelectorAll("button.respuesta").forEach(btn => {
-        btn.addEventListener("click", () => {
-            clearInterval(timer);
-            sessionStorage.removeItem('tiempoRestante');
+            // Lógica para el sonido de alerta
+            if (tiempoRestante > 0 && tiempoRestante <= 4) {
+                audioAlerta.currentTime = 0;
+                audioAlerta.play();
+            }
+        };
+
+        // Inicia el temporizador
+        const timer = setInterval(actualizarContador, 1000);
+
+        // Limpia el temporizador si el usuario responde
+        document.querySelectorAll("button.respuesta").forEach(btn => {
+            btn.addEventListener("click", () => {
+                clearInterval(timer);
+            });
         });
+
+        // Ejecuta la función una vez al cargar para evitar el retraso de 1 segundo
+        actualizarContador();
     });
 </script>

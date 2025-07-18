@@ -54,7 +54,6 @@ class PartidaController
             $pregunta_texto = $_SESSION['pregunta'];
             $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
             $user = $_SESSION["nombre_usuario"];
-            $tiempo_restante = $this->partidaModel->getTiempoRestante();
             $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
 
             $this->view->render("partida", [
@@ -64,7 +63,8 @@ class PartidaController
                 'categoria' => $categoria['nombre'],
                 'respuestas' => $respuestas,
                 'id_partida' => $_SESSION['id_partida'],
-                'tiempo_restante' => $tiempo_restante,
+                'inicio_pregunta' => $_SESSION['inicio_pregunta'],
+                'tiempo_maximo' => 10,
                 'fondo' => $categoria['color'],
                 'foto' => $categoria['foto_categoria'],
                 'user' => $user,
@@ -88,8 +88,6 @@ class PartidaController
 
         $user = $_SESSION["nombre_usuario"];
 
-        $tiempo_restante = $this->partidaModel->getTiempoRestante();
-
         $this->preguntaModel->incrementarEntregadasPregunta($id_pregunta);
         $this->juegoModel->marcarPreguntaComoVista($id_usuario, $id_pregunta);
         $this->usuarioModel->incrementarEntregadasUsuario($id_usuario);
@@ -104,7 +102,8 @@ class PartidaController
             'categoria' => $categoria['nombre'],
             'respuestas' => $respuestas,
             'id_partida' => $_SESSION['id_partida'],
-            'tiempo_restante' => $tiempo_restante,
+            'inicio_pregunta' => $_SESSION['inicio_pregunta'],
+            'tiempo_maximo' => 10,
             'fondo' => $categoria['color'],
             'foto' => $categoria['foto_categoria'],
             'user' => $user,
@@ -123,21 +122,26 @@ class PartidaController
         $id_usuario = $_SESSION['usuario_id'] ?? null;
         $id_pregunta = $_SESSION['id_pregunta'];
         $id_partida = $_SESSION['id_partida'];
-        $inicio = $_SESSION['inicio_pregunta'] ?? null;
+        $id_respuesta = isset($_POST['id_respuesta']) ? (int)$_POST['id_respuesta'] : null;
 
-        $tiempo_agotado = $inicio !== null && (time() - $inicio) > 10;
+
         $respuestaCorrecta = false;
-        $texto = $tiempo_agotado ? '¡TIEMPO AGOTADO!' : '¡INCORRECTA!';
-        $color = $tiempo_agotado ? 'text-warning' : 'text-danger';
-        $id_respuesta = $_POST['id_respuesta'] ?? null;
+        $texto = '';
+        $color = '';
 
-        if ($tiempo_agotado || $id_respuesta === -1) {
+        if ($id_respuesta === -1) {
+            $texto = '¡TIEMPO AGOTADO!';
+            $color = 'text-warning';
+            $respuestaCorrecta = false;
+
             $this->procesarTiempoAgotado($id_partida, $id_pregunta);
             $this->finalizarPartida();
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_respuesta'])) {
+            $texto = '¡INCORRECTA!';
+            $color = 'text-danger';
             $respuestaCorrecta = $this->procesarRespuesta((int)$id_respuesta, $id_pregunta, $id_partida, $id_usuario, $texto, $color);
         } else {
-            echo "error";
+            echo "Error: solicitud inválida.";
             return;
         }
 
@@ -169,7 +173,7 @@ class PartidaController
             }
         }
 
-        $this->procesarCorrecta($respuestaCorrecta, $id_pregunta, $id_partida, $id_usuario);
+        $this->procesarCorrecta($respuestaCorrecta, $id_pregunta, $id_partida, $id_usuario, true);
         $this->usuarioModel->usarTrampita($id_usuario);
         $_SESSION['cantidad'] = (int)$this->partidaModel->getCantidadPreguntasCorrectas($id_partida);
         $this->mostrarVistaRespuesta($id_usuario, $id_pregunta, true, "¡USASTE UNA TRAMPITA!", "text-warning");
@@ -199,32 +203,45 @@ class PartidaController
         return false;
     }
 
-    private function procesarCorrecta(array $respuesta, int $id_pregunta, int $id_partida, int $id_usuario): void
+    private function procesarCorrecta(array $respuesta, int $id_pregunta, int $id_partida, int $id_usuario, bool $es_trampita = false): void
     {
         $this->partidaModel->incrementarPreguntaRespondidaCorrectamente($id_partida);
         $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $respuesta['id_respuesta'], 1);
         $this->preguntaModel->incrementarCorrectasPregunta($id_pregunta);
         $this->usuarioModel->incrementarCorrectasUsuario($id_usuario);
-        $this->sumarPuntaje($id_pregunta, $id_partida, $id_usuario);
+        $this->sumarPuntaje($id_pregunta, $id_partida, $id_usuario, $es_trampita);
     }
 
     private function procesarIncorrecta(int $id_partida, int $id_pregunta, int $id_respuesta): void
     {
-        $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta, 0);
+        $id_respuesta_incorrecta = ($id_respuesta === -1) ? null : $id_respuesta;
+
+        $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta_incorrecta, 0);
         $this->finalizarPartida();
     }
 
-    private function sumarPuntaje(int $id_pregunta, int $id_partida, int $id_usuario): void
+    private function sumarPuntaje(int $id_pregunta, int $id_partida, int $id_usuario, bool $es_trampita): void
     {
-        $pregunta = $this->preguntaModel->getPreguntaPorId($id_pregunta);
-        $dificultad = $this->juegoModel->getDificultadPregunta($pregunta);
-        $tiempo = $this->partidaModel->getTiempoRestante();
+        if (!$es_trampita) {
+            $pregunta = $this->preguntaModel->getPreguntaPorId($id_pregunta);
+            $dificultad = $this->juegoModel->getDificultadPregunta($pregunta);
 
-        $puntos = $this->partidaModel->calcularPuntaje($dificultad, $tiempo);
-        $_SESSION['puntaje'] += $puntos;
+            $inicio = $_SESSION['inicio_pregunta'] ?? time();
+            $tiempo_total = 10;
+            $tiempo_transcurrido = time() - $inicio;
+            $tiempo_restante = max(0, $tiempo_total - $tiempo_transcurrido);
 
-        $this->partidaModel->incrementarPuntaje($id_partida, $puntos);
-        $this->usuarioModel->sumarPuntajeUsuario($id_usuario, $puntos);
+            $puntos = $this->partidaModel->calcularPuntaje($dificultad, $tiempo_restante);
+            $_SESSION['puntaje'] += $puntos;
+
+            $this->partidaModel->incrementarPuntaje($id_partida, $puntos);
+            $this->usuarioModel->sumarPuntajeUsuario($id_usuario, $puntos);
+        } else {
+            $_SESSION['puntaje'] += 3;
+            $this->partidaModel->incrementarPuntaje($id_partida, 3);
+            $this->usuarioModel->sumarPuntajeUsuario($id_usuario, 3);
+        }
+
     }
 
     public function perdio(): void
