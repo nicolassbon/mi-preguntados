@@ -8,6 +8,7 @@ use App\model\RolModel;
 use App\model\UbicacionModel;
 use App\model\UsuarioModel;
 use JetBrains\PhpStorm\NoReturn;
+use JsonException;
 
 class RegistroController
 {

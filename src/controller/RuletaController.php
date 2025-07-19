@@ -5,6 +5,7 @@ namespace App\controller;
 use App\core\MustachePresenter;
 use App\model\CategoriaModel;
 use App\model\UsuarioModel;
+use JsonException;
 
 class RuletaController
 {

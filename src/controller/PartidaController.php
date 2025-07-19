@@ -125,10 +125,6 @@ class PartidaController
         $id_respuesta = isset($_POST['id_respuesta']) ? (int)$_POST['id_respuesta'] : null;
 
 
-        $respuestaCorrecta = false;
-        $texto = '';
-        $color = '';
-
         if ($id_respuesta === -1) {
             $texto = '¡TIEMPO AGOTADO!';
             $color = 'text-warning';

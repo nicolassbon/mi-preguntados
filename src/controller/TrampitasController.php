@@ -113,10 +113,7 @@ class TrampitasController
                             return;
                         }
 
-                        $parts = explode('_', $reference);
-                        $id_usuario = $parts[1];
-                        $cantidad = $parts[2];
-                        $monto = $parts[3];
+                        [, $id_usuario, $cantidad, $monto] = explode('_', $reference);
 
                         $this->usuarioModel->sumarTrampitas($id_usuario, $cantidad);
                         $this->usuarioModel->registrarCompra($id_usuario, $cantidad, $monto, $reference);
