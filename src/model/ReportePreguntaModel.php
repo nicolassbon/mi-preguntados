@@ -15,20 +15,29 @@ class ReportePreguntaModel
 
     public function getPreguntasReportadasConDetalles(string|int $id_categoria = 'todasLasCategorias', string $terminoBusqueda = '', string $estado = 'pendiente'): array
     {
-        $where = '1=1';
+        $where = [];
+        $params = [];
+        $types = '';
+
         if (trim($terminoBusqueda) !== '') {
-            $term = $this->db->escapeLike($terminoBusqueda);
-            $where .= " AND p.pregunta LIKE '%$term%'";
+            $where[] = "p.pregunta LIKE ?";
+            $params[] = '%' . $this->db->escapeLike($terminoBusqueda) . '%';
+            $types .= 's';
         }
 
         if ($id_categoria !== 'todasLasCategorias') {
-            $id_categoria = (int)$id_categoria;
-            $where .= " AND p.id_categoria = $id_categoria";
+            $where[] = "p.id_categoria = ?";
+            $params[] = (int)$id_categoria;
+            $types .= 'i';
         }
 
         if ($estado !== 'todos') {
-            $where .= " AND pr.estado = '$estado'";
+            $where[] = "pr.estado = ?";
+            $params[] = $estado;
+            $types .= 's';
         }
+
+        $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
         $sql = "
             SELECT
@@ -46,19 +55,17 @@ class ReportePreguntaModel
             JOIN preguntas p ON pr.id_pregunta = p.id_pregunta
             JOIN categoria c ON p.id_categoria = c.id_categoria
             JOIN usuarios u ON pr.id_reportador = u.id_usuario
-            WHERE $where
+            $whereSql
             ORDER BY pr.fecha_reporte DESC
         ";
 
-        return $this->db->query($sql);
+        return $this->db->query($sql, $params, $types);
     }
 
     public function actualizarEstadoReporte(int $id_reporte, string $nuevo_estado): void
     {
         $sql = "UPDATE preguntas_reportadas SET estado = ? WHERE id_reporte = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("si", $nuevo_estado, $id_reporte);
-        $stmt->execute();
+        $this->db->execute($sql, [$nuevo_estado, $id_reporte], "si");
     }
 
     public function aprobarReporte(int $id_pregunta, int $id_reporte = null): void
@@ -71,9 +78,7 @@ class ReportePreguntaModel
         } else {
             $sql = "UPDATE preguntas_reportadas SET estado = 'aprobado'
                     WHERE id_pregunta = ? AND estado = 'pendiente'";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("i", $id_pregunta);
-            $stmt->execute();
+            $this->db->execute($sql, [$id_pregunta], "i");
         }
     }
 
@@ -83,6 +88,7 @@ class ReportePreguntaModel
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("ii", $activa, $id_pregunta);
         $stmt->execute();
+        $this->db->execute($sql, [$activa, $id_pregunta], "ii");
     }
 
 
@@ -95,18 +101,14 @@ class ReportePreguntaModel
         } else {
             $sql = "UPDATE preguntas_reportadas SET estado = 'descartado'
                     WHERE id_pregunta = ? AND estado = 'pendiente'";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("i", $id_pregunta);
-            $stmt->execute();
+            $this->db->execute($sql, [$id_pregunta], "i");
         }
     }
 
     private function actualizarEstadoPregunta(int $id_pregunta, string $nuevo_estado): void
     {
         $sql = "UPDATE preguntas SET estado = ? WHERE id_pregunta = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("si", $nuevo_estado, $id_pregunta);
-        $stmt->execute();
+        $this->db->execute($sql, [$nuevo_estado, $id_pregunta], "si");
     }
 
 }

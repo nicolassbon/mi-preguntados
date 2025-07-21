@@ -257,9 +257,10 @@ class EditorController
 
         $categorias = $this->categoriaModel->getCategorias();
         foreach ($categorias as &$categoria) {
-            $categoria['seleccionada'] = ($categoria['id_categoria'] === $id_categoria);
+            $categoria['seleccionada'] = ($categoria['id_categoria'] === (int)$id_categoria);
         }
         unset($categoria);
+
 
         $estadosReportes = ['pendiente', 'aprobado', 'descartado', 'todos'];
         $estadosSugerencias = ['pendiente', 'aprobada', 'rechazada', 'todos'];

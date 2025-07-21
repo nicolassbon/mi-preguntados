@@ -13,7 +13,7 @@ class RankingModel
         $this->database = $database;
     }
 
-    public function obtenerRanking($desde, $hasta): array
+    public function obtenerRanking(string $desde, string $hasta): array
     {
         $sql = "
             SELECT
@@ -28,7 +28,7 @@ class RankingModel
             FROM usuarios u
             JOIN partidas p ON u.id_usuario = p.id_usuario
             WHERE u.id_rol = 1
-              AND p.fecha_inicio BETWEEN '$desde' AND '$hasta'
+              AND p.fecha_inicio BETWEEN ? AND ?
             GROUP BY
                 u.id_usuario,
                 u.nombre_usuario,
@@ -43,7 +43,7 @@ class RankingModel
             LIMIT 10
         ";
 
-        return $this->database->query($sql);
+        return $this->database->query($sql,[$desde, $hasta], "ss");
     }
 
     public function obtenerPartidasJugadas($desde, $hasta): array
@@ -58,14 +58,14 @@ class RankingModel
                     ) AS rn
                 FROM partidas p
                 JOIN usuarios u ON p.id_usuario = u.id_usuario
-                WHERE u.id_rol = 1 AND p.fecha_inicio BETWEEN '$desde' AND '$hasta' AND p.fecha_fin IS NOT NULL
+                WHERE u.id_rol = 1 AND p.fecha_inicio BETWEEN ? AND ? AND p.fecha_fin IS NOT NULL
             ) AS sub
             WHERE rn = 1
             ORDER BY puntaje_final DESC, fecha_fin DESC
             LIMIT 10;
         ";
 
-        return $this->database->query($sql);
+        return $this->database->query($sql,[$desde, $hasta], "ss");
     }
 
 }

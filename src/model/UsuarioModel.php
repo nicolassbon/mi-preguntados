@@ -13,41 +13,33 @@ class UsuarioModel
         $this->db = $database;
     }
 
-    public function getUsuarioPorId($idUsuario) {
+    public function getUsuarioPorId(int $idUsuario): ?array
+    {
         $sql = "SELECT id_usuario, nombre_completo, email FROM usuarios WHERE id_usuario = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("i", $idUsuario);
-        $stmt->execute();
-
-        return $stmt->get_result()->fetch_assoc();
+        $result = $this->db->query($sql, [$idUsuario], "i");
+        return $result[0] ?? null;
     }
 
-    public function buscarUsuarioPorEmail($email): bool|array|null
+    public function buscarUsuarioPorEmail(string $email): ?array
     {
         $sql = "
             SELECT id_usuario, nombre_usuario, contrasena_hash, es_validado, cantidad_trampitas
             FROM usuarios
             WHERE email = ?
         ";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
 
-        return $stmt->get_result()->fetch_assoc();
+        $result = $this->db->query($sql, [$email], "s");
+        return $result[0] ?? null;
     }
 
-    public function registrarUsuario($nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $latitud, $longitud): array
+    public function registrarUsuario(string $nombreCompleto, string $anioNac, int $sexoId, int $idPais, int $id_ciudad, string $email, string $contrasenaHash, string $nombreUsuario, ?string $fotoPerfil, float $latitud, float $longitud): array
     {
 
         $tokenVerificacion = md5(uniqid(mt_rand(), true));
 
-        $stmt = $this->db->prepare(
-            "INSERT INTO usuarios (nombre_completo, anio_nacimiento, id_sexo, id_pais, id_ciudad, email, contrasena_hash, nombre_usuario, foto_perfil_url, token_verificacion, latitud, longitud)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-
-        $stmt->bind_param("siiiisssssdd", $nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $tokenVerificacion, $latitud, $longitud);
-        $stmt->execute();
+        $sql = "INSERT INTO usuarios (nombre_completo, anio_nacimiento, id_sexo, id_pais, id_ciudad, email, contrasena_hash, nombre_usuario, foto_perfil_url, token_verificacion, latitud, longitud)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $this->db->execute($sql, [$nombreCompleto, $anioNac, $sexoId, $idPais, $id_ciudad, $email, $contrasenaHash, $nombreUsuario, $fotoPerfil, $tokenVerificacion, $latitud, $longitud], "ssiiisssssdd");
 
         $idUsuario = $this->db->getLastInsertId();
 
@@ -59,62 +51,51 @@ class UsuarioModel
         ];
     }
 
-    public function verificarEmailUsuario($idVerificador, $idUsuario): bool
+    public function verificarEmailUsuario(string $idVerificador, int $idUsuario): bool
     {
-        $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE token_verificacion = ? AND id_usuario = ?");
-        $stmt->bind_param("si", $idVerificador, $idUsuario);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $sql = "SELECT * FROM usuarios WHERE token_verificacion = ? AND id_usuario = ?";
+        $result = $this->db->query($sql, [$idVerificador, $idUsuario], "si");
 
-        if ($result->num_rows === 1) {
-            $update = $this->db->prepare("UPDATE usuarios SET es_validado = 1 WHERE id_usuario = ?");
-            $update->bind_param("i", $idUsuario);
-            $update->execute();
-
+        if (!empty($result)) {
+            $this->db->execute("UPDATE usuarios SET es_validado = 1 WHERE id_usuario = ?", [$idUsuario], "i");
             return true;
         }
         return false;
     }
 
-    public function existeEmail($email): bool
+    public function existeEmail(string $email): bool
     {
-        $stmt = $this->db->prepare("SELECT id_usuario FROM usuarios WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
-        return $stmt->num_rows > 0;
+        $sql = "SELECT id_usuario FROM usuarios WHERE email = ?";
+        $result = $this->db->query($sql, [$email], "s");
+        return count($result) > 0;
     }
 
-    public function existeUsuario($usuario): bool
+    public function existeUsuario(string $usuario): bool
     {
-        $stmt = $this->db->prepare("SELECT id_usuario FROM usuarios WHERE nombre_usuario = ?");
-        $stmt->bind_param("s", $usuario);
-        $stmt->execute();
-        $stmt->store_result();
-        return $stmt->num_rows > 0;
+        $sql = "SELECT id_usuario FROM usuarios WHERE nombre_usuario = ?";
+        $result = $this->db->query($sql, [$usuario], "s");
+        return count($result) > 0;
     }
 
-    public function incrementarEntregadasUsuario($id_usuario): void
+    public function incrementarEntregadasUsuario(int $id_usuario): void
     {
-        $sql = "UPDATE usuarios SET preguntas_entregadas = preguntas_entregadas + 1 WHERE id_usuario = $id_usuario ";
-        $this->db->execute($sql);
-
+        $sql = "UPDATE usuarios SET preguntas_entregadas = preguntas_entregadas + 1 WHERE id_usuario = ?";
+        $this->db->execute($sql, [$id_usuario], "i");
     }
 
-    public function incrementarCorrectasUsuario($id_usuario): void
+    public function incrementarCorrectasUsuario(int $id_usuario): void
     {
-        $stmt = $this->db->prepare("UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = ?");
-        $stmt->bind_param("i", $id_usuario);
-        $stmt->execute();
+        $sql = "UPDATE usuarios SET preguntas_acertadas = preguntas_acertadas + 1 WHERE id_usuario = ?";
+        $this->db->execute($sql, [$id_usuario], "i");
     }
 
-    public function sumarPuntajeUsuario($id_usuario, $puntos): void
+    public function sumarPuntajeUsuario(int $id_usuario, int $puntos): void
     {
-        $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + $puntos WHERE id_usuario = $id_usuario ";
-        $this->db->execute($sql);
+        $sql = "UPDATE usuarios SET puntaje_acumulado = puntaje_acumulado + ? WHERE id_usuario = ?";
+        $this->db->execute($sql, [$puntos, $id_usuario], "ii");
     }
 
-    public function getDatosPerfil($id_usuario): array
+    public function getDatosPerfil(int $id_usuario): array
     {
         $sql = "
             SELECT u.nombre_usuario, u.foto_perfil_url,u.latitud,u.longitud, u.cantidad_trampitas,
@@ -123,49 +104,49 @@ class UsuarioModel
             JOIN paises p ON u.id_pais = p.id_pais
             JOIN ciudades c ON u.id_ciudad = c.id_ciudad
             JOIN roles r ON u.id_rol = r.id_rol
-            WHERE u.id_usuario = $id_usuario
+            WHERE u.id_usuario = ?
         ";
 
-        return $this->db->query($sql);
+        return $this->db->query($sql, [$id_usuario], "i");
     }
 
-    public function getCantidadPartidasJugadas($id_usuario)
+    public function getCantidadPartidasJugadas(int $id_usuario)
     {
-        $sql = "SELECT COUNT(*) AS total FROM partidas WHERE id_usuario = $id_usuario";
-        $resultado = $this->db->query($sql);
+        $sql = "SELECT COUNT(*) AS total FROM partidas WHERE id_usuario = ?";
+        $resultado = $this->db->query($sql, [$id_usuario], "i");
         return $resultado[0]['total'] ?? 0;
     }
 
-    public function getTotalPreguntasRespondidas($id_usuario)
+    public function getTotalPreguntasRespondidas(int $id_usuario)
     {
-        $sql = "SELECT preguntas_entregadas FROM usuarios WHERE id_usuario = $id_usuario";
-        $resultado = $this->db->query($sql);
+        $sql = "SELECT preguntas_entregadas FROM usuarios WHERE id_usuario = ?";
+        $resultado = $this->db->query($sql, [$id_usuario], "i");
         return $resultado[0]['preguntas_entregadas'] ?? 0;
     }
 
-    public function getPorcentajeAcierto($id_usuario): float|int
+    public function getPorcentajeAcierto(int $id_usuario): float|int
     {
-        $sql = "SELECT preguntas_acertadas, preguntas_entregadas FROM usuarios WHERE id_usuario = $id_usuario";
-        $resultado = $this->db->query($sql);
+        $sql = "SELECT preguntas_acertadas, preguntas_entregadas FROM usuarios WHERE id_usuario = ?";
+        $resultado = $this->db->query($sql, [$id_usuario], "i");
 
 
         $acertadas = $resultado[0]['preguntas_acertadas'] ?? 0;
         $entregadas = $resultado[0]['preguntas_entregadas'] ?? 0;
-        if ($entregadas === "0") {
+        if ((int)$entregadas === 0) {
             return 0;
         }
 
         return round(($acertadas / $entregadas) * 100, 2);
     }
 
-    public function getMayorPuntajePartida($id_usuario)
+    public function getMayorPuntajePartida(int $id_usuario)
     {
-        $sql = "SELECT MAX(puntaje_final) AS max_puntaje FROM partidas WHERE id_usuario = $id_usuario";
-        $resultado = $this->db->query($sql);
+        $sql = "SELECT MAX(puntaje_final) AS max_puntaje FROM partidas WHERE id_usuario = ?";
+        $resultado = $this->db->query($sql, [$id_usuario], "i");
         return $resultado[0]['max_puntaje'] ?? 0;
     }
 
-    public function getCategoriasDestacadas($id_usuario): array
+    public function getCategoriasDestacadas(int $id_usuario): array
     {
         $sql = "
             SELECT c.nombre, c.color
@@ -173,18 +154,19 @@ class UsuarioModel
             JOIN preguntas p ON p.id_categoria = c.id_categoria
             JOIN partida_pregunta pp ON pp.id_pregunta = p.id_pregunta
             JOIN partidas par ON par.id_partida = pp.id_partida
-            WHERE par.id_usuario = $id_usuario
+            WHERE par.id_usuario = ?
               AND pp.acerto = 1
             GROUP BY c.id_categoria
             ORDER BY COUNT(*) DESC
             LIMIT 3
         ";
-        return $this->db->query($sql);
+        return $this->db->query($sql, [$id_usuario], "i");
     }
 
-    public function getPosicionRanking($id_usuario)
+    public function getPosicionRanking(int $id_usuario)
     {
-        $puntaje = $this->db->query("SELECT puntaje_acumulado FROM usuarios WHERE id_usuario = $id_usuario");
+        $sql = "SELECT puntaje_acumulado FROM usuarios WHERE id_usuario = ?";
+        $puntaje = $this->db->query($sql, [$id_usuario], "i");
 
         if (!$puntaje || $puntaje[0]['puntaje_acumulado'] === "0") {
             return null;
@@ -197,62 +179,59 @@ class UsuarioModel
               AND u.puntaje_acumulado > (
                   SELECT puntaje_acumulado
                   FROM usuarios
-                  WHERE id_usuario = $id_usuario
+                  WHERE id_usuario = ?
               )
         ";
 
-        $resultado = $this->db->query($sql);
+        $resultado = $this->db->query($sql, [$id_usuario], "i");
         return $resultado[0]['posicion'] ?? null;
     }
 
-    public function getTrampitas($id_usuario)
+    public function getTrampitas(int $id_usuario)
     {
         $sql = "
             SELECT cantidad_trampitas
             FROM usuarios
-            WHERE id_usuario = $id_usuario
+            WHERE id_usuario = ?
         ";
-        $res = $this->db->query($sql);
+        $res = $this->db->query($sql, [$id_usuario], "i");
         return $res[0]['cantidad_trampitas'] ?? 0;
     }
 
-    public function usarTrampita($id_usuario): void
+    public function usarTrampita(int $id_usuario): void
     {
         $sql = "
             UPDATE usuarios
             SET cantidad_trampitas = GREATEST(cantidad_trampitas - 1, 0)
-            WHERE id_usuario = $id_usuario
+            WHERE id_usuario = ?
         ";
 
-        $this->db->execute($sql);
+        $this->db->execute($sql, [$id_usuario], "i");
     }
 
-    public function sumarTrampitas($id_usuario, $cantidad): void
+    public function sumarTrampitas(int $id_usuario, int $cantidad): void
     {
         $sql = "
             UPDATE usuarios
-            SET cantidad_trampitas = cantidad_trampitas + $cantidad
-            WHERE id_usuario = $id_usuario
+            SET cantidad_trampitas = cantidad_trampitas + ?
+            WHERE id_usuario = ?
         ";
-        $this->db->execute($sql);
+        $this->db->execute($sql, [$cantidad, $id_usuario], "ii");
     }
 
-    public function registrarCompra($id_usuario, $cantidad, $monto,$referencia): void
+    public function registrarCompra(int $id_usuario, int $cantidad, float $monto, string $referencia): void
     {
         $sql = "
             INSERT INTO compras_trampitas (id_usuario, cantidad_comprada, monto_pagado, fecha_compra, referencia_externa)
             VALUES (?, ?, ?, NOW(), ?)
         ";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("iids", $id_usuario, $cantidad, $monto, $referencia);
-        $stmt->execute();
+        $this->db->execute($sql, [$id_usuario, $cantidad, $monto, $referencia], "iids");
     }
 
-    public function compraYaProcesada(string $externalReference): bool {
+    public function compraYaProcesada(string $externalReference): bool
+    {
         $sql = "SELECT 1 FROM compras_trampitas WHERE referencia_externa = ? LIMIT 1";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("s", $externalReference);
-        $stmt->execute();
-        return $stmt->get_result()->num_rows > 0;
+        $result = $this->db->query($sql, [$externalReference], "s");
+        return !empty($result);
     }
 }

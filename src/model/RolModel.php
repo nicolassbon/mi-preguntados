@@ -19,21 +19,23 @@ class RolModel
             SELECT r.nombre_rol
             FROM Usuarios u
             JOIN Roles r ON u.id_rol = r.id_rol
-            WHERE u.id_usuario = $id_usuario
+            WHERE u.id_usuario = ?
             LIMIT 1
         ";
-        $resultado = $this->db->query($sql);
+        $resultado = $this->db->query($sql, [$id_usuario], "i");
 
         return $resultado[0]['nombre_rol'] ?? null;
     }
 
-    public function asignarRolJugador($id_usuario): void
+    public function asignarRolJugador(int $id_usuario): void
     {
-        $result = $this->db->query("SELECT id_rol FROM roles WHERE nombre_rol = 'jugador'");
+        $sql = "SELECT id_rol FROM roles WHERE nombre_rol = 'jugador'";
+        $result = $this->db->query($sql);
         $id_rol = $result[0]['id_rol'] ?? null;
 
         if ($id_rol) {
-            $this->db->execute("UPDATE Usuarios SET id_rol = $id_rol WHERE id_usuario = $id_usuario");
+            $execute_sql = "UPDATE roles SET id_rol = ? WHERE id_rol = ?";
+            $this->db->execute($execute_sql, [$id_rol, $id_usuario], "ii");
         }
     }
 }

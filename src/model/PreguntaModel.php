@@ -22,10 +22,7 @@ class PreguntaModel
             JOIN categoria c ON p.id_categoria = c.id_categoria
             WHERE p.id_pregunta = ?
         ";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("i", $id_pregunta);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $result = $this->db->query($sql, [$id_pregunta], "i");
         return $result[0] ?? null;
     }
 
@@ -33,119 +30,68 @@ class PreguntaModel
     {
         $sql = "INSERT INTO preguntas (pregunta, id_categoria, entregadas, correctas, estado)
                 VALUES (?, ?, 0, 0, 'sugerida')";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("si", $pregunta, $id_categoria);
-        $stmt->execute();
+        $this->db->execute($sql, [$pregunta, $id_categoria], "si");
         return $this->db->getLastInsertId();
     }
 
     public function buscarPreguntaCreada(string $pregunta)
     {
         $sql = "SELECT id_pregunta FROM preguntas WHERE pregunta = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("s", $pregunta);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        return $result['id_pregunta'] ?? null;
+        $result = $this->db->query($sql, [$pregunta], "s");
+        return $result[0]['id_pregunta'] ?? null;
     }
 
-    public function agregarRespuestas($id_pregunta, $opcion, $opcion2, $opcion3, $opcion4, $opcionCorrecta): void
+    public function agregarRespuestas(int $id_pregunta, string $opcion1, string $opcion2, string $opcion3, string $opcion4, int $opcionCorrecta): void
     {
+        $respuestas = [$opcion1, $opcion2, $opcion3, $opcion4];
+        $sql = "INSERT INTO respuestas (respuesta, esCorrecta, id_pregunta, activa) VALUES (?, ?, ?, ?)";
 
-        $insertRespuesta = "INSERT INTO respuestas (respuesta, esCorrecta, id_pregunta, activa) VALUES (?, ?, ?, ?)";
-        $esCorrecta = 0;
-        $activo = 0;
-
-        if ($opcionCorrecta === 1) {
-            $esCorrecta = 1;
+        foreach ($respuestas as $index => $texto) {
+            $esCorrecta = ($opcionCorrecta === $index + 1) ? 1 : 0;
+            $this->db->execute($sql, [$texto, $esCorrecta, $id_pregunta, 0], "siii");
         }
-
-        $sql = $insertRespuesta;
-        $stmt = $this->db->prepare($sql);
-
-        $stmt->bind_param("siii", $opcion, $esCorrecta, $id_pregunta, $activo);
-        $stmt->execute();
-
-        $esCorrecta = 0;
-
-        if ($opcionCorrecta === 2) {
-            $esCorrecta = 1;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("siii", $opcion2, $esCorrecta, $id_pregunta, $activo);
-        $stmt->execute();
-
-        $esCorrecta = 0;
-
-        if ($opcionCorrecta === 3) {
-            $esCorrecta = 1;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("siii", $opcion3, $esCorrecta, $id_pregunta, $activo);
-        $stmt->execute();
-
-        $esCorrecta = 0;
-
-        if ($opcionCorrecta === 4) {
-            $esCorrecta = 1;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("siii", $opcion4, $esCorrecta, $id_pregunta, $activo);
-        $stmt->execute();
     }
 
     public function getRespuestasPorPregunta(int $id_pregunta): array
     {
         $sql = "SELECT id_respuesta, respuesta, esCorrecta FROM respuestas WHERE id_pregunta = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("i", $id_pregunta);
-        $stmt->execute();
-        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        return $this->db->query($sql, [$id_pregunta], "i");
     }
 
     public function incrementarEntregadasPregunta(int $id_pregunta): void
     {
-        $stmt = $this->db->prepare("UPDATE preguntas SET entregadas = entregadas + 1 WHERE id_pregunta = ?");
-        $stmt->bind_param("i", $id_pregunta);
-        $stmt->execute();
+        $sql = "UPDATE preguntas SET entregadas = entregadas + 1 WHERE id_pregunta = ?";
+        $this->db->execute($sql, [$id_pregunta], "i");
     }
 
     public function incrementarCorrectasPregunta(int $id_pregunta): void
     {
-        $stmt = $this->db->prepare("UPDATE preguntas SET correctas = correctas + 1 WHERE id_pregunta = ?");
-        $stmt->bind_param("i", $id_pregunta);
-        $stmt->execute();
+        $sql = "UPDATE preguntas SET correctas = correctas + 1 WHERE id_pregunta = ?";
+        $this->db->execute($sql, [$id_pregunta], "i");
     }
 
     public function activarPregunta(int $id_pregunta): void
     {
-        $stmt = $this->db->prepare("UPDATE preguntas SET estado = 'activa' WHERE id_pregunta = ?");
-        $stmt->bind_param("i", $id_pregunta);
-        $stmt->execute();
+        $sql = "UPDATE preguntas SET estado = 'activa' WHERE id_pregunta = ?";
+        $this->db->execute($sql, [$id_pregunta], "i");
     }
 
     public function desactivarPregunta(int $id_pregunta): void
     {
-        $stmt = $this->db->prepare("UPDATE preguntas SET estado = 'deshabilitada' WHERE id_pregunta = ?");
-        $stmt->bind_param("i", $id_pregunta);
-        $stmt->execute();
+        $sql = "UPDATE preguntas SET estado = 'deshabilitada' WHERE id_pregunta = ?";
+        $this->db->execute($sql, [$id_pregunta], "i");
     }
 
     public function actualizarPregunta(int $id_pregunta, string $textoPregunta): void
     {
-        $stmt = $this->db->prepare("UPDATE preguntas SET pregunta = ? WHERE id_pregunta = ?");
-        $stmt->bind_param("si", $textoPregunta, $id_pregunta);
-        $stmt->execute();
+        $sql = "UPDATE preguntas SET pregunta = ? WHERE id_pregunta = ?";
+        $this->db->execute($sql, [$textoPregunta, $id_pregunta], "si");
     }
 
     public function actualizarRespuesta(int $id_respuesta, string $textoRespuesta): void
     {
-        $stmt = $this->db->prepare("UPDATE respuestas SET respuesta = ? WHERE id_respuesta = ?");
-        $stmt->bind_param("si", $textoRespuesta, $id_respuesta);
-        $stmt->execute();
+        $sql = "UPDATE respuestas SET respuesta = ? WHERE id_respuesta = ?";
+        $this->db->execute($sql, [$textoRespuesta, $id_respuesta], "si");
     }
 
     public function getPreguntas(string $terminoBusqueda = ''): array
@@ -188,20 +134,16 @@ class PreguntaModel
         return $this->db->query($sql);
     }
 
-    public function insertarReportePregunta($id_pregunta, $id_reportador, $motivo): void
+    public function insertarReportePregunta(int $id_pregunta, int $id_reportador, string $motivo): void
     {
         $sql = "INSERT INTO `preguntas_reportadas` (`id_pregunta`, `id_reportador`, `motivo`) VALUES (?, ?, ?)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("iis", $id_pregunta, $id_reportador, $motivo);
-        $stmt->execute();
+        $this->db->execute($sql, [$id_pregunta, $id_reportador, $motivo], "iis");
     }
 
-    public function actualizarEstadoPregunta($id_pregunta, $nuevo_estado): void
+    public function actualizarEstadoPregunta(int $id_pregunta, string $nuevo_estado): void
     {
         $sql = "UPDATE `preguntas` SET `estado` = ? WHERE `id_pregunta` = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("si", $nuevo_estado, $id_pregunta);
-        $stmt->execute();
+        $this->db->execute($sql, [$nuevo_estado, $id_pregunta], "si");
     }
 
 }

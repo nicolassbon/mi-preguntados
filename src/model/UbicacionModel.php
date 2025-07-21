@@ -47,46 +47,34 @@ class UbicacionModel
         return ['pais' => $pais, 'ciudad' => $ciudad];
     }
 
-    public function obtenerOCrearPais($nombre)
+    public function obtenerOCrearPais(string $nombre)
     {
-        $stmt = $this->db->prepare("SELECT id_pais FROM paises WHERE nombre_pais = ?");
-        $stmt->bind_param("s", $nombre);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $pais = $result->fetch_assoc();
-        $stmt->close();
+        $sql = "SELECT id_pais FROM paises WHERE nombre_pais = ?";
+        $result = $this->db->query($sql, [$nombre], "s");
 
-        if ($pais) {
-            return $pais['id_pais'];
+        if (!empty($result)) {
+            return $result[0]['id_pais'];
         }
 
         // Insertar pais si no existe
-        $stmt = $this->db->prepare("INSERT INTO paises (nombre_pais) VALUES (?)");
-        $stmt->bind_param("s", $nombre);
-        $stmt->execute();
-        $stmt->close();
+        $sql = "INSERT INTO paises (nombre_pais) VALUES (?)";
+        $this->db->query($sql, [$nombre], "s");
 
         return $this->db->getLastInsertId();
     }
 
-    public function obtenerOCrearCiudad($nombreCiudad, $idPais)
+    public function obtenerOCrearCiudad(string $nombreCiudad, int $idPais)
     {
-        $stmt = $this->db->prepare("SELECT id_ciudad FROM ciudades WHERE nombre_ciudad = ? AND id_pais = ?");
-        $stmt->bind_param("si", $nombreCiudad, $idPais);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $ciudad = $result->fetch_assoc();
-        $stmt->close();
+        $sql = "SELECT id_ciudad FROM ciudades WHERE nombre_ciudad = ? AND id_pais = ?";
+        $result = $this->db->query($sql, [$nombreCiudad, $idPais], "si");
 
-        if ($ciudad) {
-            return $ciudad['id_ciudad'];
+        if (!empty($result)) {
+            return $result[0]['id_ciudad'];
         }
 
         // Insertar ciudad si no existe
-        $stmt = $this->db->prepare("INSERT INTO ciudades (nombre_ciudad, id_pais) VALUES (?, ?)");
-        $stmt->bind_param("si", $nombreCiudad, $idPais);
-        $stmt->execute();
-        $stmt->close();
+        $sql = "INSERT INTO ciudades (nombre_ciudad, id_pais) VALUES (?, ?)";
+        $this->db->query($sql, [$nombreCiudad, $idPais], "si");
 
         return $this->db->getLastInsertId();
     }

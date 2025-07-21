@@ -44,13 +44,14 @@ class JuegoModel
         return $pregunta["entregadas"] >= 5;
     }
 
-    private function getEstadisticasUsuario($id_usuario): array
+    private function getEstadisticasUsuario(int $id_usuario): array
     {
-        $result = $this->db->query("
+        $sql = "
             SELECT preguntas_entregadas, preguntas_acertadas
             FROM usuarios
-            WHERE id_usuario = $id_usuario
-        ");
+            WHERE id_usuario = ?
+        ";
+        $result = $this->db->query($sql, [$id_usuario], "i");
 
         return [
             "entregadas" => $result[0]["preguntas_entregadas"],
@@ -92,30 +93,30 @@ class JuegoModel
         return $dificultad;
     }
 
-    private function getPreguntasNoVistas($id_usuario, $id_categoria): array
+    private function getPreguntasNoVistas(int $id_usuario, int $id_categoria): array
     {
 
         $sql = "
             SELECT p.*
             FROM preguntas p
-            LEFT JOIN usuario_pregunta up ON p.id_pregunta = up.idPregunta AND up.idUsuario = $id_usuario
-            LEFT JOIN preguntas_reportadas pr ON p.id_pregunta = pr.id_pregunta AND pr.id_reportador = $id_usuario
+            LEFT JOIN usuario_pregunta up ON p.id_pregunta = up.idPregunta AND up.idUsuario = ?
+            LEFT JOIN preguntas_reportadas pr ON p.id_pregunta = pr.id_pregunta AND pr.id_reportador = ?
             WHERE up.idPregunta IS NULL AND pr.id_reporte IS NULL
-            AND p.id_categoria  = $id_categoria AND p.estado IN ('activa','reportada')
+            AND p.id_categoria  = ? AND p.estado IN ('activa','reportada')
         ";
 
-        return $this->db->query($sql);
+        return $this->db->query($sql, [$id_usuario, $id_usuario, $id_categoria], "iii");
     }
 
-    private function limpiarHistorialPreguntasVistas($id_usuario, $id_categoria): void
+    private function limpiarHistorialPreguntasVistas(int $id_usuario, int $id_categoria): void
     {
         $sql = "
             DELETE up
             FROM usuario_pregunta up
             JOIN preguntas p ON up.idPregunta = p.id_pregunta
-            WHERE up.idUsuario = $id_usuario AND p.id_categoria = $id_categoria
+            WHERE up.idUsuario = ? AND p.id_categoria = ?
         ";
-        $this->db->execute($sql);
+        $this->db->execute($sql, [$id_usuario, $id_categoria], "ii");
     }
 
     private function agruparPorNivel($preguntas): array
@@ -155,8 +156,6 @@ class JuegoModel
     public function marcarPreguntaComoVista(int $id_usuario, int $id_pregunta): void
     {
         $sql = "INSERT INTO usuario_pregunta (idUsuario, idPregunta, fechaVisto) VALUES (?, ?, NOW())";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("ii", $id_usuario, $id_pregunta);
-        $stmt->execute();
+        $this->db->execute($sql, [$id_usuario, $id_pregunta], "ii");
     }
 }

@@ -16,13 +16,8 @@ class SugerenciaPreguntaModel
     public function agregarSugerencia($id_usuario, $id_pregunta, $id_categoria): void
     {
         $sql = "INSERT INTO sugerencias_preguntas(id_usuario, id_pregunta, id_categoria, fecha_envio, estado, fecha_resolucion)
-            VALUES (?, ?, ?, NOW(), ?, ?)";
-        $stmt = $this->db->prepare($sql);
-
-        $estado = 'pendiente';
-        $fecha_resolucion = null;
-        $stmt->bind_param("iiiss", $id_usuario, $id_pregunta, $id_categoria, $estado, $fecha_resolucion);
-        $stmt->execute();
+                VALUES (?, ?, ?, NOW(), ?, ?)";
+        $this->db->execute($sql, [$id_usuario, $id_pregunta, $id_categoria, 'pendiente', null], 'iiiss');
     }
 
     public function getPreguntasSugeridas(string $terminoBusqueda = '', string|int $id_categoria = 'todasLasCategorias', string $estado = 'pendiente'): array
@@ -60,49 +55,32 @@ class SugerenciaPreguntaModel
             SELECT u.nombre_usuario, u.email
             FROM sugerencias_preguntas sp
             JOIN usuarios u ON sp.id_usuario = u.id_usuario
-            WHERE sp.id_pregunta = $id_pregunta
+            WHERE sp.id_pregunta = ?
             LIMIT 1
         ";
-        $resultado = $this->db->query($sql);
+        $resultado = $this->db->query($sql, [$id_pregunta], 'i');
         return $resultado[0] ?? null;
     }
 
     public function activarPreguntaSugerida($id): void
     {
-
-        $estado = 'activa';
-
-        $sql = "UPDATE preguntas SET estado = '$estado' WHERE id_pregunta = $id ";
-        $this->db->execute($sql);
-
-        $sql2 = "UPDATE respuestas SET activa = '1' WHERE id_pregunta = $id ";
-        $this->db->execute($sql2);
-
+        $this->db->execute("UPDATE preguntas SET estado = ? WHERE id_pregunta = ?", ['activa', $id], 'si');
+        $this->db->execute("UPDATE respuestas SET activa = '1' WHERE id_pregunta = ?", [$id], 'i');
     }
 
     public function desactivarPreguntaSugerida($id): void
     {
-        $estado = 'deshabilitada';
-
-        $sql = "UPDATE preguntas SET estado = '$estado' WHERE id_pregunta = $id ";
-        $this->db->execute($sql);
-
-        $sql2 = "UPDATE respuestas SET activa = '0' WHERE id_pregunta = $id ";
-        $this->db->execute($sql2);
-
+        $this->db->execute("UPDATE preguntas SET estado = ? WHERE id_pregunta = ?", ['deshabilitada', $id], 'si');
+        $this->db->execute("UPDATE respuestas SET activa = '0' WHERE id_pregunta = ?", [$id], 'i');
     }
 
     public function fechaResolucionSugerencia($id): void
     {
-        $sql = "UPDATE sugerencias_preguntas SET fecha_resolucion = NOW() WHERE id_pregunta = $id";
-        $this->db->execute($sql);
+        $this->db->execute("UPDATE sugerencias_preguntas SET fecha_resolucion = NOW() WHERE id_pregunta = ?", [$id], 'i');
     }
-
 
     public function actualizarEstadoPregunta($id, $estado): void
     {
-        $sql = "UPDATE sugerencias_preguntas SET estado = '$estado' WHERE id_pregunta = $id";
-        $this->db->execute($sql);
+        $this->db->execute("UPDATE sugerencias_preguntas SET estado = ? WHERE id_pregunta = ?", [$estado, $id], 'si');
     }
-
 }

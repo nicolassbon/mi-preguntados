@@ -14,42 +14,36 @@ class PartidaModel
         $this->db = $database;
     }
 
-    public function crearPartida($id_usuario)
+    public function crearPartida(int $id_usuario)
     {
-
-        $id_usuario = (int)$id_usuario;
-        $sql = "INSERT INTO partidas (id_usuario) VALUES ($id_usuario)";
-        $this->db->execute($sql);
+        $sql = "INSERT INTO partidas (id_usuario) VALUES (?)";
+        $this->db->execute($sql, [$id_usuario], "i");
         return $this->db->getLastInsertId();
-
     }
 
-    public function actualizarFechaPartidaFinalizada($id_partida): void
+    public function actualizarFechaPartidaFinalizada(int $id_partida): void
     {
-
-        $sql = "UPDATE partidas SET fecha_fin = NOW() WHERE id_partida = $id_partida ";
-        $this->db->execute($sql);
-
+        $sql = "UPDATE partidas SET fecha_fin = NOW() WHERE id_partida = ?";
+        $this->db->execute($sql, [$id_partida], "i");
     }
 
-    public function getCantidadPreguntasCorrectas($id_partida)
+    public function getCantidadPreguntasCorrectas(int $id_partida)
     {
-        $sql = "SELECT correctas FROM partidas WHERE id_partida = $id_partida";
-        $resultado = $this->db->query($sql);
+        $sql = "SELECT correctas FROM partidas WHERE id_partida = ?";
+        $resultado = $this->db->query($sql, [$id_partida], "i");
         return $resultado[0]['correctas'];
     }
 
-    public function incrementarPuntaje($id_partida, $puntos): void
+    public function incrementarPuntaje(int $id_partida, int $puntos): void
     {
-        $sql = "UPDATE partidas SET puntaje_final = puntaje_final + $puntos  WHERE id_partida = $id_partida ";
-        $this->db->execute($sql);
+        $sql = "UPDATE partidas SET puntaje_final = puntaje_final + ?  WHERE id_partida = ? ";
+        $this->db->execute($sql, [$puntos, $id_partida], "ii");
     }
 
-    public function incrementarPreguntaRespondidaCorrectamente($id_partida): void
+    public function incrementarPreguntaRespondidaCorrectamente(int $id_partida): void
     {
-
-        $sql = "UPDATE partidas SET correctas = correctas + 1 WHERE id_partida = $id_partida";
-        $this->db->execute($sql);
+        $sql = "UPDATE partidas SET correctas = correctas + 1 WHERE id_partida = ?";
+        $this->db->execute($sql, [$id_partida], "i");
     }
 
     public function registrarPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta, $acerto): void

@@ -19,15 +19,15 @@ class CategoriaModel
         return $this->db->query($sql);
     }
 
-    public function getCategoriasUsadasEnPartida($id_partida): array
+    public function getCategoriasUsadasEnPartida(int $id_partida): array
     {
         $sql = "
             SELECT DISTINCT p.id_categoria
             FROM partida_pregunta pp
             JOIN preguntas p ON pp.id_pregunta = p.id_pregunta
-            WHERE pp.id_partida = $id_partida
+            WHERE pp.id_partida = ?
         ";
-        return $this->db->query($sql);
+        return $this->db->query($sql,[$id_partida],"i");
     }
 
     public function elegirCategoriaParaPartida(int $id_partida): array
