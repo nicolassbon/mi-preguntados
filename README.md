@@ -3,6 +3,19 @@
 ## Descripción
 Mi-Preguntados es un juego de preguntas y respuestas estilo trivia desarrollado en PHP con arquitectura MVC. Los usuarios pueden registrarse, jugar partidas respondiendo preguntas de diferentes categorías y competir por los mejores puntajes en el ranking.
 
+## Contexto y Origen del Proyecto
+Este proyecto está basado en un trabajo académico desarrollado para una materia de programación web. La versión original contemplaba funcionalidades básicas y requisitos mínimos para cumplir con los objetivos educativos.
+A partir de esa base, se incorporaron múltiples implementaciones adicionales para enriquecer la experiencia del usuario y ampliar las capacidades del juego, tales como:
+- Integración con MercadoPago para la compra de ayudas ("trampitas").
+- Sistema de desafíos entre usuarios.
+- Verificación de usuarios vía email.
+- Geolocalización opcional para usuarios.
+
+## Documentación
+La explicación detallada del proyecto base está disponible en el siguiente documento:
+
+[Documento base del proyecto (PDF)](docs/proyecto_base.pdf)
+
 ## Características Principales
 
 - **Sistema de usuarios**: Registro con verificación por email, login y perfiles personalizados
