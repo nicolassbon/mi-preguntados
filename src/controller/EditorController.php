@@ -17,9 +17,9 @@ class EditorController
     private SugerenciaPreguntaModel $sugerenciaPreguntaModel;
     private ReportePreguntaModel $reportePreguntaModel;
 
-    private const string REPORTES_URL = "/editor/reportes";
-    private const string SUGERENCIAS_URL = "/editor/sugerencias";
-    private const string PREGUNTAS_URL = "/editor/gestionarPreguntas";
+    private const REPORTES_URL = "/editor/reportes";
+    private const SUGERENCIAS_URL = "/editor/sugerencias";
+    private const PREGUNTAS_URL = "/editor/gestionarPreguntas";
 
     public function __construct($view, $preguntaModel, $categoriaModel, $sugerenciaPreguntaModel, $reportePreguntaModel)
     {
