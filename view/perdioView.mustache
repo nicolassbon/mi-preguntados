@@ -2,16 +2,48 @@
 <main class="main-height bg-fondo d-flex justify-content-center align-items-center p-2">
     <div class="container-fluid d-flex flex-column container-fluid justify-content-center align-items-center">
         <div style="background-color: rgba(171,152,169,0.53)"
-             class="container text-danger p-5 rounded-3 d-flex flex-column text-dark text-center align-items-center justify-content-center">
-            <h1 style="color: darkred;" class=" fw-bold">Usted perdio!</h1>
-            <p style="color: darkred;" class="fw-bold">puntaje: {{puntaje}}</p>
-            <p style="color: darkred;" class=" fw-bold">respondio correctamente: {{cantidad}} preguntas</p>
-            <p style="color: darkred;" class=" fw-bold">DESAFIATE Y VOLVE A INTENTARLO</p>
+             class="container p-5 rounded-3 d-flex flex-column text-white text-center align-items-center justify-content-center">
+            <h1 class="fw-bold">¡Partida finalizada!</h1>
+            <p class="fw-bold">Puntaje: {{puntaje}}</p>
+            <p class="fw-bold">Respondiste correctamente: {{cantidad}} preguntas</p>
 
+            {{#esDesafio}}
+                {{#esUsuarioDesafiante}}
+                    <p class="fw-bold text-info">¡El jugador fue desafiado con éxito! Esperando respuesta
+                        del oponente...</p>
+                {{/esUsuarioDesafiante}}
 
+                {{^esUsuarioDesafiante}}
+                    <div class="mt-3 mb-3 p-3 rounded-3" style="background-color: rgba(115, 47, 105, 0.7);">
+                        {{#resultado_gano}}
+                            <h3 class="text-white fw-bold">¡FELICITACIONES!</h3>
+                            <p class="text-white">Has vencido a tu oponente con {{puntaje}} puntos
+                                contra {{puntaje_desafiante}} puntos.</p>
+                        {{/resultado_gano}}
+
+                        {{#resultado_perdio}}
+                            <h3 class="text-white fw-bold">¡BUEN INTENTO!</h3>
+                            <p class="text-white">Tu oponente obtuvo {{puntaje_desafiante}} puntos contra
+                                tus {{puntaje}} puntos.</p>
+                        {{/resultado_perdio}}
+
+                        {{#resultado_empate}}
+                            <h3 class="text-white fw-bold">¡EMPATE!</h3>
+                            <p class="text-white">Ambos jugadores obtuvieron {{puntaje}} puntos.</p>
+                        {{/resultado_empate}}
+                    </div>
+
+                    <a href="/desafio/listarDesafios?filtro=finalizado" class="btn text-white fw-bold"
+                       style="background-color: #732F69">Ver Desafíos</a>
+                {{/esUsuarioDesafiante}}
+            {{/esDesafio}}
+
+            {{^esDesafio}}
+                <p class="fw-bold">¡DESAFÍATE Y VUELVE A INTENTARLO!</p>
+            {{/esDesafio}}
         </div>
         <div class="m-3">
-            <a style="background-color: #732F69" class="btn text-white" href="/lobby">Volver al lobby</a>
+            <a class="btn fw-bold" style="background-color: #AB98A9;" href="/lobby">Volver al lobby</a>
         </div>
     </div>
 </main>

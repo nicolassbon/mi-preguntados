@@ -2,6 +2,40 @@
 
 <main class="main-height bg-fondo d-flex justify-content-center align-items-center p-2">
     <div class="container mt-3 text-center">
+        {{#es_desafio}}
+            {{^haSuperadoPuntaje}}
+                <div class="alert alert-info mb-4">
+                    <h4 class="alert-heading fw-bold">¡Estás en un Desafío!</h4>
+                    {{#es_usuario_desafiante}}
+                        <p class="mb-0">Estás jugando la primera parte del desafío. ¡Da lo mejor de ti para establecer
+                            un
+                            puntaje alto!</p>
+                    {{/es_usuario_desafiante}}
+                    {{^es_usuario_desafiante}}
+                        <p>Tu oponente, <strong>{{nombre_oponente}}</strong>, obtuvo
+                            <strong>{{puntaje_oponente}}</strong>
+                            puntos.</p>
+                        <p class="mb-0">¡Supera su puntaje para ganar el desafío!</p>
+                    {{/es_usuario_desafiante}}
+                </div>
+            {{/haSuperadoPuntaje}}
+
+            {{#haSuperadoPuntaje}}
+                <div class="alert alert-success shadow-lg mb-4">
+                    <h4 class="alert-heading fw-bold">¡Ya has superado a tu oponente!</h4>
+                    <p>Tu puntaje actual ({{puntaje_actual}}) es mayor que el de tu oponente ({{puntaje_oponente}}).</p>
+                    <p class="mb-0">Puedes finalizar la partida ahora para asegurar tu victoria o seguir jugando para
+                        aumentar tu récord.</p>
+                    <hr>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="/partida/perdio" class="btn btn-primary fw-bold">Finalizar y Ganar</a>
+                    </div>
+                </div>
+            {{/haSuperadoPuntaje}}
+        {{/es_desafio}}
+
+
+
         <p class="fs-5 text-light">Vas a obtener una categoría aleatoria</p>
 
         <div id="ruleta-container" class="my-4 overflow-hidden border border-light rounded-4 shadow"
@@ -30,7 +64,7 @@
         </div>
 
         {{^yaGiro}}
-            <button id="boton-girar" class="btn btn-outline-light mt-3">Girar</button>
+            <button id="boton-girar" class="btn fw-bold mt-3" style="background-color: #AB98A9;">Girar</button>
         {{/yaGiro}}
 
         {{#yaGiro}}

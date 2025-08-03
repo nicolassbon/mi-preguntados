@@ -15,7 +15,7 @@ class UsuarioModel
 
     public function getUsuarioPorId(int $idUsuario): ?array
     {
-        $sql = "SELECT id_usuario, nombre_completo, email FROM usuarios WHERE id_usuario = ?";
+        $sql = "SELECT id_usuario, nombre_completo, email, nombre_usuario FROM usuarios WHERE id_usuario = ?";
         $result = $this->db->query($sql, [$idUsuario], "i");
         return $result[0] ?? null;
     }
@@ -98,7 +98,7 @@ class UsuarioModel
     public function getDatosPerfil(int $id_usuario): array
     {
         $sql = "
-            SELECT u.nombre_usuario, u.foto_perfil_url,u.latitud,u.longitud, u.cantidad_trampitas,
+            SELECT u.id_usuario,u.nombre_usuario, u.foto_perfil_url,u.latitud,u.longitud, u.cantidad_trampitas,
                    p.nombre_pais, c.nombre_ciudad, r.nombre_rol
             FROM usuarios u
             JOIN paises p ON u.id_pais = p.id_pais
@@ -139,13 +139,6 @@ class UsuarioModel
         return round(($acertadas / $entregadas) * 100, 2);
     }
 
-    public function getMayorPuntajePartida(int $id_usuario)
-    {
-        $sql = "SELECT MAX(puntaje_final) AS max_puntaje FROM partidas WHERE id_usuario = ?";
-        $resultado = $this->db->query($sql, [$id_usuario], "i");
-        return $resultado[0]['max_puntaje'] ?? 0;
-    }
-
     public function getCategoriasDestacadas(int $id_usuario): array
     {
         $sql = "
@@ -184,7 +177,13 @@ class UsuarioModel
         ";
 
         $resultado = $this->db->query($sql, [$id_usuario], "i");
-        return $resultado[0]['posicion'] ?? null;
+
+        $posicion = $resultado[0]['posicion'] ?? null;
+        $puntaje = $puntaje[0]['puntaje_acumulado'] ?? 0;
+        return [
+            'posicion' => $posicion,
+            'puntaje_acumulado' => $puntaje
+        ];
     }
 
     public function getTrampitas(int $id_usuario)
@@ -233,5 +232,50 @@ class UsuarioModel
         $sql = "SELECT 1 FROM compras_trampitas WHERE referencia_externa = ? LIMIT 1";
         $result = $this->db->query($sql, [$externalReference], "s");
         return !empty($result);
+    }
+
+    public function getUsuariosDisponiblesParaDesafiar(int $idUsuario): array
+    {
+        $sql = "
+            SELECT id_usuario, nombre_usuario
+            FROM usuarios
+            WHERE id_usuario != ? AND id_rol = 1 AND es_validado = 1
+            ORDER BY nombre_usuario
+        ";
+        return $this->db->query($sql, [$idUsuario], "i");
+    }
+
+    public function buscarUsuariosParaDesafiar(int $idActual, string $nombre): array
+    {
+        $sql = "SELECT id_usuario, nombre_usuario
+            FROM usuarios
+            WHERE id_usuario != ?
+              AND id_rol = 1
+              AND es_validado = 1
+              AND nombre_usuario LIKE ?
+            LIMIT 20";
+
+        $nombre = '%' . $nombre . '%';
+        return $this->db->query($sql, [$idActual, $nombre], "is");
+    }
+
+    public function obtenerRankingsPorUsuarios(array $idsUsuarios): array
+    {
+        if (empty($idsUsuarios)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($idsUsuarios), '?'));
+        $sql = "SELECT id_usuario, posicion, puntaje_acumulado FROM ranking WHERE id_usuario IN ($placeholders)";
+        $resultados = $this->db->query($sql, $idsUsuarios, str_repeat('i', count($idsUsuarios)));
+
+        $rankings = [];
+        foreach ($resultados as $fila) {
+            $rankings[$fila['id_usuario']] = [
+                'posicion' => $fila['posicion'],
+                'puntaje_acumulado' => $fila['puntaje_acumulado'],
+            ];
+        }
+        return $rankings;
     }
 }

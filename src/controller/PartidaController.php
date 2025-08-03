@@ -3,6 +3,7 @@
 namespace App\controller;
 
 use App\core\MustachePresenter;
+use App\model\DesafioModel;
 use App\model\JuegoModel;
 use App\model\PartidaModel;
 use App\model\PreguntaModel;
@@ -16,14 +17,27 @@ class PartidaController
     private PreguntaModel $preguntaModel;
     private UsuarioModel $usuarioModel;
     private JuegoModel $juegoModel;
+    private DesafioModel $desafioModel;
 
-    public function __construct($view, $partidaModel, $preguntaModel, $usuarioModel, $juegoModel)
+    public function __construct($view, $partidaModel, $preguntaModel, $usuarioModel, $juegoModel, $desafioModel)
     {
         $this->view = $view;
         $this->partidaModel = $partidaModel;
         $this->preguntaModel = $preguntaModel;
         $this->usuarioModel = $usuarioModel;
         $this->juegoModel = $juegoModel;
+        $this->desafioModel = $desafioModel;
+    }
+
+    public function show(): void
+    {
+        if (isset($_SESSION['id_partida'])) {
+            $this->redirectTo("/ruleta");
+        }
+
+        $this->view->render("modosJuego", [
+            'title' => 'Elegí tu modo de juego'
+        ]);
     }
 
     #[NoReturn] public function crearPartida(): void
@@ -31,16 +45,14 @@ class PartidaController
         $id_usuario = $_SESSION['usuario_id'] ?? null;
 
         if (isset($_SESSION['id_partida'])) {
-            header('Location: /ruleta/show');
-            exit();
+            $this->redirectTo("/ruleta");
         }
 
         $_SESSION['puntaje'] = 0;
         $id_partida = $this->partidaModel->crearPartida($id_usuario);
         $_SESSION['id_partida'] = $id_partida;
 
-        header('Location: /ruleta');
-        exit();
+        $this->redirectTo("/ruleta");
     }
 
     public function jugar(): void
@@ -94,7 +106,14 @@ class PartidaController
 
         $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
 
-        $this->view->render("partida", [
+        $esDesafio = $_SESSION['es_desafio'] ?? false;
+
+        $puedeUsarTrampita = $trampitas > 0;
+        if ($esDesafio) {
+            $puedeUsarTrampita = false;
+        }
+
+        $data = [
             'title' => 'Partida',
             'usuario_id' => $id_usuario,
             'pregunta' => $pregunta_texto,
@@ -108,11 +127,13 @@ class PartidaController
             'foto' => $categoria['foto_categoria'],
             'user' => $user,
             'trampitas' => $trampitas,
-            'puede_usar_trampita' => $trampitas > 0,
+            'puede_usar_trampita' => $puedeUsarTrampita,
             'respondido' => false,
-            'reset_timer' => true
-        ]);
+            'reset_timer' => true,
+            'esDesafio' => $esDesafio,
+        ];
 
+        $this->view->render("partida", $data);
     }
 
     public function responder(): void
@@ -123,7 +144,6 @@ class PartidaController
         $id_pregunta = $_SESSION['id_pregunta'];
         $id_partida = $_SESSION['id_partida'];
         $id_respuesta = isset($_POST['id_respuesta']) ? (int)$_POST['id_respuesta'] : null;
-
 
         if ($id_respuesta === -1) {
             $texto = '¡TIEMPO AGOTADO!';
@@ -156,8 +176,7 @@ class PartidaController
         $trampitas = $this->usuarioModel->getTrampitas($id_usuario);
         if ($trampitas <= 0) {
             session_destroy();
-            header("Location: /login?error=trampa");
-            exit;
+            $this->redirectTo("/login?error=trampa");
         }
 
         $respuestas = $this->preguntaModel->getRespuestasPorPregunta($id_pregunta);
@@ -173,6 +192,74 @@ class PartidaController
         $this->usuarioModel->usarTrampita($id_usuario);
         $_SESSION['cantidad'] = (int)$this->partidaModel->getCantidadPreguntasCorrectas($id_partida);
         $this->mostrarVistaRespuesta($id_usuario, $id_pregunta, true, "¡USASTE UNA TRAMPITA!", "text-warning");
+    }
+
+    public function perdio(): void
+    {
+
+        if (isset($_SESSION['id_partida'])) {
+            $this->finalizarPartida();
+        }
+
+        if (!isset($_SESSION['puntaje'], $_SESSION['cantidad'])) {
+            $this->redirectTo("/lobby");
+        }
+
+        $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
+        $esDesafio = $_SESSION['es_desafio'] ?? false;
+        $esUsuarioDesafiante = $_SESSION['es_usuario_desafiante'] ?? false;
+
+        $data = [
+            'title' => 'Partida Finalizada',
+            'puntaje' => $_SESSION['puntaje'],
+            'cantidad' => $_SESSION['cantidad'],
+            'trampitas' => $trampitas,
+            'esDesafio' => $esDesafio,
+            'esUsuarioDesafiante' => $esUsuarioDesafiante
+        ];
+
+        if ($esDesafio && !$esUsuarioDesafiante && isset($_SESSION['resultado_desafio'])) {
+            $resultado = $_SESSION['resultado_desafio'];
+
+            $data['resultado_gano'] = $resultado === 'gano_desafiado';
+            $data['resultado_perdio'] = $resultado === 'gano_desafiante';
+            $data['resultado_empate'] = $resultado === 'empate';
+            $data['puntaje_desafiante'] = $_SESSION['puntaje_desafiante'] ?? 0;
+        }
+
+        $this->view->render("perdio", $data);
+
+        unset(
+            $_SESSION['puntaje'],
+            $_SESSION['cantidad'],
+            $_SESSION['es_desafio'],
+            $_SESSION['es_usuario_desafiante'],
+            $_SESSION['desafio_id'],
+            $_SESSION['resultado_desafio'],
+            $_SESSION['puntaje_desafiante']
+        );
+    }
+
+    public function reportarPregunta(): void
+    {
+        $idPregunta = (int)$_POST['id_pregunta'];
+        $idUsuario = $_SESSION['usuario_id'] ?? null;
+        $idPartida = $_SESSION['id_partida'] ?? null;
+        $motivo = trim($_POST['motivo'] ?? '') ?: 'Sin motivo especificado';
+
+        $this->preguntaModel->insertarReportePregunta($idPregunta, $idUsuario, $motivo);
+        $this->preguntaModel->actualizarEstadoPregunta($idPregunta, 'reportada');
+
+        if ($idPartida !== null) {
+            $this->finalizarPartida();
+        }
+
+        $this->view->render("reporteCreado", [
+            'title' => 'Reporte enviado',
+            'mensaje' => 'Gracias por reportar la pregunta. Será revisada por un editor.',
+            'puntaje' => $_SESSION['puntaje'],
+            'cantidad' => $_SESSION['cantidad']
+        ]);
     }
 
     private function procesarTiempoAgotado($id_partida, $id_pregunta): void
@@ -213,6 +300,7 @@ class PartidaController
         $id_respuesta_incorrecta = ($id_respuesta === -1) ? null : $id_respuesta;
 
         $this->partidaModel->registrarPreguntaRespondida($id_partida, $id_pregunta, $id_respuesta_incorrecta, 0);
+
         $this->finalizarPartida();
     }
 
@@ -238,40 +326,6 @@ class PartidaController
             $this->usuarioModel->sumarPuntajeUsuario($id_usuario, 3);
         }
 
-    }
-
-    public function perdio(): void
-    {
-        $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
-        $this->view->render("perdio", [
-            'title' => 'Partida Perdida',
-            'puntaje' => $_SESSION['puntaje'],
-            'cantidad' => $_SESSION['cantidad'],
-            'trampitas' => $trampitas,
-        ]);
-        unset($_SESSION['puntaje'], $_SESSION['cantidad']);
-    }
-
-    public function reportarPregunta(): void
-    {
-        $idPregunta = (int)$_POST['id_pregunta'];
-        $idUsuario = $_SESSION['usuario_id'] ?? null;
-        $idPartida = $_SESSION['id_partida'] ?? null;
-        $motivo = trim($_POST['motivo'] ?? '') ?: 'Sin motivo especificado';
-
-        $this->preguntaModel->insertarReportePregunta($idPregunta, $idUsuario, $motivo);
-        $this->preguntaModel->actualizarEstadoPregunta($idPregunta, 'reportada');
-
-        if ($idPartida !== null) {
-            $this->finalizarPartida();
-        }
-
-        $this->view->render("reporteCreado", [
-            'title' => 'Reporte enviado',
-            'mensaje' => 'Gracias por reportar la pregunta. Será revisada por un editor.',
-            'puntaje' => $_SESSION['puntaje'],
-            'cantidad' => $_SESSION['cantidad']
-        ]);
     }
 
     private function mostrarVistaRespuesta($id_usuario, $id_pregunta, $respuestaCorrecta, $texto, $color): void
@@ -337,16 +391,59 @@ class PartidaController
                 $this->partidaModel->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
             }
             session_destroy();
-            header("Location: /login?error=trampa");
-            exit;
+            $this->redirectTo("/login?error=trampa");
         }
     }
 
     private function finalizarPartida(): void
     {
-        if (isset($_SESSION['id_partida'])) {
-            $this->partidaModel->actualizarFechaPartidaFinalizada($_SESSION['id_partida']);
-            unset($_SESSION['id_partida']);
+        if (!isset($_SESSION['id_partida'])) {
+            return;
         }
+
+        $idPartida = $_SESSION['id_partida'];
+        $this->partidaModel->actualizarFechaPartidaFinalizada($idPartida);
+
+        if (isset($_SESSION['es_desafio']) && $_SESSION['es_desafio'] === true) {
+            $this->finalizarDesafioSiCorresponde($idPartida);
+        }
+
+        unset($_SESSION['id_partida']);
+
     }
+
+    private function finalizarDesafioSiCorresponde(int $idPartida): void
+    {
+        if ($_SESSION['es_usuario_desafiante'] === true) {
+            return;
+        }
+
+        $idDesafio = $_SESSION['desafio_id'] ?? $this->desafioModel->obtenerIdDesafioPorPartida($idPartida);
+
+        if (!$idDesafio) {
+            return;
+        }
+        $desafio = $this->desafioModel->obtenerDesafioPorId($idDesafio);
+
+        $puntajeDesafiado = $this->partidaModel->getPuntajeFinalPartida($idPartida);
+        $puntajeDesafiante = $this->partidaModel->getPuntajeFinalPartida($desafio['id_partida_desafiante']);
+
+        $resultadoDesafio = $this->desafioModel->determinarResultadoDesafio($idPartida, $idDesafio, $puntajeDesafiado, $puntajeDesafiante);
+
+        if (!$resultadoDesafio['resultado']) {
+            return;
+        }
+
+        $this->desafioModel->finalizarDesafio($idDesafio, $resultadoDesafio['resultado']);
+
+        $_SESSION['resultado_desafio'] = $resultadoDesafio['resultado'];
+        $_SESSION['puntaje_desafiante'] = $resultadoDesafio['puntajeDesafiante'];
+    }
+
+    private function redirectTo(string $url): void
+    {
+        header('Location: ' . $url);
+        exit;
+    }
+
 }

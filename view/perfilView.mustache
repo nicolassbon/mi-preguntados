@@ -12,16 +12,83 @@
             {{^tiene_posicion}}
                 <div class="fs-6 mb-3 alert alert-secondary text-center">Todavía no tiene posición en el ranking</div>
             {{/tiene_posicion}}
-            <a href="/ranking" class="btn btn-dark">Ver Ranking</a>
+            <div>
+                <a href="/ranking" class="btn btn-dark mb-2 w-75">Ver Ranking</a>
+            </div>
+            {{#es_usuario_en_sesion}}
+                <div>
+                    <a href="/desafio/listarDesafios" class="btn btn-primary w-75 mb-2">Mis Desafíos</a>
+                </div>
+            {{/es_usuario_en_sesion}}
+            {{^es_usuario_en_sesion}}
+                <div>
+                    <button type="button" class="btn btn-success w-75 mb-2" data-bs-toggle="modal"
+                            data-bs-target="#modalDesafio{{id_usuario}}">
+                        Desafiar
+                    </button>
+                </div>
+            {{/es_usuario_en_sesion}}
+        </div>
+
+        <div class="modal fade" id="modalDesafio{{id_usuario}}" tabindex="-1"
+             aria-labelledby="modalDesafioLabel{{id_usuario}}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-light text-dark">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalDesafioLabel{{id_usuario}}">Confirmar Desafío</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5 class="text-center mb-3">¿Deseas desafiar a <strong>{{nombre_usuario}}</strong>?
+                        </h5>
+
+                        <div class="mb-3 p-3 border rounded bg-white">
+                            <h6 class="text-center">Información del Jugador</h6>
+                            <p><strong>Nombre:</strong> {{nombre_usuario}}</p>
+                            {{#posicion_ranking}}
+                                <p><strong>Ranking:</strong> {{posicion_ranking}} ({{puntaje_total}} pts)</p>
+                            {{/posicion_ranking}}
+                            {{^posicion_ranking}}
+                                <p><strong>Ranking:</strong> Sin posición en el ranking</p>
+                            {{/posicion_ranking}}
+                        </div>
+
+                        <div class="bg-light border rounded p-3 small">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">¿Cómo funciona?</h6>
+                                <button class="btn btn-sm btn-link text-decoration-none" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#infoDesafio{{id_usuario}}"
+                                        aria-expanded="false" aria-controls="infoDesafio{{id_usuario}}">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                            </div>
+                            <div class="collapse mt-2" id="infoDesafio{{id_usuario}}">
+                                <p>Al confirmar, vas a jugar tu partida para fijar un puntaje a superar.</p>
+                                <p><strong>{{nombre_usuario}}</strong> podrá aceptar o rechazar. Si acepta, jugará su partida.</p>
+                                <p>Gana quien tenga mayor puntaje. Puedes ver el estado en tu perfil.</p>
+                                <p class="mb-0">El desafío expirará si {{nombre_usuario}} no responde en 3 días.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar
+                        </button>
+                        <form method="POST" action="/desafio/crear">
+                            <input type="hidden" name="id_usuario_desafiado" value="{{id_usuario}}">
+                            <button type="submit" class="btn btn-success">Confirmar Desafío</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="card" style="grid-column: 2">
             <p class="fs-4 text-white">Estadísticas:</p>
             {{#tiene_estadisticas}}
-                <div class="d-flex flex-column align-items-center gap-2">
-                    <span class="fs-5">{{cantidad_partidas}} partidas jugadas</span>
-                    <span class="fs-5">{{total_preguntas}} preguntas vistas</span>
-                    <span class="fs-5">Mayor puntaje: {{mayor_puntaje}}</span>
+                <div class="d-flex flex-column align-items-center gap-3">
+                    <span class="fs-5 text-white">{{cantidad_partidas}} partidas jugadas</span>
+                    <span class="fs-5 text-white">{{total_preguntas}} preguntas vistas</span>
                     <span class="fs-5 text-white">Aciertos: {{porcentaje_acierto}}%</span>
                 </div>
             {{/tiene_estadisticas}}

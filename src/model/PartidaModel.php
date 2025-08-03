@@ -92,4 +92,12 @@ class PartidaModel
 
         return $base + $bonusTiempo;
     }
+
+    public function getPuntajeFinalPartida(int $idPartida): int
+    {
+        $query = "SELECT puntaje_final FROM partidas WHERE id_partida = ? LIMIT 1";
+        $resultado = $this->db->query($query, [$idPartida], "i");
+
+        return $resultado[0]['puntaje_final'] ?? 0;
+    }
 }

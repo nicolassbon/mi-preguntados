@@ -27,23 +27,27 @@ class CategoriaModel
             JOIN preguntas p ON pp.id_pregunta = p.id_pregunta
             WHERE pp.id_partida = ?
         ";
-        return $this->db->query($sql,[$id_partida],"i");
+        return $this->db->query($sql, [$id_partida], "i");
     }
 
     public function elegirCategoriaParaPartida(int $id_partida): array
     {
-        $todasLasCategorias = $this->db->query("SELECT * FROM categoria");
+        $candidatas = $this->getCategoriasNoUsadas($id_partida);
 
-        $categoriasUsadas = $this->getCategoriasUsadasEnPartida($id_partida);
-        $idsUsadas = array_column($categoriasUsadas, 'id_categoria');
-
-        $categoriasNoUsadas = array_filter($todasLasCategorias, static function ($categoria) use ($idsUsadas) {
-            return !in_array($categoria['id_categoria'], $idsUsadas, true);
-        });
-
-        $candidatas = !empty($categoriasNoUsadas) ? $categoriasNoUsadas : $todasLasCategorias;
+        if (empty($candidatas)) {
+            $candidatas = $this->db->query("SELECT * FROM categoria");
+        }
 
         return $candidatas[array_rand($candidatas)];
+    }
+
+    private function getCategoriasNoUsadas(int $id_partida): array
+    {
+        $todas = $this->db->query("SELECT * FROM categoria");
+        $usadas = $this->getCategoriasUsadasEnPartida($id_partida);
+        $idsUsadas = array_column($usadas, 'id_categoria');
+
+        return array_filter($todas, static fn($cat) => !in_array($cat['id_categoria'], $idsUsadas, true));
     }
 
 }

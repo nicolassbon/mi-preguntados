@@ -16,34 +16,29 @@ class RankingModel
     public function obtenerRanking(string $desde, string $hasta): array
     {
         $sql = "
-            SELECT
-                u.id_usuario,
-                u.nombre_usuario,
-                u.foto_perfil_url,
-                u.puntaje_acumulado,
-                u.preguntas_acertadas,
-                u.preguntas_entregadas,
-                ROUND(u.preguntas_acertadas / NULLIF(u.preguntas_entregadas, 0), 2) AS `precision`,
+            SELECT u.id_usuario, u.nombre_usuario,u.foto_perfil_url,
+                 COALESCE(SUM(p.puntaje_final), 0) AS puntaje_acumulado,
+                 COALESCE(SUM(p.correctas), 0) AS preguntas_acertadas,
+                 COALESCE(SUM(p.correctas) + COUNT(p.id_partida), 0) AS preguntas_entregadas,
+                 ROUND(
+                    COALESCE(SUM(p.correctas), 0) / NULLIF(COALESCE(SUM(p.correctas) + COUNT(p.id_partida), 0), 0),
+                    2
+                ) AS 'precision',
                 COUNT(p.id_partida) AS partidas_jugadas
-            FROM usuarios u
-            JOIN partidas p ON u.id_usuario = p.id_usuario
-            WHERE u.id_rol = 1
-              AND p.fecha_inicio BETWEEN ? AND ?
+           FROM usuarios u
+            LEFT JOIN partidas p ON u.id_usuario = p.id_usuario
+                AND p.fecha_inicio BETWEEN ? AND ?
+            WHERE u.id_rol = 1 AND u.es_validado = 1
             GROUP BY
                 u.id_usuario,
                 u.nombre_usuario,
-                u.foto_perfil_url,
-                u.puntaje_acumulado,
-                u.preguntas_acertadas,
-                u.preguntas_entregadas
+                u.foto_perfil_url
             ORDER BY
-                u.puntaje_acumulado DESC,
-                `precision` DESC,
-                partidas_jugadas DESC
+                puntaje_acumulado DESC
             LIMIT 10
         ";
 
-        return $this->database->query($sql,[$desde, $hasta], "ss");
+        return $this->database->query($sql, [$desde, $hasta], "ss");
     }
 
     public function obtenerPartidasJugadas($desde, $hasta): array
@@ -65,7 +60,7 @@ class RankingModel
             LIMIT 10;
         ";
 
-        return $this->database->query($sql,[$desde, $hasta], "ss");
+        return $this->database->query($sql, [$desde, $hasta], "ss");
     }
 
 }

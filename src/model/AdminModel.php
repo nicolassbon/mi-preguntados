@@ -22,7 +22,7 @@ class AdminModel
             WHERE u.fecha_registro BETWEEN ? AND ?
             GROUP BY s.descripcion
         ";
-        return $this->db->query($sql, [$desde, $hasta], "ss");
+        return $this->queryConFechas($sql, $desde, $hasta);
     }
 
     public function obtenerDistribucionPorRangoEdad(string $desde, string $hasta): array
@@ -39,7 +39,7 @@ class AdminModel
             WHERE u.fecha_registro BETWEEN ? AND ?
             GROUP BY rangoEdad
         ";
-        return $this->db->query($sql, [$desde, $hasta], "ss");
+        return $this->queryConFechas($sql, $desde, $hasta);
     }
 
     public function obtenerUsuariosPorPaisPorFecha(string $desde, string $hasta): array
@@ -50,52 +50,44 @@ class AdminModel
             WHERE u.fecha_registro BETWEEN ? AND ?
             GROUP BY u.id_pais
         ";
-        return $this->db->query($sql, [$desde, $hasta], "ss");
+        return $this->queryConFechas($sql, $desde, $hasta);
     }
 
-    public function obtenerTotalUsuarios()
+    public function obtenerTotalUsuarios(): int
     {
         $sql = "SELECT COUNT(*) AS cantidad
                 FROM usuarios u
                 WHERE u.id_rol = 1";
 
-        return $this->db->query($sql)[0]['cantidad'];
+        return $this->contarConFechas($sql);
     }
 
-    public function obtenerTotalUsuariosNuevosPorFecha(string $desde, string $hasta)
+    public function obtenerTotalUsuariosNuevosPorFecha(string $desde, string $hasta): int
     {
         $sql = "SELECT COUNT(*) AS cantidad
                 FROM usuarios u
                 WHERE u.id_rol = 1 AND u.fecha_registro BETWEEN ? AND ?";
-        return $this->db->query($sql, [$desde, $hasta], "ss")[0]['cantidad'];
+        return $this->contarConFechas($sql, $desde, $hasta);
     }
 
-    public function obtenerPartidasJugadasPorFecha(string $desde, string $hasta)
+    public function obtenerPartidasJugadasPorFecha(string $desde, string $hasta): int
     {
         $sql = "SELECT COUNT(*) AS cantidad
                 FROM partidas p
                 WHERE p.fecha_inicio BETWEEN ? AND ?";
-        return $this->db->query($sql, [$desde, $hasta], "ss")[0]['cantidad'];
+        return $this->contarConFechas($sql, $desde, $hasta);
     }
 
-    public function obtenerPreguntasActivasPorFecha(string $desde, string $hasta)
+    public function obtenerPreguntasActivasPorFecha(string $desde, string $hasta): int
     {
-        $sql = "
-            SELECT COUNT(*) AS cantidad
-            FROM preguntas p
-            WHERE p.estado = 'activa' AND p.fecha_registro BETWEEN ? AND ?
-        ";
-        return $this->db->query($sql, [$desde, $hasta], "ss")[0]['cantidad'];
+        $sql = "SELECT COUNT(*) AS cantidad FROM preguntas p WHERE p.estado = 'activa' AND p.fecha_registro BETWEEN ? AND ?";
+        return $this->contarConFechas($sql, $desde, $hasta);
     }
 
-    public function obtenerPreguntasActivas()
+    public function obtenerPreguntasActivas(): int
     {
-        $sql = "
-            SELECT COUNT(*) AS cantidad
-            FROM preguntas p
-            WHERE p.estado = 'activa'
-        ";
-        return $this->db->query($sql)[0]['cantidad'];
+        $sql = "SELECT COUNT(*) AS cantidad FROM preguntas p WHERE p.estado = 'activa'";
+        return $this->contarConFechas($sql);
     }
 
     public function obtenerRendimientosUsuarios(string $desde, string $hasta): array
@@ -104,9 +96,7 @@ class AdminModel
             SELECT
                 u.nombre_usuario,
                 COUNT(DISTINCT p.id_partida) AS partidas_jugadas,
-                ROUND(
-                    SUM(pp.acerto) / COUNT(*) * 100
-                , 1) AS porcentaje_correctas
+                ROUND(SUM(pp.acerto) / NULLIF(COUNT(*), 0) * 100, 1) AS porcentaje_correctas
             FROM partida_pregunta pp
             JOIN partidas p
                 ON pp.id_partida = p.id_partida
@@ -118,7 +108,7 @@ class AdminModel
             LIMIT 10;
         ";
 
-        return $this->db->query($sql, [$desde, $hasta], "ss");
+        return $this->queryConFechas($sql, $desde, $hasta);
     }
 
     public function obtenerBalanceTrampitasPorUsuarioConFecha(string $desde, string $hasta): array
@@ -135,7 +125,7 @@ class AdminModel
             ORDER BY total_gastado DESC
         ";
 
-        return $this->db->query($sql, [$desde, $hasta], "ss");
+        return $this->queryConFechas($sql, $desde, $hasta);
     }
 
     public function obtenerGananciaTotalTrampitas(string $desde, string $hasta): float
@@ -147,6 +137,22 @@ class AdminModel
         ";
         $result = $this->db->query($sql, [$desde, $hasta], "ss");
         return (float)$result[0]['total'];
+    }
+
+    private function queryConFechas(string $sql, string $desde, string $hasta): array
+    {
+        return $this->db->query($sql, [$desde, $hasta], "ss");
+    }
+
+    private function contarConFechas(string $sql, string $desde = null, string $hasta = null): int
+    {
+        $params = [];
+        $types = "";
+        if ($desde && $hasta) {
+            $params = [$desde, $hasta];
+            $types = "ss";
+        }
+        return (int)$this->db->query($sql, $params, $types)[0]['cantidad'];
     }
 
 }

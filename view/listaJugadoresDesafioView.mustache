@@ -1,0 +1,48 @@
+{{> navbar}}
+<main class="main-height bg-fondo text-white p-4">
+    <div class="container">
+
+        <h2 class="text-center mb-4">Desafiar a un Jugador</h2>
+
+        <form id="formBuscarJugador" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="buscar" id="buscarJugador" class="form-control"
+                       placeholder="Buscar jugador por nombre">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+            </div>
+        </form>
+
+        <div id="resultadoJugadores">
+            <p class="text-center mt-5" id="mensajeInicial">Por favor, ingresa un nombre para buscar jugadores.</p>
+        </div>
+    </div>
+</main>
+<script>
+    const inputBuscar = document.getElementById("buscarJugador");
+    const contenedor = document.getElementById("resultadoJugadores");
+    let timeout = null;
+
+    inputBuscar.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+        }
+    });
+
+    inputBuscar.addEventListener("input", () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            const valor = inputBuscar.value.trim();
+
+            if (valor === "") {
+                contenedor.innerHTML = `<p class="text-center mt-5">Por favor, ingresa un nombre para buscar jugadores.</p>`;
+                return;
+            }
+
+            fetch(`/desafio/buscarUsuarios?buscar=${encodeURIComponent(valor)}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        contenedor.innerHTML = html || `<p class="text-center mt-5">No se encontraron jugadores.</p>`;
+                    });
+        }, 300);
+    });
+</script>

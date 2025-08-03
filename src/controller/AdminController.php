@@ -60,41 +60,8 @@ class AdminController
         $desde = $rangoFechas['desde'];
         $hasta = $rangoFechas['hasta'];
 
-        $edad = ['menor' => 0, 'media' => 0, 'mayor' => 0];
-        foreach ($this->adminModel->obtenerDistribucionPorRangoEdad($desde, $hasta) as $fila) {
-            switch ($fila['rangoEdad']) {
-                case 'Menor':
-                    $edad['menor'] = (int)$fila['cantidad'];
-                    break;
-                case 'Mediana edad':
-                    $edad['media'] = (int)$fila['cantidad'];
-                    break;
-                case 'Mayor':
-                    $edad['mayor'] = (int)$fila['cantidad'];
-                    break;
-                default:
-                    error_log("Rango de edad desconocido: " . $fila['rangoEdad']);
-                    break;
-            }
-        }
-
-        $genero = ['femenino' => 0, 'masculino' => 0, 'otro' => 0];
-        foreach ($this->adminModel->obtenerDistribucionPorGenero($desde, $hasta) as $fila) {
-            switch ($fila['descripcion']) {
-                case 'Femenino':
-                    $genero['femenino'] = (int)$fila['cantidad'];
-                    break;
-                case 'Masculino':
-                    $genero['masculino'] = (int)$fila['cantidad'];
-                    break;
-                case 'Prefiero no cargarlo':
-                    $genero['otro'] = (int)$fila['cantidad'];
-                    break;
-                default:
-                    error_log("Género desconocido: " . $fila['descripcion']);
-                    break;
-            }
-        }
+        $edad = $this->mapearEdad($this->adminModel->obtenerDistribucionPorRangoEdad($desde, $hasta));
+        $genero = $this->mapearGenero($this->adminModel->obtenerDistribucionPorGenero($desde, $hasta));
 
         $usuariosPais = $this->adminModel->obtenerUsuariosPorPaisPorFecha($desde, $hasta);
         $rendimientoUsuarios = $this->adminModel->obtenerRendimientosUsuarios($desde, $hasta);
@@ -134,5 +101,49 @@ class AdminController
             'hay_balance_trampitas' => count($balanceTrampitas) > 0,
             'ganancia_trampitas' => $gananciaTrampitas
         ];
+    }
+
+    private function mapearEdad(array $datos): array
+    {
+        $edad = ['menor' => 0, 'media' => 0, 'mayor' => 0];
+        foreach ($datos as $fila) {
+            switch ($fila['rangoEdad']) {
+                case 'Menor':
+                    $edad['menor'] = (int)$fila['cantidad'];
+                    break;
+                case 'Mediana edad':
+                    $edad['media'] = (int)$fila['cantidad'];
+                    break;
+                case 'Mayor':
+                    $edad['mayor'] = (int)$fila['cantidad'];
+                    break;
+                default:
+                    error_log("Rango de edad desconocido: " . $fila['rangoEdad']);
+                    break;
+            }
+        }
+        return $edad;
+    }
+
+    private function mapearGenero(array $datos): array
+    {
+        $genero = ['femenino' => 0, 'masculino' => 0, 'otro' => 0];
+        foreach ($datos as $fila) {
+            switch ($fila['descripcion']) {
+                case 'Femenino':
+                    $genero['femenino'] = (int)$fila['cantidad'];
+                    break;
+                case 'Masculino':
+                    $genero['masculino'] = (int)$fila['cantidad'];
+                    break;
+                case 'Prefiero no cargarlo':
+                    $genero['otro'] = (int)$fila['cantidad'];
+                    break;
+                default:
+                    error_log("Género desconocido: " . $fila['descripcion']);
+                    break;
+            }
+        }
+        return $genero;
     }
 }

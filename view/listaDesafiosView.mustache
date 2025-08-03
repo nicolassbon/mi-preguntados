@@ -1,0 +1,190 @@
+{{> navbar}}
+<main class="main-height bg-fondo text-white p-4">
+    <div class="container">
+        <h2 class="text-center mb-4 fw-bold">Mis Desafíos</h2>
+
+        {{#rechazado}}
+            <div class="alert alert-info text-center">Has rechazado el desafío correctamente.</div>
+        {{/rechazado}}
+
+        {{#error}}
+            <div class="alert alert-danger text-center">Ha ocurrido un error al procesar el desafío.</div>
+        {{/error}}
+
+        <div class="mb-4 d-flex justify-content-center gap-2">
+            <a href="/desafio/listarDesafios?filtro=pendiente"
+               class="btn text-white btn-outline-light"
+               style="background-color: {{#filtro_pendiente}}#732F69{{/filtro_pendiente}}{{^filtro_pendiente}}transparent; border: 2px solid #732F69; color: #732F69{{/filtro_pendiente}}">Pendientes</a>
+
+            <a href="/desafio/listarDesafios?filtro=rechazado"
+               class="btn text-white btn-outline-light "
+               style="background-color: {{#filtro_rechazado}}#732F69{{/filtro_rechazado}}{{^filtro_rechazado}}transparent; border: 2px solid #732F69; color: #732F69{{/filtro_rechazado}}">Rechazados</a>
+
+            <a href="/desafio/listarDesafios?filtro=finalizado"
+               class="btn text-white btn-outline-light "
+               style="background-color: {{#filtro_finalizado}}#732F69{{/filtro_finalizado}}{{^filtro_finalizado}}transparent; border: 2px solid #732F69; color: #732F69{{/filtro_finalizado}}">Finalizados</a>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-center mb-4">Desafíos {{filtro}}</h3>
+
+            <div class="d-flex flex-column gap-3">
+                {{#desafios}}
+                    <div class="rounded-3 p-4"
+                         style="background-color: rgba(171,152,169,0.53)">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="/public/uploads/{{#rol_desafiado}}{{foto_desafiante}}{{/rol_desafiado}}{{#rol_desafiante}}{{foto_desafiado}}{{/rol_desafiante}}"
+                                 alt="Foto de perfil"
+                                 class="rounded-circle me-3 border border-white"
+                                 style="width: 60px; height: 60px; object-fit: cover;">
+                            <div>
+                                {{#rol_desafiado}}
+                                    <h5 class="fw-bold mb-0 text-white">{{nombre_desafiante}} te ha desafiado</h5>
+                                    <p class="text-light small mb-1">Puntaje del desafiante:
+                                        <span class="badge" style="background-color: #732F69;">{{puntaje_desafiante}}
+                                            pts</span>
+                                    </p>
+                                    {{#puntaje_desafiado}}
+                                        <p class="text-light small mb-0">Tu puntaje:
+                                            <span class="badge bg-success">{{puntaje_desafiado}} pts</span>
+                                        </p>
+                                    {{/puntaje_desafiado}}
+                                {{/rol_desafiado}}
+
+                                {{#rol_desafiante}}
+                                    <h5 class="fw-bold mb-0 text-white">Has desafiado a {{nombre_desafiado}}</h5>
+                                    <p class="text-light small mb-1">Tu puntaje:
+                                        <span class="badge" style="background-color: #732F69;">{{puntaje_desafiante}}
+                                            pts</span>
+                                    </p>
+                                    {{#puntaje_desafiado}}
+                                        <p class="text-light small mb-0">Puntaje de {{nombre_desafiado}}:
+                                            <span class="badge bg-success">{{puntaje_desafiado}} pts</span>
+                                        </p>
+                                    {{/puntaje_desafiado}}
+                                {{/rol_desafiante}}
+                            </div>
+                        </div>
+
+                        <p class="text-white mb-1">Estado:
+                            <span class="badge bg-{{color_estado}}">{{estado}}</span>
+                        </p>
+
+                        {{#filtro_pendiente}}
+                            <p class="text-white mb-3">Expira en: <span class="text-warning">{{fecha_expiracion}}</span>
+                            </p>
+                        {{/filtro_pendiente}}
+                        {{#es_finalizado}}
+                            <p class="text-white mb-3">Finalización: <span
+                                    class="text-warning">{{fecha_finalizacion}}</span>
+                            </p>
+                        {{/es_finalizado}}
+                        {{#es_expirado}}
+                            <div class="alert alert-secondary text-center my-2">
+                                <i class="fas fa-clock me-2"></i> <strong>DESAFÍO EXPIRADO</strong>
+                                <p class="mb-0">Este desafío ha expirado porque no fue respondido a tiempo.</p>
+                            </div>
+                        {{/es_expirado}}
+
+
+                        {{#es_finalizado}}
+                            <div class="alert {{#gano}}alert-success{{/gano}}{{#perdio}}alert-danger{{/perdio}}{{#empato}}alert-info{{/empato}} text-center my-2">
+                                {{#gano}}
+                                    <i class="fas fa-trophy me-2"></i> <strong>¡GANASTE!</strong>
+                                    Puntaje: {{puntaje_desafiante}} vs {{puntaje_desafiado}}
+                                {{/gano}}
+                                {{#perdio}}
+                                    <i class="fas fa-thumbs-down me-2"></i> <strong>PERDISTE</strong>
+                                    Puntaje: {{puntaje_desafiante}} vs {{puntaje_desafiado}}
+                                {{/perdio}}
+                                {{#empato}}
+                                    <i class="fas fa-handshake me-2"></i> <strong>EMPATE</strong>
+                                    Puntaje: {{puntaje_desafiante}} = {{puntaje_desafiado}}
+                                {{/empato}}
+                            </div>
+                        {{/es_finalizado}}
+
+                        {{#mostrar_botones}}
+                            <div class="bg-light text-dark rounded p-3 small mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">Información del Desafío</h6>
+                                    <button class="btn btn-sm btn-link text-decoration-none" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#infoDesafioB{{id_desafio}}"
+                                            aria-expanded="false" aria-controls="infoDesafioB{{id_desafio}}">
+                                        <i class="bi bi-info-circle"></i>
+                                    </button>
+                                </div>
+                                <div class="collapse mt-2" id="infoDesafioB{{id_desafio}}">
+                                    <p>{{nombre_desafiante}} ya jugó y obtuvo <strong>{{puntaje_desafiante}}
+                                        pts</strong>.</p>
+                                    <p>Si aceptás, deberás jugar una partida para superar ese puntaje.</p>
+                                    <p>Podés rechazar si no querés competir. Tenés tiempo hasta
+                                        <strong>{{fecha_expiracion}}</strong>.</p>
+                                    <p class="mb-0">El resultado (ganador, empate o expirado) se mostrará en la sección finalizado.</p>
+                                </div>
+                            </div>
+
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <form method="POST" action="/desafio/rechazar">
+                                    <input type="hidden" name="id_desafio" value="{{id_desafio}}">
+                                    <button type="submit" class="btn text-white btn-danger">Rechazar</button>
+                                </form>
+                                <form method="POST" action="/desafio/aceptar">
+                                    <input type="hidden" name="id_desafio" value="{{id_desafio}}">
+                                    <button type="submit" class="btn text-white btn-success">
+                                        Aceptar Desafío
+                                    </button>
+                                </form>
+                            </div>
+                        {{/mostrar_botones}}
+                    </div>
+                {{/desafios}}
+
+                {{^desafios}}
+                    <p class="text-center mt-3">No tienes desafíos {{filtro}} en este momento.</p>
+                {{/desafios}}
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                {{#paginacion.hay_paginas}}
+                    <nav aria-label="Paginación de desafíos">
+                        <ul class="pagination">
+                            {{#paginacion.pagina_anterior}}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="/desafio/listarDesafios?filtro={{filtro}}
+                                    &pagina={{paginacion.pagina_anterior}}"
+                                    aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {{/paginacion.pagina_anterior}}
+
+                            {{#paginacion.numeros_pagina}}
+                                <li class="page-item {{#es_actual}}active{{/es_actual}}">
+                                    <a class="page-link"
+                                       href="/desafio/listarDesafios?filtro={{filtro}}&pagina={{numero}}">
+                                    {{numero}}
+                                    </a>
+                                </li>
+                            {{/paginacion.numeros_pagina}}
+
+                            {{#paginacion.pagina_siguiente}}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="/desafio/listarDesafios?filtro={{filtro}}
+                                    &pagina={{paginacion.pagina_siguiente}}"
+                                    aria-label="Siguiente">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {{/paginacion.pagina_siguiente}}
+                        </ul>
+                    </nav>
+                {{/paginacion.hay_paginas}}
+            </div>
+
+        </div>
+    </div>
+</main>

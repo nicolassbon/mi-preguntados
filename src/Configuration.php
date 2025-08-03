@@ -3,6 +3,7 @@
 namespace App;
 
 use App\controller\AdminController;
+use App\controller\DesafioController;
 use App\controller\EditorController;
 use App\controller\HomeController;
 use App\controller\LoginController;
@@ -21,6 +22,7 @@ use App\core\PdfGenerator;
 use App\core\Router;
 use App\model\AdminModel;
 use App\model\CategoriaModel;
+use App\model\DesafioModel;
 use App\model\JuegoModel;
 use App\model\PartidaModel;
 use App\model\PreguntaModel;
@@ -200,6 +202,11 @@ class Configuration
         return $this->usuarioModel;
     }
 
+    private function getDesafioModel(): DesafioModel
+    {
+        return new DesafioModel($this->getDatabase());
+    }
+
 
     public function getRegistroController(): RegistroController
     {
@@ -270,7 +277,9 @@ class Configuration
         return new RuletaController(
             $this->getViewer(),
             $this->getCategoriaModel(),
-            $this->getUsuarioModel()
+            $this->getUsuarioModel(),
+            $this->getDesafioModel(),
+            $this->getPartidaModel()
         );
     }
 
@@ -291,6 +300,7 @@ class Configuration
             $this->getPreguntaModel(),
             $this->getUsuarioModel(),
             $this->getJuegoModel(),
+            $this->getDesafioModel()
         );
     }
 
@@ -300,6 +310,16 @@ class Configuration
             $this->getViewer(),
             $this->getUsuarioModel(),
             $this->getMercadoPagoService()
+        );
+    }
+
+    public function getDesafioController(): DesafioController
+    {
+        return new DesafioController(
+            $this->getViewer(),
+            $this->getDesafioModel(),
+            $this->getUsuarioModel(),
+            $this->getPartidaModel()
         );
     }
 

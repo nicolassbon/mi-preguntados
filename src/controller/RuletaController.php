@@ -4,6 +4,8 @@ namespace App\controller;
 
 use App\core\MustachePresenter;
 use App\model\CategoriaModel;
+use App\model\DesafioModel;
+use App\model\PartidaModel;
 use App\model\UsuarioModel;
 use JsonException;
 
@@ -13,17 +15,20 @@ class RuletaController
     private MustachePresenter $view;
     private CategoriaModel $categoriaModel;
     private UsuarioModel $usuarioModel;
+    private DesafioModel $desafioModel;
+    private PartidaModel $partidaModel;
 
-    public function __construct($view, $categoriaModel, $usuarioModel)
+    public function __construct($view, $categoriaModel, $usuarioModel, $desafioModel, $partidaModel)
     {
         $this->view = $view;
         $this->categoriaModel = $categoriaModel;
         $this->usuarioModel = $usuarioModel;
+        $this->desafioModel = $desafioModel;
+        $this->partidaModel = $partidaModel;
     }
 
     public function show(): void
     {
-
         $categorias = $this->categoriaModel->getCategorias();
         $categoriasRepetidas = $this->repetirCategorias($categorias, 5);
 
@@ -36,13 +41,42 @@ class RuletaController
 
         $trampitas = $this->usuarioModel->getTrampitas($_SESSION['usuario_id']);
 
-        $this->view->render("ruleta", [
+        $data = [
             'title' => 'Ruleta',
             'categorias' => $categoriasRepetidas,
             'yaGiro' => $yaGiro,
             'posicionGanadora' => $posicionGanadora,
             'trampitas' => $trampitas,
-        ]);
+            'es_desafio' => false,
+            'es_usuario_desafiante' => false,
+            'ha_superado_puntaje' => false
+        ];
+
+        if (isset($_SESSION['es_desafio'], $_SESSION['desafio_id']) && $_SESSION['es_desafio'] === true) {
+            $esDesafiante = $_SESSION['es_usuario_desafiante'] ?? false;
+            $desafio = $this->desafioModel->obtenerDesafioPorId($_SESSION['desafio_id']);
+
+            if ($desafio) {
+                $data['es_desafio'] = true;
+                $puntajeActual = $_SESSION['puntaje'] ?? 0;
+                $data['puntaje_actual'] = $puntajeActual;
+
+                if ($esDesafiante) {
+                    $data['es_usuario_desafiante'] = true;
+                } else {
+                    $puntajeOponente = $this->partidaModel->getPuntajeFinalPartida($desafio['id_partida_desafiante']);
+                    $data['puntaje_oponente'] = $puntajeOponente;
+                    $data['nombre_oponente'] = $desafio['nombre_desafiante'];
+
+                    // Lógica para verificar si se superó el puntaje
+                    if ($puntajeActual > $puntajeOponente) {
+                        $data['haSuperadoPuntaje'] = true;
+                    }
+                }
+            }
+        }
+
+        $this->view->render("ruleta", $data);
     }
 
     /**

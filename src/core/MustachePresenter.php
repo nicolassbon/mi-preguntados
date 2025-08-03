@@ -4,6 +4,7 @@ namespace App\core;
 
 use Mustache_Engine;
 use Mustache_Loader_FilesystemLoader;
+use RuntimeException;
 
 class MustachePresenter
 {
@@ -47,5 +48,17 @@ class MustachePresenter
     {
         $contentAsString = file_get_contents($this->partialsPathLoader . '/' . $contentFile . "View.mustache");
         return $this->mustache->render($contentAsString, $data);
+    }
+
+    public function renderPartial(string $partialFile, array $data = []): string
+    {
+        $contentPath = $this->partialsPathLoader . '/' . $partialFile . '.mustache';
+
+        if (!file_exists($contentPath)) {
+            throw new RuntimeException("Partial no encontrado: " . $contentPath);
+        }
+
+        $content = file_get_contents($contentPath);
+        return $this->mustache->render($content, $data);
     }
 }
